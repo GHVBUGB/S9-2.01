@@ -57,52 +57,16 @@ const ListenAndChoose = ({ word, onComplete }) => {
   const options = useMemo(() => {
     const correctWord = word.word;
     
-    // 形近词生成策略
-    const generateSimilarWords = (word) => {
-      const similar = [];
-      const vowels = ['a', 'e', 'i', 'o', 'u'];
-      
-      // 策略1: 替换元音
-      for (let i = 0; i < word.length && similar.length < 3; i++) {
-        if (vowels.includes(word[i].toLowerCase())) {
-          for (const v of vowels) {
-            if (v !== word[i].toLowerCase()) {
-              const newWord = word.slice(0, i) + v + word.slice(i + 1);
-              if (newWord !== word && !similar.includes(newWord)) {
-                similar.push(newWord);
-                break;
-              }
-            }
-          }
-        }
-      }
-      
-      // 策略2: 常见混淆词
-      const confusionPairs = {
-        'adapt': ['adopt', 'adept', 'apart'],
-        'brave': ['bravo', 'grave', 'crave'],
-        'create': ['crate', 'cream', 'great'],
-        'imagine': ['image', 'imitate', 'emigrate'],
-        'perfect': ['prefect', 'protect', 'project'],
-      };
-      
-      if (confusionPairs[word.toLowerCase()]) {
-        return confusionPairs[word.toLowerCase()];
-      }
-      
-      // 策略3: 通用形近词
-      const commonSimilar = ['accept', 'except', 'effect', 'affect'];
-      while (similar.length < 3) {
-        const random = commonSimilar[Math.floor(Math.random() * commonSimilar.length)];
-        if (random !== correctWord && !similar.includes(random)) {
-          similar.push(random);
-        }
-      }
-      
-      return similar.slice(0, 3);
-    };
+    // ✅ 使用数据表中的干扰项
+    let distractors = word.training?.distractors || [];
     
-    const distractors = generateSimilarWords(correctWord);
+    // 如果没有提供干扰项，使用备用策略
+    if (distractors.length < 3) {
+      console.warn(`Word "${correctWord}" missing distractors in training data`);
+      // 备用：使用通用形近词
+      const backup = ['accept', 'except', 'effect'];
+      distractors = [...distractors, ...backup].slice(0, 3);
+    }
     
     const allOptions = [
       { id: 0, text: correctWord, isCorrect: true },

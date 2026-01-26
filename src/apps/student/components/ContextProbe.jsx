@@ -27,7 +27,7 @@ const ContextProbe = ({ word, onComplete }) => {
   
   // 生成中文释义选项
   const options = useMemo(() => {
-    const correctMeaning = word.meaning?.definitionCn || '未知';
+    const correctMeaning = word.meaning?.chinese || '未知';
     
     // 干扰项
     const commonDistractors = [
