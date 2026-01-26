@@ -1,0 +1,119 @@
+/* ================================
+   AI Context - AI 个性化语境闭环（增值服务）
+   【负责人：同事】
+   ================================ */
+
+.ai-context {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: var(--spacing-6);
+}
+
+.ai-context__header {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-8);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.ai-context__back-btn {
+  flex-shrink: 0;
+}
+
+.ai-context__header-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.ai-context__icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, 0.2);
+  border-radius: var(--radius-lg);
+  color: var(--color-yellow);
+}
+
+.ai-context__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.ai-context__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Placeholder Content */
+.ai-context__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-10) var(--spacing-6);
+}
+
+.ai-context__placeholder-icon {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 50%;
+  color: var(--color-yellow);
+  margin-bottom: var(--spacing-6);
+}
+
+.ai-context__placeholder-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.ai-context__placeholder-desc {
+  font-size: var(--font-size-lg);
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 var(--spacing-6) 0;
+}
+
+.ai-context__feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-8) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  align-items: flex-start;
+  text-align: left;
+}
+
+.ai-context__feature-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-base);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ai-context__feature-list svg {
+  flex-shrink: 0;
+  color: var(--color-yellow);
+}
+
+.ai-context__placeholder-hint {
+  padding: var(--spacing-4) var(--spacing-6);
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-md);
+  color: #FCD34D;
+  font-size: var(--font-size-sm);
+}
+

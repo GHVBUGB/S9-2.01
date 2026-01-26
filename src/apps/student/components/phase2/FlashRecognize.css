@@ -1,0 +1,254 @@
+/* ========================================
+   FlashRecognize - L2 闪视辨析
+   ======================================== */
+
+.flash-recognize {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-4);
+}
+
+/* ========================================
+   闪现区域
+   ======================================== */
+
+.flash-recognize__display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-8);
+}
+
+.flash-recognize__ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--color-text-secondary);
+  animation: pulse 1.5s infinite;
+}
+
+.flash-recognize__ready span {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.flash-recognize__word {
+  font-size: var(--font-size-word-lg);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-family-en);
+  color: var(--color-primary);
+  animation: flashIn 0.3s ease-out;
+}
+
+@keyframes flashIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.flash-recognize__hidden {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-disabled);
+}
+
+.flash-recognize__reflash-btn {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.flash-recognize__reflash-btn:hover {
+  background: var(--color-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-secondary);
+}
+
+/* ========================================
+   提示文字
+   ======================================== */
+
+.flash-recognize__instruction {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========================================
+   选项列表
+   ======================================== */
+
+.flash-recognize__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+.flash-recognize__option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  font-size: var(--font-size-lg);
+  text-align: left;
+}
+
+.flash-recognize__option:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  transform: translateX(4px);
+}
+
+.flash-recognize__option-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+}
+
+.flash-recognize__option-text {
+  flex: 1;
+  font-weight: var(--font-weight-medium);
+}
+
+.flash-recognize__option-icon {
+  flex-shrink: 0;
+}
+
+/* 选中状态 */
+.flash-recognize__option--selected {
+  border-color: var(--color-primary);
+  background: rgba(0, 99, 242, 0.05);
+}
+
+.flash-recognize__option--selected .flash-recognize__option-label {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* 正确答案 */
+.flash-recognize__option--correct {
+  border-color: var(--color-green);
+  background: var(--color-green-light);
+}
+
+.flash-recognize__option--correct .flash-recognize__option-label {
+  background: var(--color-green);
+  color: white;
+}
+
+.flash-recognize__option--correct .flash-recognize__option-icon {
+  color: var(--color-green);
+}
+
+/* 错误答案 */
+.flash-recognize__option--wrong {
+  border-color: var(--color-red);
+  background: var(--color-red-light);
+}
+
+.flash-recognize__option--wrong .flash-recognize__option-label {
+  background: var(--color-red);
+  color: white;
+}
+
+.flash-recognize__option--wrong .flash-recognize__option-icon {
+  color: var(--color-red);
+}
+
+/* ========================================
+   提交按钮
+   ======================================== */
+
+.flash-recognize__submit-btn {
+  width: 100%;
+  padding: var(--spacing-4);
+  font-size: var(--font-size-lg);
+}
+
+/* ========================================
+   反馈信息
+   ======================================== */
+
+.flash-recognize__feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
+}
+
+.flash-recognize__feedback--correct {
+  background: var(--color-green-light);
+  color: var(--color-green);
+  border: 2px solid var(--color-green);
+}
+
+.flash-recognize__feedback--wrong {
+  background: var(--color-red-light);
+  color: var(--color-red);
+  border: 2px solid var(--color-red);
+}
+
+.flash-recognize__feedback strong {
+  color: var(--color-primary);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+

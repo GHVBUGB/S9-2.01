@@ -1,0 +1,109 @@
+/* Red Box Container - 简化版 */
+.redbox-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  width: 100%;
+}
+
+/* Loading State */
+.redbox-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-500);
+}
+
+/* Summary Styles */
+.redbox-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #f0f9ff 0%, #fefce8 50%, #f0fdf4 100%);
+}
+
+.redbox-summary__card {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.redbox-summary__icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  animation: bounceIn 0.5s ease-out;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.redbox-summary__card h2 {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--color-neutral-800);
+}
+
+.redbox-summary__rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-neutral-100);
+  border-radius: var(--radius-lg);
+}
+
+.redbox-summary__rate-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+}
+
+.redbox-summary__rate-value {
+  font-size: 3rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.redbox-summary__rate-value--green {
+  color: var(--color-green);
+}
+
+.redbox-summary__rate-value--yellow {
+  color: #d97706;
+}
+
+.redbox-summary__rate-value--red {
+  color: var(--color-red);
+}
+
+.redbox-summary__stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.redbox-summary__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.redbox-summary__stat span:last-child {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.redbox-summary__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}

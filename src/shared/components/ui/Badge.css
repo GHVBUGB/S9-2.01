@@ -1,0 +1,86 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* 尺寸变体 */
+.badge--sm {
+  font-size: var(--font-size-xs);
+  padding: 2px var(--spacing-2);
+  min-height: 18px;
+}
+
+.badge--md {
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-1) var(--spacing-3);
+  min-height: 24px;
+}
+
+.badge--lg {
+  font-size: var(--font-size-base);
+  padding: var(--spacing-2) var(--spacing-4);
+  min-height: 28px;
+}
+
+/* 颜色变体 */
+.badge--default {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.badge--primary {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.badge--red {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.badge--yellow {
+  background-color: var(--color-yellow-light);
+  color: #F57C00;
+}
+
+.badge--green {
+  background-color: var(--color-green-light);
+  color: var(--color-green);
+}
+
+/* 圆点模式 */
+.badge--dot {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  min-height: 8px;
+}
+
+.badge--dot.badge--sm {
+  width: 6px;
+  height: 6px;
+  min-height: 6px;
+}
+
+.badge--dot.badge--lg {
+  width: 10px;
+  height: 10px;
+  min-height: 10px;
+}
+
+.badge--dot.badge--red {
+  background-color: var(--color-red);
+}
+
+.badge--dot.badge--yellow {
+  background-color: var(--color-yellow);
+}
+
+.badge--dot.badge--green {
+  background-color: var(--color-green);
+}
+

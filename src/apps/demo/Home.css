@@ -1,0 +1,181 @@
+/* ================================
+   Home Page - 首页主框架
+   【注意】具体模块样式已拆分到各组件的 CSS 文件中：
+   - ModelCards.css: Model A/B 卡片
+   - ExtraModules.css: 额外功能模块
+   - ViewSelector.css: 视角选择器
+   ================================ */
+
+.home {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  position: relative;
+  overflow-x: hidden;
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+/* 背景装饰 */
+.home__bg-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.home__bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  animation: float 20s ease-in-out infinite;
+}
+
+.home__bg-circle--1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -200px;
+}
+
+.home__bg-circle--2 {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -5s;
+}
+
+.home__bg-circle--3 {
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(20px, 20px) scale(1.02);
+  }
+}
+
+/* 主容器 */
+.home__container {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 头部品牌区域 */
+.home__header {
+  text-align: center;
+  margin-bottom: var(--spacing-10);
+}
+
+.home__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.home__logo {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, #60A5FA, #3B82F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home__title {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  margin: 0 0 var(--spacing-3) 0;
+  text-shadow: 0 2px 20px rgba(59, 130, 246, 0.3);
+}
+
+.home__subtitle {
+  font-size: var(--font-size-lg);
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* 进入按钮区域 */
+.home__enter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-10);
+}
+
+.home__enter-btn {
+  min-width: 400px;
+  height: 56px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.home__enter-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+}
+
+.home__enter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.home__enter-hint {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .home__enter-btn {
+    min-width: 300px;
+    height: 48px;
+    font-size: var(--font-size-base);
+  }
+}
+
+/* 页脚 */
+.home__footer {
+  padding-top: var(--spacing-8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.home__footer-info {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.home__footer-info p {
+  margin: var(--spacing-2) 0;
+  font-size: var(--font-size-sm);
+}
+
+.home__footer-tech {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.4);
+}

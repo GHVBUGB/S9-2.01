@@ -1,0 +1,368 @@
+.dashboard {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  overflow-y: auto;
+}
+
+/* ========================================
+   顶部标题栏
+   ======================================== */
+
+.dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-3);
+  border-bottom: 2px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.dashboard__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.dashboard__model-badge {
+  margin-left: auto;
+  margin-right: var(--spacing-2);
+}
+
+.dashboard__session-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* ========================================
+   常驻武器库面板
+   ======================================== */
+
+.dashboard__weapon-dock {
+  position: fixed;
+  right: calc(30% + 20px);
+  bottom: 20px;
+  z-index: 100;
+}
+
+/* ========================================
+   学生实时状态卡片
+   ======================================== */
+
+.dashboard__student-status {
+  background: linear-gradient(135deg, #E3F2FD 0%, #FFFFFF 100%);
+  border: 2px solid var(--color-primary);
+}
+
+.dashboard__status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+}
+
+.dashboard__status-header h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.dashboard__status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+}
+
+.dashboard__status-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.dashboard__status-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.dashboard__status-value {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dashboard__status-value--highlight {
+  color: var(--color-primary);
+}
+
+.dashboard__status-value--red {
+  color: var(--color-red);
+}
+
+.dashboard__status-value--word {
+  font-size: var(--font-size-xl);
+  font-family: var(--font-family-en);
+  color: var(--color-primary);
+}
+
+.dashboard__status-value--red-word {
+  color: var(--color-red);
+}
+
+/* ========================================
+   教师控制面板
+   ======================================== */
+
+.dashboard__controls {
+  background: var(--color-bg-secondary);
+}
+
+.dashboard__redbox-controls {
+  margin-bottom: var(--spacing-3);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard__control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.dashboard__control-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-red);
+}
+
+.dashboard__control-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+.dashboard__control-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.dashboard__control-buttons button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+/* ========================================
+   统计面板网格
+   ======================================== */
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-3);
+}
+
+.dashboard__card-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-3);
+  color: var(--color-text-primary);
+}
+
+/* Red Box Card */
+.dashboard__card--redbox {
+  border-color: var(--color-red);
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+}
+
+.dashboard__card--redbox .dashboard__card-title {
+  color: var(--color-red);
+}
+
+.dashboard__redbox-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-3);
+}
+
+/* 统计数据 */
+.dashboard__stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.dashboard__stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard__stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.dashboard__stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* 进度条 */
+.dashboard__progress-bar {
+  height: 8px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-2);
+}
+
+.dashboard__progress-bar--red {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.dashboard__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal) var(--ease-out);
+}
+
+.dashboard__progress-fill--red {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.dashboard__progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+/* 单词列表 */
+.dashboard__word-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dashboard__word-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-2);
+  background: var(--color-red-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  gap: var(--spacing-2);
+}
+
+.dashboard__word-item span:first-child {
+  font-family: var(--font-family-en);
+  font-weight: var(--font-weight-medium);
+}
+
+.dashboard__word-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-red);
+}
+
+/* Red word list */
+.dashboard__word-list--red .dashboard__word-item {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.dashboard__word-item--current {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border: 2px solid var(--color-red);
+}
+
+.dashboard__word-item--cleared {
+  background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.dashboard__word-item--failed {
+  background: rgba(239, 68, 68, 0.1) !important;
+  opacity: 0.7;
+}
+
+/* P3 单词列表 */
+.dashboard__word-list--p3 .dashboard__word-item {
+  background: var(--color-bg-secondary);
+  gap: var(--spacing-2);
+}
+
+/* ========================================
+   P3 验收监控
+   ======================================== */
+
+.dashboard__p3-stats {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+}
+
+.dashboard__p3-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dashboard__p3-stat--passed {
+  color: #D97706;
+}
+
+.dashboard__p3-stat--failed {
+  color: var(--color-text-disabled);
+}
+
+.dashboard__p3-stat--pending {
+  color: var(--color-text-secondary);
+}
+
+.dashboard__p3-stat-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+}
+
+/* Text colors */
+.text-green {
+  color: var(--color-green);
+}
+
+.text-yellow {
+  color: #d97706;
+}
+
+.text-red {
+  color: var(--color-red);
+}
+
+/* ========================================
+   响应式适配
+   ======================================== */
+
+@media (max-width: 768px) {
+  .dashboard__status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+}

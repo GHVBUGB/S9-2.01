@@ -1,0 +1,387 @@
+/* ========================================
+   51Talk 单词学习 2.0 设计系统
+   ======================================== */
+
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* ========== 品牌色彩 ========== */
+  /* 51Talk 品牌色 */
+  --color-primary: #0063F2;       /* 51Talk蓝 - 主色 */
+  --color-primary-hover: #0052CC;
+  --color-primary-light: #E3F2FD;
+  
+  --color-secondary: #FFBE1B;     /* Toki黄 - 强调色 */
+  --color-secondary-hover: #FFA000;
+  --color-secondary-light: #FFF9C4;
+  
+  --color-accent: #26B7FF;        /* 天蓝色 - 辅助色 */
+  --color-accent-light: #E1F5FE;
+  
+  /* 状态色（交通灯系统） */
+  --color-red: #F44336;           /* 🔴 Red - 待修补 */
+  --color-red-hover: #D32F2F;
+  --color-red-light: #FFEBEE;
+  
+  --color-yellow: #FFC107;        /* 🟡 Yellow - 复习中 */
+  --color-yellow-hover: #FFA000;
+  --color-yellow-light: #FFF8E1;
+  
+  --color-green: #4CAF50;         /* 🟢 Green - 已掌握 */
+  --color-green-hover: #388E3C;
+  --color-green-light: #E8F5E9;
+  
+  /* 中性色 */
+  --color-text-primary: #3E3A39;  /* 主文字 */
+  --color-text-secondary: #757575;/* 次要文字 */
+  --color-text-disabled: #BDBDBD; /* 禁用文字 */
+  --color-text-inverse: #FFFFFF;  /* 反色文字 */
+  
+  --color-bg-primary: #FFFFFF;    /* 主背景 */
+  --color-bg-secondary: #F5F5F5;  /* 次要背景 */
+  --color-bg-tertiary: #FAFAFA;   /* 三级背景 */
+  --color-bg-overlay: rgba(0, 0, 0, 0.5); /* 遮罩 */
+  
+  --color-border: #E0E0E0;        /* 边框色 */
+  --color-border-light: #F0F0F0;  /* 浅边框 */
+  --color-divider: #EEEEEE;       /* 分割线 */
+  
+  /* 功能色 */
+  --color-success: #4CAF50;
+  --color-warning: #FF9800;
+  --color-error: #F44336;
+  --color-info: #2196F3;
+  
+  /* ========== 字体系统 ========== */
+  /* 字体族 */
+  --font-family-cn: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  --font-family-en: 'DIN Alternate', 'Arial', 'Helvetica', sans-serif;
+  --font-family-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  
+  /* 字号 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  
+  /* 单词展示专用 - 超大字号 */
+  --font-size-word: 48px;
+  --font-size-word-lg: 64px;
+  
+  /* 行高 */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* 字重 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* ========== 间距系统 ========== */
+  /* 间距（基于 4px 基准） */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+  
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+  
+  /* ========== 动效系统 ========== */
+  /* 过渡时长 */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+  
+  /* 缓动函数 */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* ========== 布局系统 ========== */
+  --layout-content-width: 70%;    /* 内容区宽度 */
+  --layout-video-width: 30%;      /* 视频区宽度 */
+  --layout-max-width: 1920px;     /* 最大宽度 */
+  --layout-header-height: 64px;   /* 头部高度 */
+  
+  /* ========== Z-index层级 ========== */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+}
+
+/* ========== 全局样式 ========== */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-cn);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  overflow-x: hidden;
+}
+
+/* 英文字体 */
+body.en, .en {
+  font-family: var(--font-family-en);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* 选中文本样式 */
+::selection {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* 焦点样式 */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 链接样式 */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* 按钮默认样式重置 */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* 输入框默认样式 */
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* 图片默认样式 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ========== 工具类 ========== */
+/* Flexbox */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: var(--spacing-2);
+}
+
+.gap-4 {
+  gap: var(--spacing-4);
+}
+
+.gap-6 {
+  gap: var(--spacing-6);
+}
+
+/* 文字对齐 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* 文字大小 */
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.text-xl {
+  font-size: var(--font-size-xl);
+}
+
+/* 文字颜色 */
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-red {
+  color: var(--color-red);
+}
+
+.text-yellow {
+  color: var(--color-yellow);
+}
+
+.text-green {
+  color: var(--color-green);
+}
+
+/* 字重 */
+.font-normal {
+  font-weight: var(--font-weight-normal);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 圆角 */
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.rounded-full {
+  border-radius: var(--radius-full);
+}
+
+/* 阴影 */
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 过渡 */
+.transition {
+  transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+/* 隐藏滚动条 */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,222 @@
+/* ========================================
+   GhostSpelling - L3 幽灵拼写
+   ======================================== */
+
+.ghost-spelling {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-4);
+}
+
+/* ========================================
+   提示信息
+   ======================================== */
+
+.ghost-spelling__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background: linear-gradient(135deg, rgba(255, 190, 27, 0.1) 0%, rgba(255, 190, 27, 0.05) 100%);
+  border-left: 4px solid var(--color-secondary);
+  border-radius: var(--radius-md);
+}
+
+.ghost-spelling__hint-icon {
+  font-size: var(--font-size-xl);
+}
+
+.ghost-spelling__hint-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   骨架展示
+   ======================================== */
+
+.ghost-spelling__skeleton-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-8);
+  background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+  border-radius: var(--radius-lg);
+}
+
+.ghost-spelling__skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.ghost-spelling__char {
+  font-size: var(--font-size-word);
+  font-family: 'Courier New', monospace;
+  font-weight: var(--font-weight-bold);
+  min-width: 40px;
+  text-align: center;
+}
+
+.ghost-spelling__char--letter {
+  color: var(--color-primary);
+}
+
+.ghost-spelling__char--blank {
+  color: var(--color-text-disabled);
+  border-bottom: 3px solid var(--color-text-disabled);
+  margin: 0 2px;
+}
+
+/* ========================================
+   输入区域
+   ======================================== */
+
+.ghost-spelling__input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.ghost-spelling__instruction {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.ghost-spelling__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ghost-spelling__input {
+  width: 100%;
+  padding: var(--spacing-4);
+  font-size: var(--font-size-2xl);
+  font-family: 'Courier New', monospace;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  letter-spacing: 8px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-out);
+  text-transform: lowercase;
+}
+
+.ghost-spelling__input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 99, 242, 0.1);
+}
+
+.ghost-spelling__input--correct {
+  border-color: var(--color-green);
+  background: var(--color-green-light);
+}
+
+.ghost-spelling__input--wrong {
+  border-color: var(--color-red);
+  background: var(--color-red-light);
+}
+
+.ghost-spelling__input-icon {
+  position: absolute;
+  right: var(--spacing-4);
+  display: flex;
+  align-items: center;
+}
+
+/* ========================================
+   提交按钮
+   ======================================== */
+
+.ghost-spelling__submit-btn {
+  width: 100%;
+  padding: var(--spacing-4);
+  font-size: var(--font-size-lg);
+}
+
+/* ========================================
+   反馈信息
+   ======================================== */
+
+.ghost-spelling__feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
+}
+
+.ghost-spelling__feedback--correct {
+  background: var(--color-green-light);
+  border: 2px solid var(--color-green);
+}
+
+.ghost-spelling__feedback--correct svg {
+  color: var(--color-green);
+  flex-shrink: 0;
+}
+
+.ghost-spelling__feedback--wrong {
+  background: var(--color-red-light);
+  border: 2px solid var(--color-red);
+}
+
+.ghost-spelling__feedback--wrong svg {
+  color: var(--color-red);
+  flex-shrink: 0;
+}
+
+.ghost-spelling__feedback-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.ghost-spelling__feedback-content span:first-child {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+}
+
+.ghost-spelling__feedback--correct .ghost-spelling__feedback-content span:first-child {
+  color: var(--color-green);
+}
+
+.ghost-spelling__feedback--wrong .ghost-spelling__feedback-content span:first-child {
+  color: var(--color-red);
+}
+
+.ghost-spelling__feedback-content strong {
+  color: var(--color-primary);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+}
+
+.ghost-spelling__feedback-word {
+  font-size: var(--font-size-xl);
+  font-family: var(--font-family-en);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.ghost-spelling__feedback-retry {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

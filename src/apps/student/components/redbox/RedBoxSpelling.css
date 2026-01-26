@@ -1,0 +1,283 @@
+/* Red Box Spelling Styles */
+.redbox-spelling {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Title */
+.redbox-spelling__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-800);
+}
+
+.redbox-spelling__title-icon {
+  font-size: 1.5rem;
+}
+
+.redbox-spelling__title-desc {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-neutral-500);
+  margin-left: auto;
+}
+
+/* Context Section */
+.redbox-spelling__context {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-color: var(--color-brand-primary);
+}
+
+.redbox-spelling__context-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-600);
+  margin-bottom: var(--spacing-sm);
+}
+
+.redbox-spelling__context-sentence {
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-800);
+  line-height: var(--line-height-relaxed);
+  margin: 0 0 var(--spacing-sm) 0;
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--radius-md);
+}
+
+.redbox-spelling__context-translation {
+  font-size: var(--font-size-md);
+  color: var(--color-neutral-600);
+  margin: 0;
+  padding-left: var(--spacing-md);
+  border-left: 3px solid var(--color-brand-primary);
+}
+
+/* Hint Section */
+.redbox-spelling__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-yellow);
+  animation: hintReveal 0.5s ease-out;
+}
+
+@keyframes hintReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.redbox-spelling__hint-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-700);
+}
+
+.redbox-spelling__hint-skeleton {
+  font-size: var(--font-size-2xl);
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-red);
+  letter-spacing: 0.3em;
+}
+
+/* Input Section */
+.redbox-spelling__input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.redbox-spelling__input-label {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-700);
+}
+
+.redbox-spelling__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.redbox-spelling__input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-2xl);
+  font-family: var(--font-family-mono);
+  text-align: center;
+  letter-spacing: 0.1em;
+  border: 3px solid var(--color-neutral-300);
+  border-radius: var(--radius-lg);
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.redbox-spelling__input:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 4px rgba(255, 110, 0, 0.15);
+}
+
+.redbox-spelling__input--correct {
+  border-color: var(--color-green);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.redbox-spelling__input--wrong {
+  border-color: var(--color-red);
+  background: rgba(239, 68, 68, 0.1);
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.redbox-spelling__input-icon {
+  position: absolute;
+  right: var(--spacing-md);
+  animation: iconPop 0.3s ease;
+}
+
+@keyframes iconPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.redbox-spelling__answer {
+  text-align: center;
+  font-size: var(--font-size-md);
+  color: var(--color-red);
+  padding: var(--spacing-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.redbox-spelling__answer strong {
+  font-size: var(--font-size-lg);
+  font-family: var(--font-family-mono);
+}
+
+/* Status Section */
+.redbox-spelling__status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+
+.redbox-spelling__attempts {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.redbox-spelling__heart {
+  transition: all 0.3s ease;
+}
+
+.redbox-spelling__heart--filled {
+  color: var(--color-red);
+  animation: heartBeat 1s ease infinite;
+}
+
+.redbox-spelling__heart--empty {
+  color: var(--color-neutral-300);
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.redbox-spelling__error-history {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+}
+
+/* Submit Button */
+.redbox-spelling__submit-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+}
+
+/* Feedback Section */
+.redbox-spelling__feedback {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  animation: feedbackSlide 0.5s ease;
+}
+
+@keyframes feedbackSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.redbox-spelling__feedback--success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 2px solid var(--color-green);
+  color: var(--color-green);
+}
+
+.redbox-spelling__feedback--fail {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  border: 2px solid var(--color-red);
+  color: var(--color-red);
+}
+
+.redbox-spelling__feedback-text h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+}
+
+.redbox-spelling__feedback-text p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+}
+

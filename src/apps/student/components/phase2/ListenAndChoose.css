@@ -1,0 +1,241 @@
+/* ========================================
+   ListenAndChoose - L2 听音辨形
+   ======================================== */
+
+.listen-choose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-4);
+}
+
+/* ========================================
+   音频播放区域
+   ======================================== */
+
+.listen-choose__audio-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-8);
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  border-radius: var(--radius-lg);
+}
+
+.listen-choose__audio-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-normal) var(--ease-out);
+  box-shadow: 0 4px 20px rgba(0, 99, 242, 0.3);
+}
+
+.listen-choose__audio-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(0, 99, 242, 0.4);
+}
+
+.listen-choose__audio-btn--playing {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(0, 99, 242, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(0, 99, 242, 0.5);
+  }
+}
+
+.listen-choose__ipa {
+  font-size: var(--font-size-xl);
+  font-family: var(--font-family-en);
+  color: var(--color-text-secondary);
+}
+
+.listen-choose__replay-btn {
+  padding: var(--spacing-2) var(--spacing-4);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.listen-choose__replay-btn:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ========================================
+   提示文字
+   ======================================== */
+
+.listen-choose__instruction {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ========================================
+   选项列表 (2x2 网格)
+   ======================================== */
+
+.listen-choose__options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-3);
+}
+
+.listen-choose__option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  font-size: var(--font-size-lg);
+  text-align: left;
+}
+
+.listen-choose__option:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.listen-choose__option-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+.listen-choose__option-text {
+  flex: 1;
+  font-family: var(--font-family-en);
+  font-weight: var(--font-weight-medium);
+}
+
+.listen-choose__option-icon {
+  flex-shrink: 0;
+}
+
+/* 选中状态 */
+.listen-choose__option--selected {
+  border-color: var(--color-primary);
+  background: rgba(0, 99, 242, 0.05);
+}
+
+.listen-choose__option--selected .listen-choose__option-label {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* 正确答案 */
+.listen-choose__option--correct {
+  border-color: var(--color-green);
+  background: var(--color-green-light);
+}
+
+.listen-choose__option--correct .listen-choose__option-label {
+  background: var(--color-green);
+  color: white;
+}
+
+.listen-choose__option--correct .listen-choose__option-icon {
+  color: var(--color-green);
+}
+
+/* 错误答案 */
+.listen-choose__option--wrong {
+  border-color: var(--color-red);
+  background: var(--color-red-light);
+}
+
+.listen-choose__option--wrong .listen-choose__option-label {
+  background: var(--color-red);
+  color: white;
+}
+
+.listen-choose__option--wrong .listen-choose__option-icon {
+  color: var(--color-red);
+}
+
+/* ========================================
+   提交按钮
+   ======================================== */
+
+.listen-choose__submit-btn {
+  width: 100%;
+  padding: var(--spacing-4);
+  font-size: var(--font-size-lg);
+}
+
+/* ========================================
+   反馈信息
+   ======================================== */
+
+.listen-choose__feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  animation: fadeInUp var(--duration-normal) var(--ease-out);
+}
+
+.listen-choose__feedback--correct {
+  background: var(--color-green-light);
+  color: var(--color-green);
+  border: 2px solid var(--color-green);
+}
+
+.listen-choose__feedback--wrong {
+  background: var(--color-red-light);
+  color: var(--color-red);
+  border: 2px solid var(--color-red);
+}
+
+.listen-choose__feedback strong {
+  color: var(--color-primary);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

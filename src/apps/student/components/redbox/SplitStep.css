@@ -1,0 +1,234 @@
+/* Split Step Styles */
+.split-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Title */
+.split-step__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-neutral-800);
+}
+
+.split-step__title-icon {
+  font-size: 1.5rem;
+}
+
+.split-step__title-desc {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-neutral-500);
+  margin-left: auto;
+}
+
+/* Content Grid */
+.split-step__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Section Label */
+.split-step__section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-700);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Audio Section */
+.split-step__audio-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-color: var(--color-brand-primary);
+}
+
+.split-step__audio-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.split-step__play-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.split-step__audio-feedback {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-green);
+  font-size: var(--font-size-sm);
+  animation: fadeIn 0.3s ease;
+}
+
+.split-step__phonetic {
+  text-align: center;
+  padding: var(--spacing-sm);
+  background: white;
+  border-radius: var(--radius-md);
+}
+
+.split-step__ipa {
+  font-size: var(--font-size-xl);
+  color: var(--color-neutral-700);
+  font-family: var(--font-family-mono);
+}
+
+/* Syllables Section */
+.split-step__syllables-section {
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border-color: var(--color-yellow);
+}
+
+.split-step__syllables-display {
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+.split-step__syllables-word {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.split-step__syllable {
+  font-size: 1.8rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-red);
+  font-family: var(--font-family-mono);
+  background: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: syllableFadeIn 0.4s ease-out forwards;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@keyframes syllableFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.split-step__syllable-dot {
+  color: var(--color-neutral-400);
+  margin: 0 var(--spacing-xs);
+}
+
+.split-step__syllables-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+}
+
+/* Etymology Section */
+.split-step__etymology-section {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-color: #8b5cf6;
+}
+
+.split-step__etymology-display {
+  padding: var(--spacing-sm);
+}
+
+.split-step__etymology-text {
+  font-size: var(--font-size-md);
+  color: var(--color-neutral-700);
+  line-height: var(--line-height-relaxed);
+  margin: 0 0 var(--spacing-md) 0;
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  animation: fadeIn 0.3s ease;
+}
+
+.split-step__confusables {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.split-step__confusables-label {
+  color: var(--color-red);
+  font-weight: var(--font-weight-medium);
+}
+
+.split-step__confusable-word {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-red);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-mono);
+}
+
+/* Reveal Button */
+.split-step__reveal-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px dashed var(--color-neutral-300);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--color-neutral-600);
+  transition: all 0.2s ease;
+}
+
+.split-step__reveal-btn:hover {
+  border-color: var(--color-brand-primary);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--color-brand-primary);
+}
+
+/* Footer */
+.split-step__footer {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.split-step__complete-btn {
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.split-step__complete-btn--done {
+  background: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.split-step__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-500);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+

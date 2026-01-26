@@ -1,0 +1,138 @@
+/* 武器库面板 - 教师端 */
+.weapon-dock {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 200px;
+}
+
+.weapon-dock--empty {
+  opacity: 0.6;
+}
+
+/* 头部 */
+.weapon-dock__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.weapon-dock__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.weapon-dock__word {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3b82f6;
+  font-family: 'Georgia', serif;
+}
+
+/* 武器按钮组 */
+.weapon-dock__weapons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.weapon-dock__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weapon-dock__btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.weapon-dock__btn--highlight {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.weapon-dock__btn--highlight:hover:not(:disabled) {
+  border-color: #16a34a;
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.weapon-dock__btn--active {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: white;
+}
+
+.weapon-dock__btn--active .weapon-dock__btn-icon,
+.weapon-dock__btn--active .weapon-dock__btn-name {
+  color: white;
+}
+
+.weapon-dock__btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.weapon-dock__btn-icon {
+  color: #64748b;
+  transition: color 0.2s;
+}
+
+.weapon-dock__btn:hover:not(:disabled) .weapon-dock__btn-icon {
+  color: #3b82f6;
+}
+
+.weapon-dock__btn--highlight .weapon-dock__btn-icon {
+  color: #22c55e;
+}
+
+.weapon-dock__btn-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+
+/* 关闭按钮 */
+.weapon-dock__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.weapon-dock__close-btn:hover {
+  background: #dc2626;
+}
+
+/* 空状态 */
+.weapon-dock__empty-text {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 20px 0;
+}
+

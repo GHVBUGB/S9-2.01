@@ -1,0 +1,261 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Volume2, CheckCircle2, XCircle } from 'lucide-react';
+import Button from '../../../../shared/components/ui/Button';
+import useClassroomStore from '../../../../shared/store/useClassroomStore';
+import './ListenAndChoose.css';
+
+/**
+ * L2 听音辨形
+ * 播放音频 + 4选1形近词
+ * 目的：音 → 形，防混淆
+ */
+const ListenAndChoose = ({ word, onComplete }) => {
+  // ✅ 从 store 获取状态和 actions
+  const { 
+    studentState, 
+    teacherState,
+    studentSelectOption,
+    studentSubmitAnswer,
+    resetStudentState,
+  } = useClassroomStore();
+
+  // ✅ 使用 store 的状态，而不是本地状态
+  const selectedOption = studentState.selectedOption;
+  const submitted = studentState.isSubmitted;
+  const isCorrect = studentState.isCorrect;
+  
+  // 🔊 音频播放状态（仍然用本地状态）
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // 重置状态并自动播放音频
+  useEffect(() => {
+    resetStudentState();
+    playAudio();
+  }, [word.id, resetStudentState]);
+
+  // ✅ 监听教师命令
+  useEffect(() => {
+    if (!teacherState.command) return;
+
+    if (teacherState.command === 'repeat') {
+      // 教师点击重做
+      resetStudentState();
+      playAudio();
+    } else if (teacherState.showAnswer && !submitted) {
+      // 教师点击显示答案
+      const correctOpt = options.find(opt => opt.isCorrect);
+      if (correctOpt) {
+        handleOptionClick(correctOpt.id);
+        setTimeout(() => {
+          handleSubmit(true); // 强制提交为正确
+        }, 500);
+      }
+    }
+  }, [teacherState.command, teacherState.showAnswer]);
+
+  // 生成形近词选项
+  const options = useMemo(() => {
+    const correctWord = word.word;
+    
+    // 形近词生成策略
+    const generateSimilarWords = (word) => {
+      const similar = [];
+      const vowels = ['a', 'e', 'i', 'o', 'u'];
+      
+      // 策略1: 替换元音
+      for (let i = 0; i < word.length && similar.length < 3; i++) {
+        if (vowels.includes(word[i].toLowerCase())) {
+          for (const v of vowels) {
+            if (v !== word[i].toLowerCase()) {
+              const newWord = word.slice(0, i) + v + word.slice(i + 1);
+              if (newWord !== word && !similar.includes(newWord)) {
+                similar.push(newWord);
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      // 策略2: 常见混淆词
+      const confusionPairs = {
+        'adapt': ['adopt', 'adept', 'apart'],
+        'brave': ['bravo', 'grave', 'crave'],
+        'create': ['crate', 'cream', 'great'],
+        'imagine': ['image', 'imitate', 'emigrate'],
+        'perfect': ['prefect', 'protect', 'project'],
+      };
+      
+      if (confusionPairs[word.toLowerCase()]) {
+        return confusionPairs[word.toLowerCase()];
+      }
+      
+      // 策略3: 通用形近词
+      const commonSimilar = ['accept', 'except', 'effect', 'affect'];
+      while (similar.length < 3) {
+        const random = commonSimilar[Math.floor(Math.random() * commonSimilar.length)];
+        if (random !== correctWord && !similar.includes(random)) {
+          similar.push(random);
+        }
+      }
+      
+      return similar.slice(0, 3);
+    };
+    
+    const distractors = generateSimilarWords(correctWord);
+    
+    const allOptions = [
+      { id: 0, text: correctWord, isCorrect: true },
+      ...distractors.map((d, i) => ({ id: i + 1, text: d, isCorrect: false }))
+    ];
+    
+    return allOptions.sort(() => Math.random() - 0.5);
+  }, [word]);
+
+  // 播放音频
+  const playAudio = () => {
+    setIsPlaying(true);
+    // 模拟音频播放（实际项目中接入真实音频）
+    console.log('🔊 播放音频:', word.sound?.ipa);
+    
+    // 模拟播放时间
+    setTimeout(() => {
+      setIsPlaying(false);
+    }, 1000);
+  };
+
+  // 处理选项点击
+  const handleOptionClick = (optionId) => {
+    if (!submitted) {
+      studentSelectOption(optionId); // ✅ 更新到 store，教师端立即看到
+    }
+  };
+
+  // 提交答案
+  const handleSubmit = (forceCorrect = false) => {
+    if (selectedOption === null) return;
+    
+    const selected = options.find(opt => opt.id === selectedOption);
+    const correct = forceCorrect || (selected?.isCorrect || false);
+    
+    studentSubmitAnswer(correct); // ✅ 更新到 store，教师端立即看到
+    
+    // 延迟回调
+    setTimeout(() => {
+      onComplete(correct);
+      if (!correct) {
+        // 错误时重置，允许重试
+        setTimeout(() => {
+          resetStudentState();
+          playAudio();
+        }, 2000);
+      }
+    }, 1500);
+  };
+
+  // 获取选项样式
+  const getOptionClass = (option) => {
+    const classes = ['listen-choose__option'];
+    
+    if (!submitted) {
+      if (selectedOption === option.id) {
+        classes.push('listen-choose__option--selected');
+      }
+    } else {
+      if (option.isCorrect) {
+        classes.push('listen-choose__option--correct');
+      } else if (selectedOption === option.id && !option.isCorrect) {
+        classes.push('listen-choose__option--wrong');
+      }
+    }
+    
+    return classes.join(' ');
+  };
+
+  return (
+    <div className="listen-choose">
+      {/* 音频播放区域 */}
+      <div className="listen-choose__audio-section">
+        <button 
+          className={`listen-choose__audio-btn ${isPlaying ? 'listen-choose__audio-btn--playing' : ''}`}
+          onClick={playAudio}
+          disabled={isPlaying}
+        >
+          <Volume2 size={32} />
+        </button>
+        <div className="listen-choose__ipa">
+          {word.sound?.ipa || '/.../ '}
+        </div>
+        <button 
+          className="listen-choose__replay-btn"
+          onClick={playAudio}
+          disabled={isPlaying}
+        >
+          再听一次
+        </button>
+      </div>
+
+      {/* 提示文字 */}
+      <div className="listen-choose__instruction">
+        选出你听到的单词：
+      </div>
+
+      {/* 选项列表 (2x2 网格) */}
+      <div className="listen-choose__options">
+        {options.map((option, index) => (
+          <button
+            key={option.id}
+            className={getOptionClass(option)}
+            onClick={() => handleOptionClick(option.id)}
+            disabled={submitted}
+          >
+            <span className="listen-choose__option-label">
+              {String.fromCharCode(65 + index)}.
+            </span>
+            <span className="listen-choose__option-text">
+              {option.text}
+            </span>
+            {submitted && option.isCorrect && (
+              <CheckCircle2 className="listen-choose__option-icon" size={20} />
+            )}
+            {submitted && selectedOption === option.id && !option.isCorrect && (
+              <XCircle className="listen-choose__option-icon" size={20} />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* 提交按钮 */}
+      {!submitted && (
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={selectedOption === null}
+          className="listen-choose__submit-btn"
+        >
+          确认
+        </Button>
+      )}
+
+      {/* 反馈信息 */}
+      {submitted && (
+        <div className={`listen-choose__feedback ${isCorrect ? 'listen-choose__feedback--correct' : 'listen-choose__feedback--wrong'}`}>
+          {isCorrect ? (
+            <>
+              <CheckCircle2 size={24} />
+              <span>正确！进入下一步...</span>
+            </>
+          ) : (
+            <>
+              <XCircle size={24} />
+              <span>错误，正确答案是 <strong>{word.word}</strong>，再试一次</span>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ListenAndChoose;
+
