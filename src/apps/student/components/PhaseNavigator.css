@@ -1,210 +1,96 @@
-/* ========================================
-   PhaseNavigator - 阶段导航栏
-   ======================================== */
+.phase-navigator-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-4) var(--spacing-8);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--spacing-6);
+}
 
 .phase-navigator {
-  width: 100%;
-  padding: var(--spacing-4);
   display: flex;
-  justify-content: center;
-}
-
-.phase-navigator__track {
-  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-1);
-  padding: var(--spacing-2);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 99, 242, 0.15) 0%,
-    rgba(38, 183, 255, 0.15) 100%
-  );
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-md);
+  gap: 4px;
 }
 
-/* ========================================
-   阶段项
-   ======================================== */
-
-.phase-navigator__item {
-  position: relative;
+.phase-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: 8px 20px;
   border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.5);
+  transition: all var(--duration-normal) var(--ease-out);
   font-weight: var(--font-weight-medium);
-  transition: all var(--duration-normal) var(--ease-out);
-  cursor: default;
-  white-space: nowrap;
+  font-size: var(--font-size-sm);
 }
 
-.phase-navigator__icon {
+.phase-item__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
   transition: all var(--duration-normal) var(--ease-out);
 }
 
-.phase-navigator__label {
-  line-height: 1;
-}
-
-.phase-navigator__check {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 16px;
-  height: 16px;
-  background: var(--color-green);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* ========================================
-   连接线
-   ======================================== */
-
-.phase-navigator__connector {
-  width: 20px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 1px;
-  transition: background var(--duration-normal) var(--ease-out);
-}
-
-.phase-navigator__connector--completed {
-  background: var(--color-green);
-}
-
-/* ========================================
-   激活状态 (Active)
-   ======================================== */
-
-.phase-navigator__item--active {
-  background: white;
+/* 激活状态 - 模仿图3 */
+.phase-item.is-active {
+  background: #fff;
   color: var(--color-primary);
   box-shadow: var(--shadow-md);
-  transform: scale(1.05);
 }
 
-.phase-navigator__item--active .phase-navigator__icon {
+.phase-item.is-active .phase-item__icon {
   background: var(--color-primary);
-  color: white;
+  color: #fff;
 }
 
-/* ========================================
-   已完成状态 (Completed)
-   ======================================== */
-
-.phase-navigator__item--completed {
-  background: rgba(255, 255, 255, 0.3);
-  color: var(--color-text-secondary);
+/* 已完成状态 */
+.phase-item.is-completed {
+  color: var(--color-green);
 }
 
-.phase-navigator__item--completed .phase-navigator__icon {
-  background: var(--color-green);
-  color: white;
+.phase-item.is-completed .phase-item__icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--color-green);
 }
 
-/* ========================================
-   待完成状态 (Pending)
-   ======================================== */
-
-.phase-navigator__item--pending {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  opacity: 0.6;
+.phase-connector {
+  width: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.phase-navigator__item--pending .phase-navigator__icon {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
+/* 进度显示样式 */
+.phase-navigator__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ========================================
-   Red Box 特殊样式
-   ======================================== */
-
-.phase-navigator__item--redbox.phase-navigator__item--active {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  color: #dc2626;
+.progress-label {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.phase-navigator__item--redbox.phase-navigator__item--active .phase-navigator__icon {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  animation: redboxPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes redboxPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
-}
-
-.phase-navigator__item--redbox.phase-navigator__item--completed .phase-navigator__icon {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-}
-
-/* ========================================
-   悬停效果（仅用于视觉反馈，不可点击）
-   ======================================== */
-
-.phase-navigator__item:not(.phase-navigator__item--active):hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ========================================
-   响应式适配
-   ======================================== */
-
-@media (max-width: 1024px) {
-  .phase-navigator__track {
-    gap: var(--spacing-1);
-  }
-
-  .phase-navigator__item {
-    padding: var(--spacing-2) var(--spacing-3);
-    font-size: var(--font-size-xs);
-  }
-
-  .phase-navigator__icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .phase-navigator__connector {
-    width: 12px;
-  }
-}
-
-@media (max-width: 768px) {
-  .phase-navigator__label {
-    display: none; /* 小屏幕只显示图标 */
-  }
-
-  .phase-navigator__item {
-    padding: var(--spacing-2);
-  }
-
-  .phase-navigator__connector {
-    width: 8px;
-  }
+.progress-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  font-family: var(--font-mono);
 }

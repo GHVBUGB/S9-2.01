@@ -1,127 +1,53 @@
 import React from 'react';
-import { Search, Dumbbell, CheckCircle, RotateCcw, AlertCircle, Trophy, Flame } from 'lucide-react';
+import { Search, Dumbbell, CheckCircle2, LayoutGrid } from 'lucide-react';
 import './PhaseNavigator.css';
 
 /**
- * Phase 阶段导航栏
- * 展示学习流程的阶段
- * 支持 Model A（P1-P6）和 Model B（RedBox + P1-P3）
- * 
- * @param {string} currentPhase - 当前激活的阶段 (RedBox | P1-P6)
- * @param {Array} completedPhases - 已完成的阶段列表 ['RedBox', 'P1', 'P2', ...]
- * @param {Array} phases - 要显示的阶段列表，默认为标准六阶段
- * @param {boolean} showRedBox - 是否显示 Red Box 阶段（Model B）
+ * 阶段导航栏 - 模仿图3的胶囊样式
+ * 整合了单词进度显示
  */
-const PhaseNavigator = ({ 
-  currentPhase = 'P1', 
-  completedPhases = [], 
-  phases = null,
-  showRedBox = false 
-}) => {
+const PhaseNavigator = ({ currentPhase, completedPhases = [], phases = [], currentWordIndex = 0, totalWords = 0, showRedBox = false }) => {
   
-  // 完整的阶段配置
-  const allPhasesConfig = {
-    RedBox: {
-      id: 'RedBox',
-      name: 'Red Box',
-      icon: Flame,
-      description: 'Attack',
-      color: '#ef4444'
-    },
-    P1: {
-      id: 'P1',
-      name: '精准筛查',
-      icon: Search,
-      description: 'Filter'
-    },
-    P2: {
-      id: 'P2',
-      name: '集中训练',
-      icon: Dumbbell,
-      description: 'Train'
-    },
-    P3: {
-      id: 'P3',
-      name: '门神验收',
-      icon: CheckCircle,
-      description: 'Check'
-    },
-    P4: {
-      id: 'P4',
-      name: '螺旋复习',
-      icon: RotateCcw,
-      description: 'Review'
-    },
-    P5: {
-      id: 'P5',
-      name: '紧急救援',
-      icon: AlertCircle,
-      description: 'Rescue'
-    },
-    P6: {
-      id: 'P6',
-      name: '里程碑考',
-      icon: Trophy,
-      description: 'Milestone'
-    }
-  };
+  // 基础阶段定义
+  const allPhases = [
+    { id: 'P1', name: '精准筛查', icon: <Search size={18} /> },
+    { id: 'P2', name: '集中训练', icon: <Dumbbell size={18} /> },
+    { id: 'P3', name: '门神验收', icon: <CheckCircle2 size={18} /> },
+  ];
 
-  // 根据 props 确定要显示的阶段
-  const displayPhases = phases || (showRedBox 
-    ? ['RedBox', 'P1', 'P2', 'P3'] 
-    : ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
-  );
-
-  // 获取要渲染的阶段配置
-  const phasesToRender = displayPhases.map(phaseId => allPhasesConfig[phaseId]).filter(Boolean);
-
-  // 判断阶段状态
-  const getPhaseStatus = (phaseId) => {
-    if (phaseId === currentPhase) return 'active';
-    if (completedPhases.includes(phaseId)) return 'completed';
-    return 'pending';
-  };
-
-  // 获取阶段样式类
-  const getPhaseClass = (phaseId) => {
-    const status = getPhaseStatus(phaseId);
-    const isRedBox = phaseId === 'RedBox';
-    return `phase-navigator__item phase-navigator__item--${status} ${isRedBox ? 'phase-navigator__item--redbox' : ''}`;
-  };
+  // 如果是 Model B，前面加一个红盒子阶段
+  const displayPhases = showRedBox 
+    ? [{ id: 'RedBox', name: '攻坚复习', icon: <LayoutGrid size={18} /> }, ...allPhases]
+    : allPhases;
 
   return (
-    <div className="phase-navigator">
-      <div className="phase-navigator__track">
-        {phasesToRender.map((phase, index) => {
-          const Icon = phase.icon;
-          const status = getPhaseStatus(phase.id);
+    <div className="phase-navigator-container">
+      <div className="phase-navigator">
+        {displayPhases.map((phase, index) => {
+          const isActive = currentPhase === phase.id;
+          const isCompleted = completedPhases.includes(phase.id);
           
           return (
             <React.Fragment key={phase.id}>
-              <div className={getPhaseClass(phase.id)}>
-                <div 
-                  className="phase-navigator__icon"
-                  style={phase.color && status === 'active' ? { backgroundColor: phase.color } : {}}
-                >
-                  <Icon size={18} />
+              <div className={`phase-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}>
+                <div className="phase-item__icon">
+                  {phase.icon}
                 </div>
-                <div className="phase-navigator__label">
-                  {phase.name}
-                </div>
-                {status === 'completed' && (
-                  <div className="phase-navigator__check">✓</div>
-                )}
+                <span className="phase-item__name">{phase.name}</span>
               </div>
-              {/* 连接线 */}
-              {index < phasesToRender.length - 1 && (
-                <div className={`phase-navigator__connector ${
-                  completedPhases.includes(phase.id) ? 'phase-navigator__connector--completed' : ''
-                }`} />
-              )}
+              {index < displayPhases.length - 1 && <div className="phase-connector" />}
             </React.Fragment>
           );
         })}
       </div>
+
+      {/* 单词进度整合在导航栏右侧 */}
+      {totalWords > 0 && (
+        <div className="phase-navigator__progress">
+          <span className="progress-label">单词进度:</span>
+          <span className="progress-value">{currentWordIndex + 1} / {totalWords}</span>
+        </div>
+      )}
     </div>
   );
 };
