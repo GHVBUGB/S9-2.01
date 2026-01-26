@@ -88,7 +88,7 @@ const ContextProbe = ({ word, onComplete }) => {
     
     setTimeout(() => {
       onComplete(correct);
-    }, 1500);
+    }, 500); // 缩短到 0.5秒，保持反馈动画时间
   };
 
   return (
