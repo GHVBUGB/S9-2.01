@@ -80,19 +80,26 @@ const P2Container = ({ readonly = false }) => {
     const totalInCurrentList = roundWords.length;
     console.log(`📝 [P2] 第${currentRound}轮${isRetryRound ? '(错题)' : ''} 单词${currentWordIndex + 1}/${totalInCurrentList} 完成:`, isCorrect ? '正确 ✓' : '错误 ✗');
     
-    // 检查当前单词是否被武器库标记为错误（即使学生答对了）
-    const storeCurrentWrongWords = useClassroomStore.getState().studentState.p2WrongWords;
-    const weaponMarkedWrong = currentWord && storeCurrentWrongWords.includes(currentWord.id);
+    // 检查当前单词是否被武器库标记为错误（通过 wordResults 中的 weaponUsed 字段判断）
+    const wordResult = useClassroomStore.getState().wordResults[currentWord?.id] || {};
+    const weaponMarkedWrong = wordResult.weaponUsed === true;
     
     // 记录本题结果到本轮错题集
     // 如果答错 或 被武器库标记，都算作错题
     if (((!isCorrect) || weaponMarkedWrong) && currentWord) {
       roundWrongWordsRef.current.add(currentWord.id);
-      if (weaponMarkedWrong && isCorrect) {
-        console.log(`🚨 [P2] 单词 "${currentWord.word}" 被武器库标记为红灯，即使答对也算错题`);
+      if (weaponMarkedWrong) {
+        console.log(`🚨 [P2] 单词 "${currentWord.word}" 被武器库标记为红灯，算作错题`);
+        // 清除武器库标记（已处理）
+        useClassroomStore.getState().updateWordResults({
+          [currentWord.id]: {
+            ...wordResult,
+            weaponUsed: false,
+          }
+        });
       }
     }
-    // 注意：答对且未被武器库标记时，不需要加入错题
+    // 注意：答对且未被武器库标记时，不需要加入错题（做对了就过了）
     
     // 检查当前列表是否还有更多单词
     if (currentWordIndex < totalInCurrentList - 1) {

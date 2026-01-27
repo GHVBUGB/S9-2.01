@@ -1046,17 +1046,18 @@ const useClassroomStore = create((set, get) => ({
       console.log(`🚨 [Store] 武器库启动 - 单词 "${word.word}" 自动判定为红灯 (当前阶段: ${currentPhase})`);
       
       if (currentPhase === 'P2') {
-        // P2 阶段：添加到 P2 错题池
-        const currentWrongWords = studentState.p2WrongWords || [];
-        if (!currentWrongWords.includes(word.id)) {
-          set((state) => ({
-            studentState: {
-              ...state.studentState,
-              p2WrongWords: [...state.studentState.p2WrongWords, word.id],
+        // P2 阶段：标记 weaponUsed，让 P2Container 判定为错题
+        const currentResult = get().wordResults[word.id] || {};
+        set((state) => ({
+          wordResults: {
+            ...state.wordResults,
+            [word.id]: {
+              ...currentResult,
+              weaponUsed: true, // 标记使用了武器库
             },
-          }));
-          console.log(`❌ [P2] 武器库触发 - 单词 "${word.word}" 加入错题池`);
-        }
+          },
+        }));
+        console.log(`❌ [P2] 武器库触发 - 单词 "${word.word}" 标记为红灯`);
       } else if (currentPhase === 'P3') {
         // P3 阶段：标记为 P3 失败，需要回 P2 重学
         const currentResult = wordResults[word.id] || {};
