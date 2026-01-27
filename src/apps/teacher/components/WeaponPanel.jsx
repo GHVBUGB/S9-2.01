@@ -23,24 +23,6 @@ const WeaponPanel = ({ currentWord, onSelectWeapon }) => {
 
   const weapons = [
     {
-      id: 'compare',
-      name: '对比矩阵',
-      icon: <Layers size={28} />,
-      desc: '形近词对比，区分易混淆词',
-      forError: '形近混淆',
-      color: '#ef4444',
-      bgColor: 'rgba(239, 68, 68, 0.1)',
-    },
-    {
-      id: 'phonics',
-      name: '音素强化',
-      icon: <Brain size={28} />,
-      desc: '音节拆解，强化发音记忆',
-      forError: '发音模糊',
-      color: '#f59e0b',
-      bgColor: 'rgba(245, 158, 11, 0.1)',
-    },
-    {
       id: 'context',
       name: '语境堆叠',
       icon: <Wand2 size={28} />,
@@ -57,6 +39,15 @@ const WeaponPanel = ({ currentWord, onSelectWeapon }) => {
       forError: '机械遗忘',
       color: '#8b5cf6',
       bgColor: 'rgba(139, 92, 246, 0.1)',
+    },
+    {
+      id: 'compare',
+      name: '对比矩阵',
+      icon: <Layers size={28} />,
+      desc: '形近词对比，区分易混淆词',
+      forError: '形近混淆',
+      color: '#ef4444',
+      bgColor: 'rgba(239, 68, 68, 0.1)',
     },
   ];
 
@@ -149,4 +140,3 @@ const WeaponPanel = ({ currentWord, onSelectWeapon }) => {
 };
 
 export default WeaponPanel;
-

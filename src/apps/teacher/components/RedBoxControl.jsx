@@ -38,12 +38,11 @@ const RedBoxControl = () => {
   // 步骤名称
   const stepLabels = ['听音', '看形', '助记', '验收'];
 
-  // 武器列表
+  // 武器列表（精准助记阶段可用的武器）
   const weapons = [
-    { id: 'compare', name: '对比', icon: <Layers size={16} /> },
-    { id: 'phonics', name: '音节', icon: <Brain size={16} /> },
     { id: 'context', name: '语境', icon: <Wand2 size={16} /> },
     { id: 'visual', name: '口诀', icon: <Image size={16} /> },
+    { id: 'compare', name: '对比', icon: <Brain size={16} /> },
   ];
 
   if (!currentWord) return null;

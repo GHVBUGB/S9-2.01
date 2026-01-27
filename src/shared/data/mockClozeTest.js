@@ -309,4 +309,3 @@ export const parseTextSegments = (text) => {
 };
 
 export default mockClozeTest;
-

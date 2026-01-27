@@ -52,6 +52,12 @@
   background-color: var(--color-bg-secondary);
 }
 
+/* 覆盖嵌套布局的高度，使用 100% 而不是 100vh */
+.demo-view__panel .student-layout,
+.demo-view__panel .teacher-layout {
+  height: 100%;
+}
+
 .demo-view__panel-label {
   position: absolute;
   top: var(--spacing-3);
@@ -66,4 +72,3 @@
   z-index: var(--z-sticky);
   box-shadow: var(--shadow-md);
 }
-

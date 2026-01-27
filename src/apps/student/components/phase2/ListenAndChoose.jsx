@@ -8,8 +8,10 @@ import './ListenAndChoose.css';
  * L2 听音辨形
  * 播放音频 + 4选1形近词
  * 目的：音 → 形，防混淆
+ * 
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const ListenAndChoose = ({ word, onComplete }) => {
+const ListenAndChoose = ({ word, onComplete, readonly = false }) => {
   // ✅ 从 store 获取状态和 actions
   const { 
     studentState, 
@@ -27,45 +29,58 @@ const ListenAndChoose = ({ word, onComplete }) => {
   // 🔊 音频播放状态（仍然用本地状态）
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // 重置状态并自动播放音频
+  // 重置状态并自动播放音频（仅学生端）
   useEffect(() => {
-    resetStudentState();
-    playAudio();
-  }, [word.id, resetStudentState]);
+    if (!readonly) {
+      resetStudentState();
+      playAudio();
+    }
+  }, [word.id, resetStudentState, readonly]);
 
-  // ✅ 监听教师命令
+  // ✅ 监听教师命令（仅学生端响应）
   useEffect(() => {
-    if (!teacherState.command) return;
-
-    if (teacherState.command === 'repeat') {
+    if (teacherState.command === 'repeat' && !readonly) {
       // 教师点击重做
       resetStudentState();
       playAudio();
-    } else if (teacherState.showAnswer && !submitted) {
-      // 教师点击显示答案
+    }
+  }, [teacherState.command, resetStudentState, readonly]);
+  
+  // 单独监听教师显示答案（仅学生端响应）
+  useEffect(() => {
+    if (teacherState.showAnswer && !submitted && !readonly) {
+      // 教师点击显示答案 - 自动选中正确选项并提交
       const correctOpt = options.find(opt => opt.isCorrect);
       if (correctOpt) {
-        handleOptionClick(correctOpt.id);
+        studentSelectOption(correctOpt.id);
         setTimeout(() => {
-          handleSubmit(true); // 强制提交为正确
+          studentSubmitAnswer(true);
+          setTimeout(() => onComplete(true), 1500);
         }, 500);
       }
     }
-  }, [teacherState.command, teacherState.showAnswer]);
+  }, [teacherState.showAnswer, readonly]);
 
-  // 生成形近词选项
+  // 生成形近词选项（4选1）
   const options = useMemo(() => {
     const correctWord = word.word;
     
     // ✅ 使用数据表中的干扰项
     let distractors = word.training?.distractors || [];
     
-    // 如果没有提供干扰项，使用备用策略
+    // 确保有3个干扰项（4选1需要3个干扰项）
     if (distractors.length < 3) {
-      console.warn(`Word "${correctWord}" missing distractors in training data`);
+      console.warn(`Word "${correctWord}" missing distractors in training data, using fallback`);
       // 备用：使用通用形近词
-      const backup = ['accept', 'except', 'effect'];
-      distractors = [...distractors, ...backup].slice(0, 3);
+      const backup = ['accept', 'except', 'effect', 'affect', 'adopt', 'adapt'];
+      distractors = [...distractors, ...backup]
+        .filter(d => d !== correctWord) // 排除正确答案
+        .slice(0, 3); // 取3个
+    } else if (distractors.length > 3) {
+      // 如果干扰项超过3个，随机选3个
+      distractors = distractors
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
     }
     
     const allOptions = [
@@ -73,6 +88,7 @@ const ListenAndChoose = ({ word, onComplete }) => {
       ...distractors.map((d, i) => ({ id: i + 1, text: d, isCorrect: false }))
     ];
     
+    // 随机打乱顺序
     return allOptions.sort(() => Math.random() - 0.5);
   }, [word]);
 
@@ -88,32 +104,33 @@ const ListenAndChoose = ({ word, onComplete }) => {
     }, 1000);
   };
 
-  // 处理选项点击
+  // 处理选项点击（仅学生端）
   const handleOptionClick = (optionId) => {
-    if (!submitted) {
+    if (!submitted && !readonly) {
       studentSelectOption(optionId); // ✅ 更新到 store，教师端立即看到
     }
   };
 
-  // 提交答案
-  const handleSubmit = (forceCorrect = false) => {
-    if (selectedOption === null) return;
+  // 提交答案（学生点击确认按钮，仅学生端）
+  const handleSubmit = () => {
+    if (selectedOption === null || readonly) return;
     
     const selected = options.find(opt => opt.id === selectedOption);
-    const correct = forceCorrect || (selected?.isCorrect || false);
+    const correct = selected?.isCorrect === true;
     
-    studentSubmitAnswer(correct); // ✅ 更新到 store，教师端立即看到
+    console.log('🎯 [ListenAndChoose] 提交答案:', {
+      selectedOption,
+      selectedText: selected?.text,
+      selectedIsCorrect: selected?.isCorrect,
+      correctWord: word.word,
+      isCorrect: correct
+    });
     
-    // 延迟回调
+    studentSubmitAnswer(correct);
+    
+    // 延迟回调 - 无论对错都进入下一题，错题会在轮次结束后统一重做
     setTimeout(() => {
       onComplete(correct);
-      if (!correct) {
-        // 错误时重置，允许重试
-        setTimeout(() => {
-          resetStudentState();
-          playAudio();
-        }, 2000);
-      }
     }, 1500);
   };
 
@@ -137,7 +154,14 @@ const ListenAndChoose = ({ word, onComplete }) => {
   };
 
   return (
-    <div className="listen-choose">
+    <div className={`listen-choose ${readonly ? 'listen-choose--readonly' : ''}`}>
+      {/* 教师端只读提示 */}
+      {readonly && (
+        <div className="listen-choose__readonly-hint">
+          👀 教师观看模式 - 等待学生作答
+        </div>
+      )}
+      
       {/* 音频播放区域 */}
       <div className="listen-choose__audio-section">
         <button 
@@ -169,9 +193,9 @@ const ListenAndChoose = ({ word, onComplete }) => {
         {options.map((option, index) => (
           <button
             key={option.id}
-            className={getOptionClass(option)}
+            className={`${getOptionClass(option)} ${readonly ? 'listen-choose__option--readonly' : ''}`}
             onClick={() => handleOptionClick(option.id)}
-            disabled={submitted}
+            disabled={submitted || readonly}
           >
             <span className="listen-choose__option-label">
               {String.fromCharCode(65 + index)}.
@@ -189,8 +213,8 @@ const ListenAndChoose = ({ word, onComplete }) => {
         ))}
       </div>
 
-      {/* 提交按钮 */}
-      {!submitted && (
+      {/* 提交按钮（仅学生端显示） */}
+      {!submitted && !readonly && (
         <Button
           variant="primary"
           onClick={handleSubmit}
@@ -207,12 +231,12 @@ const ListenAndChoose = ({ word, onComplete }) => {
           {isCorrect ? (
             <>
               <CheckCircle2 size={24} />
-              <span>正确！进入下一步...</span>
+              <span>正确！进入下一题...</span>
             </>
           ) : (
             <>
               <XCircle size={24} />
-              <span>错误，正确答案是 <strong>{word.word}</strong>，再试一次</span>
+              <span>正确答案是 <strong>{word.word}</strong>，稍后重做</span>
             </>
           )}
         </div>

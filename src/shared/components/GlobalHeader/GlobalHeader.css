@@ -1,0 +1,260 @@
+/* ========================================
+   全局顶部导航栏
+   ======================================== */
+
+.global-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  min-height: 64px;
+  flex-shrink: 0;
+  padding: 0 24px;
+  background: linear-gradient(90deg, #0063f2 0%, #26b7ff 100%); /* 51Talk Blue → Sky Blue */
+  box-shadow: 0 2px 8px rgba(0, 99, 242, 0.2);
+  position: relative;
+  z-index: 100;
+}
+
+/* ========================================
+   左侧：Logo
+   ======================================== */
+
+.global-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.global-header__logo-icon {
+  color: #ffbe1b; /* Toki Yellow */
+  filter: drop-shadow(0 0 8px rgba(255, 190, 27, 0.5));
+}
+
+.global-header__logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ========================================
+   中间：阶段导航
+   ======================================== */
+
+.global-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* 阶段胶囊 */
+.global-header__phase {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.global-header__phase-icon {
+  font-size: 14px;
+}
+
+.global-header__phase-name {
+  font-size: 14px;
+}
+
+.global-header__phase-progress {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-left: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+}
+
+.global-header__phase-check {
+  color: #ffbe1b; /* Toki Yellow */
+  margin-left: 4px;
+}
+
+/* 待完成状态 */
+.global-header__phase--pending {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 当前激活状态 */
+.global-header__phase--active {
+  background: white;
+  color: #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.global-header__phase--active .global-header__phase-progress {
+  background: rgba(255, 190, 27, 0.2);
+  color: #ffbe1b; /* Toki Yellow */
+}
+
+/* 已完成状态 */
+.global-header__phase--completed {
+  background: rgba(255, 190, 27, 0.2);
+  color: #ffbe1b; /* Toki Yellow */
+}
+
+/* 连接线 */
+.global-header__connector {
+  width: 32px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+.global-header__connector--active {
+  background: rgba(255, 190, 27, 0.6); /* Toki Yellow */
+}
+
+/* ========================================
+   右侧：计时器 + 用户信息
+   ======================================== */
+
+.global-header__right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 课堂计时器 */
+.global-header__timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  backdrop-filter: blur(4px);
+}
+
+.global-header__timer-icon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.global-header__timer-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
+.global-header__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.global-header__user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.global-header__user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.global-header__user-role {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.global-header__user-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ffbe1b 0%, #f5a800 100%); /* Toki Yellow */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3e3a39; /* Font Gray */
+  box-shadow: 0 2px 8px rgba(255, 190, 27, 0.4);
+}
+
+.global-header__online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #ffbe1b; /* Toki Yellow */
+  border-radius: 50%;
+  border: 2px solid #0063f2; /* 51Talk Blue */
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .global-header {
+    padding: 0 16px;
+  }
+
+  .global-header__phase {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .global-header__phase-name {
+    display: none;
+  }
+
+  .global-header__connector {
+    width: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .global-header__logo-text {
+    display: none;
+  }
+
+  .global-header__user-info {
+    display: none;
+  }
+
+  .global-header__right {
+    gap: 12px;
+  }
+
+  .global-header__timer {
+    padding: 6px 10px;
+  }
+
+  .global-header__timer-value {
+    font-size: 13px;
+  }
+}
+

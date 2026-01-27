@@ -138,4 +138,3 @@ const ModelCards = ({ selectedModel, onSelectModel }) => {
 };
 
 export default ModelCards;
-

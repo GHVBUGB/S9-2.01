@@ -14,16 +14,14 @@ import './WeaponDock.css';
  */
 const WeaponDock = () => {
   const {
-    getCurrentWord,
-    getCurrentRedWord,
-    currentPhase,
+    getActiveWord,
     weaponPopup,
     openWeaponPopup,
     closeWeaponPopup,
   } = useClassroomStore();
 
-  // 获取当前单词（根据阶段）
-  const currentWord = currentPhase === 'RedBox' ? getCurrentRedWord() : getCurrentWord();
+  // 获取当前阶段正在学习的单词
+  const currentWord = getActiveWord();
 
   // 武器列表
   const weapons = [

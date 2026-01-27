@@ -266,4 +266,3 @@ const RedBoxSpelling = ({ word, onComplete }) => {
 };
 
 export default RedBoxSpelling;
-

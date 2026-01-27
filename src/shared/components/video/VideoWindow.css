@@ -1,6 +1,7 @@
 .video-window {
   position: relative;
   width: 100%;
+  /* 16:9 比例：使用 padding-top 技巧 */
   aspect-ratio: 16 / 9;
   background-color: #1a1a1a;
   border-radius: var(--radius-lg);
@@ -110,4 +111,3 @@
 .video-window--current:hover {
   box-shadow: 0 0 0 1px var(--color-primary), var(--shadow-xl);
 }
-

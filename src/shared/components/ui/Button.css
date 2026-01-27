@@ -78,6 +78,40 @@
   background-color: var(--color-bg-secondary);
 }
 
+/* 警告样式 */
+.btn--warning {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: white;
+  border: none;
+}
+
+.btn--warning:hover:not(:disabled) {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn--warning:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 危险样式 */
+.btn--danger {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  border: none;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn--danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 /* 禁用状态 */
 .btn--disabled,
 .btn:disabled {
@@ -109,4 +143,3 @@
     transform: rotate(360deg);
   }
 }
-

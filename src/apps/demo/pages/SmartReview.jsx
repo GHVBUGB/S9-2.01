@@ -75,4 +75,3 @@ const SmartReview = () => {
 };
 
 export default SmartReview;
-

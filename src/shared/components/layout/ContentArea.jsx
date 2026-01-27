@@ -16,4 +16,3 @@ const ContentArea = ({ children, role = 'student' }) => {
 };
 
 export default ContentArea;
-

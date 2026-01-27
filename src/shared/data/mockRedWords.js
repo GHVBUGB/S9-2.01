@@ -3,107 +3,121 @@
  * 红词 = 历史遗留的错词（之前课程学过但没记住的词）
  * 
  * 在 Model B（攻坚复习课）中，这些红词会在 Red Box 阶段优先处理
+ * 
+ * 数据字段参考 word.md
  */
 
 export const mockRedWords = [
   {
-    id: 'red_1',
-    word: 'efficient',
+    id: 'V2-001',
+    word: 'adapt',
     status: 'red',
     lastError: '2024-01-20',
     errorCount: 3,
     // 六维数据
     sound: {
-      ipa: '/ɪˈfɪʃnt/',
-      syllables: 'ef · fi · cient',
-      audioUrl: '/audio/efficient.mp3',
+      ipa: '/əˈdæpt/',
+      syllables: 'a·dapt',
+      audioUrl: '/audio/adapt.mp3',
     },
     meaning: {
-      partOfSpeech: 'adj.',
-      definitionEn: 'working well without wasting time or resources',
-      definitionCn: '高效的；有效率的',
+      partOfSpeech: 'v.',
+      definitionEn: 'To change your way to fit a new place.',
+      definitionCn: '(使)适应',
     },
     context: [
       {
-        sentence: 'She is an efficient worker who always meets deadlines.',
-        sentenceCn: '她是一个高效的员工，总是能按时完成任务。',
-        blankPosition: [3, 4],
+        sentence: 'It takes time to adapt to a new school.',
+        sentenceCn: '适应新学校需要时间。',
+        blankPosition: [4, 5],
       }
     ],
     logic: {
-      mnemonic: 'e-ffi-cient：e像眼睛👁️，ffi像火苗🔥，cient像科学家 → 眼睛盯着火苗的科学家，工作很高效！',
-      etymology: '来自拉丁语 efficere (完成)，ef- (出) + facere (做) = 做出成果',
-      confusables: ['effective', 'sufficient'],
+      mnemonic: 'A大嘴巴是适应，O圆嘴巴是收养。',
+      etymology: 'ad(to)+apt(fit)',
+      confusables: ['adopt', 'adept', 'depth'],
     },
     visual: {
-      imageUrl: '/images/efficient.jpg',
-      imageDescription: '一个高效工作的办公室场景',
+      imageUrl: '/images/adapt.jpg',
+      imageDescription: 'A chameleon changing color on a green leaf.',
+    },
+    phrase: {
+      en: 'adapt to new changes',
+      cn: '适应新的变化',
     },
   },
   {
-    id: 'red_2',
-    word: 'necessary',
+    id: 'V2-002',
+    word: 'environment',
     status: 'red',
     lastError: '2024-01-18',
     errorCount: 4,
     sound: {
-      ipa: '/ˈnesəseri/',
-      syllables: 'nec · es · sa · ry',
-      audioUrl: '/audio/necessary.mp3',
+      ipa: '/ɪnˈvaɪrənmənt/',
+      syllables: 'en·vi·ron·ment',
+      audioUrl: '/audio/environment.mp3',
     },
     meaning: {
-      partOfSpeech: 'adj.',
-      definitionEn: 'needed in order to achieve a result',
-      definitionCn: '必要的；必需的',
+      partOfSpeech: 'n.',
+      definitionEn: 'The place where people and animals live.',
+      definitionCn: '环境',
     },
     context: [
       {
-        sentence: 'It is necessary to learn English for international communication.',
-        sentenceCn: '为了国际交流，学习英语是必要的。',
-        blankPosition: [2, 3],
+        sentence: 'We must plant trees to save the environment.',
+        sentenceCn: '我们必须种树来拯救环境。',
+        blankPosition: [7, 8],
       }
     ],
     logic: {
-      mnemonic: 'ne-ces-sary：一件衬衫(one Collar)，两只袖子(two Sleeves) → 1C + 2S = necessary！',
-      etymology: '来自拉丁语 necessarius，necesse (不可避免的)',
-      confusables: ['necessarily', 'necessity'],
+      mnemonic: 'en(进)+vi(六)+ron(人)→六人进豪门的环境。',
+      etymology: 'environ(surround)+ment',
+      confusables: ['government', 'requirement', 'retirement'],
     },
     visual: {
-      imageUrl: null, // 无图片
-      imageDescription: null,
+      imageUrl: '/images/environment.jpg',
+      imageDescription: 'Hands holding a small green earth.',
+    },
+    phrase: {
+      en: 'protect the environment',
+      cn: '保护环境',
     },
   },
   {
-    id: 'red_3',
-    word: 'separate',
+    id: 'V2-012',
+    word: 'challenge',
     status: 'red',
     lastError: '2024-01-15',
     errorCount: 2,
     sound: {
-      ipa: '/ˈseprət/',
-      syllables: 'sep · a · rate',
-      audioUrl: '/audio/separate.mp3',
+      ipa: '/ˈtʃælɪndʒ/',
+      syllables: 'chal·lenge',
+      audioUrl: '/audio/challenge.mp3',
     },
     meaning: {
-      partOfSpeech: 'v./adj.',
-      definitionEn: 'to divide into parts; not joined or connected',
-      definitionCn: '分开；分离的',
+      partOfSpeech: 'n.',
+      definitionEn: 'A new and difficult job to do.',
+      definitionCn: '挑战',
     },
     context: [
       {
-        sentence: 'Please separate the white clothes from the colored ones.',
-        sentenceCn: '请把白色衣服和彩色衣服分开。',
-        blankPosition: [1, 2],
+        sentence: 'Climbing that high mountain is a big challenge.',
+        sentenceCn: '爬那座高山是个大挑战。',
+        blankPosition: [7, 8],
       }
     ],
     logic: {
-      mnemonic: 'sep-a-rate：中间有个a，就像一堵墙把两边"分开"了！记住：separ-A-te，A在中间！',
-      etymology: '来自拉丁语 separare，se- (分开) + parare (准备)',
-      confusables: ['seperate (错误拼写)', 'desperate'],
+      mnemonic: 'cha(茶)+ll(两)+enge(天使)→天使喝茶比赛。',
+      etymology: 'chall(accusation)+enge',
+      confusables: ['change', 'channel', 'orange'],
     },
     visual: {
-      imageUrl: '/images/separate.jpg',
-      imageDescription: '两个分开的圆圈',
+      imageUrl: '/images/challenge.jpg',
+      imageDescription: 'A climber reaching for a rock ledge.',
+    },
+    phrase: {
+      en: 'face a challenge',
+      cn: '面临挑战',
     },
   },
 ];
@@ -129,4 +143,3 @@ export const getRedWordCount = () => mockRedWords.length;
 export const hasRedWordsBacklog = () => mockRedWords.length > 0;
 
 export default mockRedWords;
-

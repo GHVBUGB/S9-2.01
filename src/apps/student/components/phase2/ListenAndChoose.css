@@ -239,3 +239,27 @@
   }
 }
 
+/* ========================================
+   只读模式（教师端）
+   ======================================== */
+
+.listen-choose__readonly-hint {
+  text-align: center;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius-md);
+  color: #92400e;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin-bottom: var(--spacing-4);
+}
+
+.listen-choose__option--readonly {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.listen-choose__option--readonly:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

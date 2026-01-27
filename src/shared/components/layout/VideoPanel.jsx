@@ -5,8 +5,11 @@ import './VideoPanel.css';
 /**
  * 视频面板组件 (30%)
  * 包含双视频窗口：上方对方视频 + 下方自己视频
+ * 
+ * @param {string} role - 角色：'student' | 'teacher'
+ * @param {React.ReactNode} controls - 可选的控制区域（显示在视频下方）
  */
-const VideoPanel = ({ role = 'student' }) => {
+const VideoPanel = ({ role = 'student', controls = null }) => {
   // 根据角色确定视频顺序
   const isStudent = role === 'student';
   
@@ -23,23 +26,30 @@ const VideoPanel = ({ role = 'student' }) => {
     avatar: null,
     isCurrent: true
   };
-  
+
   return (
     <div className="video-panel">
-      <div className="video-panel__inner">
+      {/* 视频窗口区域 */}
+      <div className="video-panel__videos">
         {/* 对方视频 */}
-        <div className="video-panel__video video-panel__video--other">
+        <div className="video-panel__video-wrapper">
           <VideoWindow {...topVideo} />
         </div>
         
         {/* 自己视频 */}
-        <div className="video-panel__video video-panel__video--self">
+        <div className="video-panel__video-wrapper">
           <VideoWindow {...bottomVideo} />
         </div>
       </div>
+      
+      {/* 控制区域（教师端使用） */}
+      {controls && (
+        <div className="video-panel__controls">
+          {controls}
+        </div>
+      )}
     </div>
   );
 };
 
 export default VideoPanel;
-

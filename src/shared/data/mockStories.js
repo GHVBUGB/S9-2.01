@@ -145,4 +145,3 @@ export const parseStoryText = (text) => {
 };
 
 export default mockStories;
-

@@ -11,17 +11,19 @@
 
 :root {
   /* ========== 品牌色彩 ========== */
-  /* 51Talk 品牌色 */
-  --color-primary: #0063F2;       /* 51Talk蓝 - 主色 */
+  /* 51Talk 官方品牌色 - 仅使用这4种颜色！ */
+  --color-primary: #0063F2;       /* 51Talk Blue - 主色 */
   --color-primary-hover: #0052CC;
-  --color-primary-light: #E3F2FD;
+  --color-primary-light: rgba(0, 99, 242, 0.1);
   
-  --color-secondary: #FFBE1B;     /* Toki黄 - 强调色 */
+  --color-secondary: #FFBE1B;     /* Toki Yellow - 强调色 */
   --color-secondary-hover: #FFA000;
-  --color-secondary-light: #FFF9C4;
+  --color-secondary-light: rgba(255, 190, 27, 0.1);
   
-  --color-accent: #26B7FF;        /* 天蓝色 - 辅助色 */
-  --color-accent-light: #E1F5FE;
+  --color-accent: #26B7FF;        /* Sky Blue - 辅助色 */
+  --color-accent-light: rgba(38, 183, 255, 0.1);
+  
+  --color-text-dark: #3E3A39;     /* Font Gray - 文字色 */
   
   /* 状态色（交通灯系统） */
   --color-red: #F44336;           /* 🔴 Red - 待修补 */

@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import Button from '../../../../shared/components/ui/Button';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import './GhostSpelling.css';
 
 /**
- * L3 幽灵拼写
- * 骨架提示 + 补全字母
- * 目的：形 → 形，架梯子
+ * L3 幽灵拼写（重构版）
+ * 只显示首尾字母，中间挖空让学生直接填写
+ * 每个空位是独立的输入框，自动跳转
+ * 
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const GhostSpelling = ({ word, onComplete }) => {
-  // ✅ 从 store 获取状态和 actions
+const GhostSpelling = ({ word, onComplete, readonly = false }) => {
   const { 
     studentState, 
     teacherState,
@@ -19,190 +20,220 @@ const GhostSpelling = ({ word, onComplete }) => {
     resetStudentState,
   } = useClassroomStore();
 
-  // ✅ 使用 store 的状态
-  const inputValue = studentState.inputText;
   const submitted = studentState.isSubmitted;
   const isCorrect = studentState.isCorrect;
   
-  const inputRef = useRef(null);
+  // 每个空位的输入值（学生端用本地状态，教师端从 store 读取）
+  const [letters, setLetters] = useState([]);
+  const inputRefs = useRef([]);
+  
+  // 教师端：从 store 的 inputText 解析出字母数组
+  const displayLetters = readonly 
+    ? studentState.inputText.split('').concat(Array(100).fill('')).slice(0, letters.length || 10)
+    : letters;
+
+  // 计算单词结构：哪些位置显示字母，哪些位置需要填写
+  const wordStructure = useMemo(() => {
+    const w = word.word;
+    const len = w.length;
+    
+    // 只显示首尾字母
+    return w.split('').map((char, index) => ({
+      char,
+      index,
+      isVisible: index === 0 || index === len - 1, // 只有首尾可见
+      isBlank: index !== 0 && index !== len - 1,   // 中间都是空白
+    }));
+  }, [word]);
+
+  // 需要填写的空位数量
+  const blankCount = wordStructure.filter(s => s.isBlank).length;
+  
+  // 需要填写的正确字母
+  const correctLetters = useMemo(() => {
+    return wordStructure
+      .filter(s => s.isBlank)
+      .map(s => s.char.toLowerCase());
+  }, [wordStructure]);
 
   // 重置状态
   useEffect(() => {
-    resetStudentState();
-    // 自动聚焦输入框
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 300);
-  }, [word.id, resetStudentState]);
-
-  // ✅ 监听教师命令
-  useEffect(() => {
-    if (!teacherState.command) return;
-
-    if (teacherState.command === 'repeat') {
-      // 教师点击重做
+    if (!readonly) {
       resetStudentState();
+    }
+    setLetters(Array(blankCount).fill(''));
+    // 自动聚焦第一个输入框（仅学生端）
+    if (!readonly) {
       setTimeout(() => {
-        inputRef.current?.focus();
+        inputRefs.current[0]?.focus();
       }, 300);
-    } else if (teacherState.showAnswer && !submitted) {
-      // 教师点击显示答案
-      studentInputText(missingLetters);
+    }
+  }, [word.id, blankCount, resetStudentState, readonly]);
+
+  // 监听教师命令
+  useEffect(() => {
+    if (teacherState.command === 'repeat' && !readonly) {
+      resetStudentState();
+      setLetters(Array(blankCount).fill(''));
       setTimeout(() => {
-        handleSubmit(true); // 强制提交为正确
+        inputRefs.current[0]?.focus();
+      }, 300);
+    }
+  }, [teacherState.command, blankCount, resetStudentState, readonly]);
+
+  // 教师显示答案（仅学生端响应）
+  useEffect(() => {
+    if (teacherState.showAnswer && !submitted && !readonly) {
+      setLetters(correctLetters);
+      studentInputText(correctLetters.join(''));
+      setTimeout(() => {
+        studentSubmitAnswer(true);
+        setTimeout(() => onComplete(true), 1500);
       }, 500);
     }
-  }, [teacherState.command, teacherState.showAnswer]);
+  }, [teacherState.showAnswer, readonly]);
 
-  // 生成骨架（保留首尾和部分字母）
-  const skeleton = useMemo(() => {
-    const w = word.word;
-    const len = w.length;
+  // 处理单个输入框变化（仅学生端）
+  const handleLetterChange = useCallback((index, value) => {
+    if (submitted || readonly) return;
     
-    if (len <= 3) {
-      // 短词：只显示首字母
-      return w[0] + ' _'.repeat(len - 1);
-    } else if (len <= 5) {
-      // 中等词：显示首尾
-      return w[0] + ' _ '.repeat(len - 2) + w[len - 1];
-    } else {
-      // 长词：显示首尾和中间一个字母
-      const midIndex = Math.floor(len / 2);
-      let result = '';
-      for (let i = 0; i < len; i++) {
-        if (i === 0 || i === len - 1 || i === midIndex) {
-          result += w[i];
-        } else {
-          result += ' _ ';
-        }
-      }
-      return result;
-    }
-  }, [word]);
-
-  // 计算需要填写的字母
-  const missingLetters = useMemo(() => {
-    const w = word.word;
-    const len = w.length;
+    // 只取最后一个字符，转小写
+    const newValue = value.slice(-1).toLowerCase();
     
-    if (len <= 3) {
-      return w.slice(1);
-    } else if (len <= 5) {
-      return w.slice(1, -1);
-    } else {
-      const midIndex = Math.floor(len / 2);
-      let missing = '';
-      for (let i = 0; i < len; i++) {
-        if (i !== 0 && i !== len - 1 && i !== midIndex) {
-          missing += w[i];
-        }
-      }
-      return missing;
-    }
-  }, [word]);
+    setLetters(prev => {
+      const newLetters = [...prev];
+      newLetters[index] = newValue;
+      // 同步到 store
+      studentInputText(newLetters.join(''));
+      return newLetters;
+    });
 
-  // 处理输入
-  const handleInputChange = (e) => {
-    if (!submitted) {
-      studentInputText(e.target.value.toLowerCase()); // ✅ 更新到 store，教师端立即看到
+    // 如果输入了字符，自动跳到下一个输入框
+    if (newValue && index < blankCount - 1) {
+      setTimeout(() => {
+        inputRefs.current[index + 1]?.focus();
+      }, 0);
     }
-  };
+  }, [submitted, readonly, blankCount, studentInputText]);
+
+  // 处理键盘事件
+  const handleKeyDown = useCallback((index, e) => {
+    if (submitted) return;
+
+    if (e.key === 'Backspace') {
+      if (letters[index] === '' && index > 0) {
+        // 当前为空，删除上一个并跳回
+        e.preventDefault();
+        setLetters(prev => {
+          const newLetters = [...prev];
+          newLetters[index - 1] = '';
+          studentInputText(newLetters.join(''));
+          return newLetters;
+        });
+        inputRefs.current[index - 1]?.focus();
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < blankCount - 1) {
+      e.preventDefault();
+      inputRefs.current[index + 1]?.focus();
+    } else if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  }, [submitted, letters, blankCount, studentInputText]);
 
   // 提交答案
-  const handleSubmit = (forceCorrect = false) => {
-    if (inputValue.trim() === '') return;
+  const handleSubmit = () => {
+    const userInput = letters.join('').toLowerCase();
+    const expectedInput = correctLetters.join('');
     
-    // 检查输入是否正确
-    const correct = forceCorrect || (inputValue.toLowerCase() === missingLetters.toLowerCase());
+    if (userInput.length !== expectedInput.length) return;
     
-    studentSubmitAnswer(correct); // ✅ 更新到 store，教师端立即看到
+    const correct = userInput === expectedInput;
     
+    console.log('🎯 [GhostSpelling] 提交答案:', {
+      userInput,
+      expectedInput,
+      isCorrect: correct
+    });
+    
+    studentSubmitAnswer(correct);
+    
+    // 无论对错都进入下一题，错题会在轮次结束后统一重做
     setTimeout(() => {
       onComplete(correct);
-      if (!correct) {
-        // 错误时重试
-        setTimeout(() => {
-          resetStudentState();
-          inputRef.current?.focus();
-        }, 2500);
-      }
     }, 1500);
   };
 
-  // 处理回车提交
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
+  // 检查是否所有空位都已填写
+  const allFilled = letters.every(l => l !== '');
 
+  // 渲染单词骨架
+  let blankIndex = 0;
+  
   return (
-    <div className="ghost-spelling">
-      {/* 提示信息 */}
-      <div className="ghost-spelling__hint">
-        <span className="ghost-spelling__hint-icon">💡</span>
-        <span className="ghost-spelling__hint-text">
-          提示：{word.meaning?.definitionCn} ({word.meaning?.partOfSpeech})
-        </span>
-      </div>
-
-      {/* 骨架展示 */}
-      <div className="ghost-spelling__skeleton-container">
-        <div className="ghost-spelling__skeleton">
-          {skeleton.split('').map((char, index) => (
-            <span 
-              key={index} 
-              className={`ghost-spelling__char ${char === '_' ? 'ghost-spelling__char--blank' : 'ghost-spelling__char--letter'}`}
-            >
-              {char === '_' ? '_' : char}
-            </span>
-          ))}
+    <div className={`ghost-spelling ${readonly ? 'ghost-spelling--readonly' : ''}`}>
+      {/* 只读模式提示 */}
+      {readonly && (
+        <div className="ghost-spelling__readonly-hint">
+          👀 教师观看模式 - 等待学生输入
+        </div>
+      )}
+      
+      {/* 单词骨架 - 直接填写 */}
+      <div className="ghost-spelling__word-container">
+        <div className="ghost-spelling__word">
+          {wordStructure.map((item, index) => {
+            if (item.isVisible) {
+              // 显示固定字母
+              return (
+                <span 
+                  key={index} 
+                  className={`ghost-spelling__letter ghost-spelling__letter--fixed ${
+                    submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
+                  }`}
+                >
+                  {item.char}
+                </span>
+              );
+            } else {
+              // 可编辑的空位
+              const currentBlankIndex = blankIndex++;
+              const inputValue = displayLetters[currentBlankIndex] || '';
+              const isInputCorrect = submitted && inputValue.toLowerCase() === item.char.toLowerCase();
+              const isInputWrong = submitted && inputValue.toLowerCase() !== item.char.toLowerCase();
+              
+              return (
+                <input
+                  key={index}
+                  ref={el => inputRefs.current[currentBlankIndex] = el}
+                  type="text"
+                  className={`ghost-spelling__letter ghost-spelling__letter--input ${
+                    inputValue ? 'has-value' : ''
+                  } ${isInputCorrect ? 'is-correct' : ''} ${isInputWrong ? 'is-wrong' : ''} ${readonly ? 'is-readonly' : ''}`}
+                  value={inputValue}
+                  onChange={(e) => handleLetterChange(currentBlankIndex, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(currentBlankIndex, e)}
+                  disabled={submitted || readonly}
+                  maxLength={2}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  readOnly={readonly}
+                />
+              );
+            }
+          })}
         </div>
       </div>
 
-      {/* 输入区域 */}
-      <div className="ghost-spelling__input-section">
-        <div className="ghost-spelling__instruction">
-          补全缺失的字母：
-        </div>
-        <div className="ghost-spelling__input-wrapper">
-          <input
-            ref={inputRef}
-            type="text"
-            className={`ghost-spelling__input ${
-              submitted 
-                ? isCorrect 
-                  ? 'ghost-spelling__input--correct' 
-                  : 'ghost-spelling__input--wrong'
-                : ''
-            }`}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder={`输入 ${missingLetters.length} 个字母...`}
-            disabled={submitted}
-            autoComplete="off"
-            autoCapitalize="off"
-            spellCheck="false"
-          />
-          {submitted && (
-            <div className="ghost-spelling__input-icon">
-              {isCorrect ? (
-                <CheckCircle2 size={24} color="var(--color-green)" />
-              ) : (
-                <XCircle size={24} color="var(--color-red)" />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 提交按钮 */}
-      {!submitted && (
+      {/* 提交按钮（仅学生端显示） */}
+      {!submitted && !readonly && (
         <Button
           variant="primary"
           onClick={handleSubmit}
-          disabled={inputValue.trim() === ''}
+          disabled={!allFilled}
           className="ghost-spelling__submit-btn"
         >
           检查
@@ -224,9 +255,8 @@ const GhostSpelling = ({ word, onComplete }) => {
             <>
               <XCircle size={24} />
               <div className="ghost-spelling__feedback-content">
-                <span>错误，正确答案是 <strong>{missingLetters}</strong></span>
-                <span className="ghost-spelling__feedback-word">{word.word}</span>
-                <span className="ghost-spelling__feedback-retry">再试一次</span>
+                <span>正确答案是 <strong>{word.word}</strong></span>
+                <span className="ghost-spelling__feedback-retry">稍后重做</span>
               </div>
             </>
           )}
@@ -237,4 +267,3 @@ const GhostSpelling = ({ word, onComplete }) => {
 };
 
 export default GhostSpelling;
-

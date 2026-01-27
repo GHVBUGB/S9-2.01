@@ -249,4 +249,3 @@ word.visual.imageUrl; // "/images/adapt.jpg"
 **单词总数**：30个  
 
 🎉 所有数据已完整集成，可以开始测试和开发！
-

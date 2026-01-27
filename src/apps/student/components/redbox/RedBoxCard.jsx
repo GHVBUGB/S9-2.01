@@ -1,26 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
-import { Volume2, Mic, CheckCircle2, XCircle } from 'lucide-react';
+import { Volume2, CheckCircle2, XCircle, Heart, Layers, Wand2, Lightbulb, Brain } from 'lucide-react';
 import './RedBoxCard.css';
 
 /**
  * Red Box 单词卡片组件
- * 极简设计，根据当前步骤显示不同内容
+ * 
+ * 新设计（三步流程）：
+ * - Step 1: 定音定形（听音、看形、建立音形对应）
+ * - Step 2: 精准助记（教师选择武器：音节/词根/口诀/语境）
+ * - Step 3: L4 验收（完整拼写验收）
+ * 
+ * 支持 readonly 模式（教师端监控学生输入）
  */
-const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
+const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) => {
   const {
     studentState,
     teacherState,
+    redBoxUI,
     studentInputText,
     studentSubmitAnswer,
     resetStudentState,
+    updateWordResult,
   } = useClassroomStore();
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showPhonetic, setShowPhonetic] = useState(false);
-  const [showSyllables, setShowSyllables] = useState(false);
-  const [showEtymology, setShowEtymology] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [attempts, setAttempts] = useState(2);
   const inputRef = useRef(null);
 
@@ -28,18 +32,13 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
   const submitted = studentState.isSubmitted;
   const isCorrect = studentState.isCorrect;
 
-  // 重置状态（当单词或步骤变化时）
+  // 重置状态（当单词变化时）
   useEffect(() => {
-    setShowPhonetic(false);
-    setShowSyllables(false);
-    setShowEtymology(false);
-    setIsPlaying(false);
-    setIsRecording(false);
     setAttempts(2);
-    resetStudentState();
-  }, [word?.id, step]);
+    setIsPlaying(false);
+  }, [word?.id]);
 
-  // 监听教师命令 - 关键：添加 teacherState.command 到依赖数组
+  // 监听教师命令
   useEffect(() => {
     const cmd = teacherState.command;
     if (!cmd) return;
@@ -50,45 +49,28 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
       case 'playAudio':
         handlePlayAudio();
         break;
-      case 'showPhonetic':
-        setShowPhonetic(true);
-        break;
-      case 'showSyllables':
-        setShowSyllables(true);
-        break;
-      case 'showEtymology':
-        setShowEtymology(true);
-        break;
-      case 'startRecord':
-        setIsRecording(true);
-        break;
-      case 'stopRecord':
-        setIsRecording(false);
-        break;
       case 'repeat':
         resetStudentState();
-        setShowPhonetic(false);
-        setShowSyllables(false);
-        setShowEtymology(false);
         setAttempts(2);
-        inputRef.current?.focus();
+        if (!readonly) {
+          inputRef.current?.focus();
+        }
+        break;
+      case 'showAnswer':
+        if (!submitted && !readonly) {
+          studentInputText(word.word);
+          studentSubmitAnswer(true);
+          updateWordResult(word.id, 'redbox', true);
+        }
         break;
       default:
         break;
     }
-  }, [teacherState.command]); // 关键：监听命令变化
-
-  // 监听显示答案
-  useEffect(() => {
-    if (teacherState.showAnswer && step === 4 && !submitted) {
-      studentInputText(word.word);
-      studentSubmitAnswer(true);
-    }
-  }, [teacherState.showAnswer]);
+  }, [teacherState.command]);
 
   // 播放发音
   const handlePlayAudio = () => {
-    if (!word?.word) return;
+    if (!word?.word || isPlaying) return;
     setIsPlaying(true);
     const utterance = new SpeechSynthesisUtterance(word.word);
     utterance.lang = 'en-US';
@@ -97,26 +79,35 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // 处理输入
+  // 处理输入（仅学生端）
   const handleInputChange = (e) => {
-    if (!submitted) {
+    if (!submitted && !readonly) {
       studentInputText(e.target.value);
     }
   };
 
   // 提交验收
   const handleSubmit = () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === '' || readonly) return;
     const correct = inputValue.toLowerCase().trim() === word.word.toLowerCase();
     studentSubmitAnswer(correct);
-    if (!correct) {
-      setAttempts(prev => prev - 1);
+    
+    if (correct) {
+      updateWordResult(word.id, 'redbox', true);
+    } else {
+      setAttempts(prev => {
+        const newAttempts = prev - 1;
+        if (newAttempts <= 0) {
+          updateWordResult(word.id, 'redbox', false);
+        }
+        return newAttempts;
+      });
     }
   };
 
   // 处理回车
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !readonly) {
       handleSubmit();
     }
   };
@@ -124,7 +115,8 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
   // 渲染音节高亮
   const renderSyllables = () => {
     if (!word?.sound?.syllables) return word?.word;
-    const parts = word.sound.syllables.split(' · ');
+    // 支持多种分隔符格式：'·' 或 ' · ' 或 '-'
+    const parts = word.sound.syllables.split(/[·\-]/).map(s => s.trim()).filter(Boolean);
     return parts.map((part, idx) => (
       <span key={idx} className="redbox-card__syllable">
         {part}
@@ -134,58 +126,49 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
   };
 
   // 生成语境挖空句
-  const getBlankSentence = () => {
+  const getBlankSentence = useMemo(() => {
     if (!word?.context?.[0]?.sentence) return '';
     return word.context[0].sentence.replace(
       new RegExp(`\\b${word.word}\\b`, 'gi'),
       '_______'
     );
+  }, [word]);
+
+  // 武器图标映射
+  const weaponIcons = {
+    phonics: <Layers size={20} />,
+    context: <Wand2 size={20} />,
+    visual: <Lightbulb size={20} />,
+    compare: <Brain size={20} />,
   };
 
   if (!word) return null;
 
   return (
-    <div className="redbox-card">
-      {/* 进度指示器 */}
-      <div className="redbox-card__progress">
-        <span className="redbox-card__progress-text">{currentIndex + 1} / {totalWords}</span>
-        <div className="redbox-card__progress-dots">
+    <div className={`redbox-card ${readonly ? 'redbox-card--readonly' : ''}`}>
+      {/* 顶部进度条 */}
+      <div className="redbox-card__header">
+        <div className="redbox-card__progress-bar">
           {[...Array(totalWords)].map((_, i) => (
-            <span 
-              key={i} 
-              className={`redbox-card__dot ${i === currentIndex ? 'redbox-card__dot--active' : ''} ${i < currentIndex ? 'redbox-card__dot--done' : ''}`}
+            <div 
+              key={i}
+              className={`redbox-card__progress-dot ${i === currentIndex ? 'is-active' : ''} ${i < currentIndex ? 'is-done' : ''}`}
             />
           ))}
+        </div>
+        <div className="redbox-card__progress-text">
+          红词 {currentIndex + 1}/{totalWords}
         </div>
       </div>
 
       {/* 主卡片 */}
       <div className={`redbox-card__main redbox-card__main--step${step}`}>
         
-        {/* Step 1: 听音 */}
+        {/* Step 1: 定音定形 */}
         {step === 1 && (
-          <>
-            <div className="redbox-card__word-section">
-              <span className="redbox-card__word">{word.word}</span>
-              <button 
-                className={`redbox-card__audio-btn ${isPlaying ? 'redbox-card__audio-btn--playing' : ''}`}
-                onClick={handlePlayAudio}
-                disabled={isPlaying}
-              >
-                <Volume2 size={24} />
-              </button>
-            </div>
-            {showPhonetic && (
-              <div className="redbox-card__phonetic">{word.sound?.ipa}</div>
-            )}
-          </>
-        )}
-
-        {/* Step 2: 看形 */}
-        {step === 2 && (
-          <>
-            <div className="redbox-card__word-section">
-              {showSyllables ? (
+          <div className="redbox-card__step1">
+            <div className="redbox-card__word-display">
+              {redBoxUI.showSyllables ? (
                 <span className="redbox-card__word redbox-card__word--syllables">
                   {renderSyllables()}
                 </span>
@@ -193,148 +176,192 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex }) => {
                 <span className="redbox-card__word">{word.word}</span>
               )}
               <button 
-                className={`redbox-card__audio-btn ${isPlaying ? 'redbox-card__audio-btn--playing' : ''}`}
+                className={`redbox-card__audio-btn ${isPlaying ? 'is-playing' : ''}`}
                 onClick={handlePlayAudio}
+                disabled={isPlaying}
               >
                 <Volume2 size={24} />
               </button>
             </div>
-            <div className="redbox-card__phonetic">{word.sound?.ipa}</div>
-            {showEtymology && word.logic?.etymology && (
-              <div className="redbox-card__etymology">
-                <p>{word.logic.etymology}</p>
+            
+            {redBoxUI.showPhonetic && (
+              <div className="redbox-card__phonetic">{word.sound?.ipa}</div>
+            )}
+
+            <div className="redbox-card__meaning">
+              {word.meaning?.definitionCn}
+            </div>
+
+            {!redBoxUI.audioPlayed && !redBoxUI.showSyllables && !redBoxUI.showPhonetic && (
+              <div className="redbox-card__hint">
+                👆 等待老师操作
               </div>
             )}
-          </>
+          </div>
         )}
 
-        {/* Step 3: 助记 */}
-        {step === 3 && (
-          <>
-            <div className="redbox-card__word-section">
-              <span className="redbox-card__word">{word.word}</span>
+        {/* Step 2: 精准助记 */}
+        {step === 2 && (
+          <div className="redbox-card__step2">
+            <div className="redbox-card__word-mini">
+              {word.word}
+              <button 
+                className={`redbox-card__audio-btn-sm ${isPlaying ? 'is-playing' : ''}`}
+                onClick={handlePlayAudio}
+              >
+                <Volume2 size={18} />
+              </button>
             </div>
-            <div className="redbox-card__mnemonic">
-              {teacherState.selectedWeapon === 'compare' && word.logic?.confusables && (
-                <div className="redbox-card__mnemonic-content">
-                  <h4>📊 形近词对比</h4>
-                  <div className="redbox-card__compare-grid">
+
+            {redBoxUI.selectedWeapon ? (
+              <div className="redbox-card__weapon-content">
+                <div className="redbox-card__weapon-header">
+                  {weaponIcons[redBoxUI.selectedWeapon]}
+                  <span>
+                    {redBoxUI.selectedWeapon === 'phonics' && '音节拆解'}
+                    {redBoxUI.selectedWeapon === 'context' && '语境记忆'}
+                    {redBoxUI.selectedWeapon === 'visual' && '记忆口诀'}
+                    {redBoxUI.selectedWeapon === 'compare' && '形近对比'}
+                  </span>
+                </div>
+
+                {/* 音节拆解 */}
+                {redBoxUI.selectedWeapon === 'phonics' && (
+                  <div className="redbox-card__phonics">
+                    {word.sound?.syllables?.split(/[·\-]/).map(s => s.trim()).filter(Boolean).map((s, i) => (
+                      <span key={i} className="redbox-card__phonics-part">{s}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* 语境记忆 */}
+                {redBoxUI.selectedWeapon === 'context' && word.context?.[0] && (
+                  <div className="redbox-card__context">
+                    <p className="redbox-card__context-en">{word.context[0].sentence}</p>
+                    <p className="redbox-card__context-cn">{word.context[0].sentenceCn}</p>
+                  </div>
+                )}
+
+                {/* 记忆口诀 */}
+                {redBoxUI.selectedWeapon === 'visual' && (
+                  <div className="redbox-card__mnemonic">
+                    <p>{word.logic?.mnemonic || '暂无口诀'}</p>
+                  </div>
+                )}
+
+                {/* 形近对比 */}
+                {redBoxUI.selectedWeapon === 'compare' && (
+                  <div className="redbox-card__compare">
                     <div className="redbox-card__compare-item redbox-card__compare-item--target">
                       <span>{word.word}</span>
                       <small>{word.meaning?.definitionCn}</small>
                     </div>
-                    {word.logic.confusables.map((conf, i) => (
+                    {word.logic?.confusables?.map((conf, i) => (
                       <div key={i} className="redbox-card__compare-item">
                         <span>{conf}</span>
                         <small>易混淆</small>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-              {teacherState.selectedWeapon === 'context' && word.context?.[0] && (
-                <div className="redbox-card__mnemonic-content">
-                  <h4>📚 语境记忆</h4>
-                  <p className="redbox-card__context-sentence">{word.context[0].sentence}</p>
-                  <p className="redbox-card__context-cn">{word.context[0].sentenceCn}</p>
-                </div>
-              )}
-              {teacherState.selectedWeapon === 'visual' && word.logic?.mnemonic && (
-                <div className="redbox-card__mnemonic-content">
-                  <h4>💡 记忆口诀</h4>
-                  <p className="redbox-card__mnemonic-text">{word.logic.mnemonic}</p>
-                </div>
-              )}
-              {teacherState.selectedWeapon === 'phonics' && word.sound?.syllables && (
-                <div className="redbox-card__mnemonic-content">
-                  <h4>🎵 音节拆解</h4>
-                  <div className="redbox-card__phonics">
-                    {word.sound.syllables.split(' · ').map((s, i) => (
-                      <span key={i} className="redbox-card__phonics-part">{s}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {!teacherState.selectedWeapon && (
-                <div className="redbox-card__waiting">
-                  <p>等待老师选择助记方式...</p>
-                </div>
-              )}
-            </div>
-          </>
+                )}
+              </div>
+            ) : (
+              <div className="redbox-card__waiting">
+                <div className="redbox-card__waiting-icon">🛠️</div>
+                <p>等待老师选择助记武器...</p>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Step 4: 验收 */}
-        {step === 4 && (
-          <>
-            <div className="redbox-card__test-section">
-              <p className="redbox-card__context-hint">{getBlankSentence()}</p>
-              <p className="redbox-card__context-cn">{word.context?.[0]?.sentenceCn}</p>
+        {/* Step 3: L4 验收 */}
+        {step === 3 && (
+          <div className="redbox-card__step3">
+            {/* 语境提示 */}
+            <div className="redbox-card__test-context">
+              <p className="redbox-card__test-sentence">{getBlankSentence}</p>
+              <p className="redbox-card__test-cn">{word.context?.[0]?.sentenceCn}</p>
+            </div>
+
+            {/* 输入区 */}
+            <div className="redbox-card__input-section">
               <div className="redbox-card__input-wrapper">
                 <input
                   ref={inputRef}
                   type="text"
                   className={`redbox-card__input ${
-                    submitted ? (isCorrect ? 'redbox-card__input--correct' : 'redbox-card__input--wrong') : ''
+                    submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
                   }`}
                   value={inputValue}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  placeholder="输入单词..."
-                  disabled={submitted}
+                  placeholder={readonly ? '监控学生输入...' : '输入完整单词...'}
+                  disabled={submitted || readonly}
                   autoComplete="off"
-                  autoFocus
+                  autoCapitalize="off"
+                  spellCheck="false"
                 />
                 {submitted && (
                   <span className="redbox-card__input-icon">
-                    {isCorrect ? <CheckCircle2 color="#22c55e" /> : <XCircle color="#ef4444" />}
+                    {isCorrect ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
                   </span>
                 )}
               </div>
+
+              {/* 错误时显示正确答案 */}
               {submitted && !isCorrect && (
-                <p className="redbox-card__answer">正确答案: <strong>{word.word}</strong></p>
-              )}
-              {!submitted && (
-                <div className="redbox-card__attempts">
-                  剩余机会: {'❤️'.repeat(attempts)}{'🖤'.repeat(2 - attempts)}
+                <div className="redbox-card__answer">
+                  正确答案：<strong>{word.word}</strong>
                 </div>
               )}
             </div>
-          </>
-        )}
-      </div>
 
-      {/* 底部操作区 */}
-      <div className="redbox-card__footer">
-        {step === 1 && (
-          <button 
-            className={`redbox-card__record-btn ${isRecording ? 'redbox-card__record-btn--recording' : ''}`}
-            onClick={() => setIsRecording(!isRecording)}
-          >
-            <Mic size={28} />
-            {isRecording && <span className="redbox-card__record-text">跟读中...</span>}
-          </button>
-        )}
-        
-        {step === 3 && teacherState.selectedWeapon && (
-          <button className="redbox-card__confirm-btn">
-            👍 我记住了
-          </button>
-        )}
-        
-        {step === 4 && !submitted && (
-          <button 
-            className="redbox-card__submit-btn"
-            onClick={handleSubmit}
-            disabled={!inputValue.trim()}
-          >
-            提交
-          </button>
-        )}
-        
-        {step === 4 && submitted && (
-          <div className={`redbox-card__result ${isCorrect ? 'redbox-card__result--success' : 'redbox-card__result--fail'}`}>
-            {isCorrect ? '✅ 攻克成功！' : (attempts > 0 ? '❌ 再试一次' : '💔 下次继续')}
+            {/* 状态信息 */}
+            <div className="redbox-card__status">
+              <div className="redbox-card__attempts">
+                {[...Array(2)].map((_, i) => (
+                  <Heart
+                    key={i}
+                    size={20}
+                    className={i < attempts ? 'is-filled' : ''}
+                    fill={i < attempts ? '#ef4444' : 'none'}
+                    stroke={i < attempts ? '#ef4444' : '#d1d5db'}
+                  />
+                ))}
+              </div>
+              
+              {!readonly && !submitted && (
+                <button 
+                  className="redbox-card__submit-btn"
+                  onClick={handleSubmit}
+                  disabled={!inputValue.trim()}
+                >
+                  提交验收
+                </button>
+              )}
+            </div>
+
+            {/* 结果反馈 */}
+            {submitted && (
+              <div className={`redbox-card__feedback ${isCorrect ? 'is-success' : 'is-fail'}`}>
+                {isCorrect ? (
+                  <>
+                    <CheckCircle2 size={24} />
+                    <span>🎉 红词攻克成功！</span>
+                  </>
+                ) : attempts > 0 ? (
+                  <>
+                    <XCircle size={24} />
+                    <span>再试一次，还有 {attempts} 次机会</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={24} />
+                    <span>💪 下节课继续攻坚</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -292,4 +292,3 @@ const ToolboxStep = ({ word, onComplete }) => {
 };
 
 export default ToolboxStep;
-

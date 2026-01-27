@@ -1,9 +1,10 @@
-/* Red Box Container - 简化版 */
+/* Red Box Container - 现代卡片式设计 */
 .redbox-container {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  flex: 1;
   width: 100%;
+  min-height: 0;
 }
 
 /* Loading State */
@@ -14,6 +15,7 @@
   min-height: 300px;
   font-size: var(--font-size-lg);
   color: var(--color-neutral-500);
+  background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 50%, #fffbeb 100%);
 }
 
 /* Summary Styles */
@@ -106,4 +108,30 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.redbox-summary__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.redbox-summary__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 50%;
+  color: #f59e0b;
+  margin-bottom: var(--spacing-md);
 }

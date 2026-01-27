@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Card from '../../../shared/components/ui/Card';
 import Badge from '../../../shared/components/ui/Badge';
@@ -6,7 +6,7 @@ import Button from '../../../shared/components/ui/Button';
 import RedBoxControl from '../components/RedBoxControl';
 import { WeaponDock } from '../../../shared/components/weapon';
 import useClassroomStore from '../../../shared/store/useClassroomStore';
-import { SkipForward, RotateCcw, Eye, EyeOff, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { SkipForward, RotateCcw, Eye, EyeOff, CheckCircle2, XCircle, Clock, FastForward, AlertTriangle } from 'lucide-react';
 import './Dashboard.css';
 
 /**
@@ -17,6 +17,10 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [searchParams] = useSearchParams();
   const model = searchParams.get('model') || 'A';
+  
+  // 强制进入下一阶段确认弹窗状态
+  const [showForceConfirm, setShowForceConfirm] = useState(false);
+  const [forceResult, setForceResult] = useState(null);
 
   // 从共享 store 获取状态
   const {
@@ -41,7 +45,12 @@ const Dashboard = () => {
     getWordStats,
     getP1Progress,
     getRedBoxProgress,
+    forceNextPhase,
+    getNextPhaseInfo,
   } = useClassroomStore();
+  
+  // 获取下一阶段信息
+  const nextPhaseInfo = getNextPhaseInfo();
 
   // 获取当前单词（新词或红词）
   const currentWord = currentPhase === 'RedBox' ? getCurrentRedWord() : getCurrentWord();
@@ -234,6 +243,103 @@ const Dashboard = () => {
             </div>
           </Card>
         </>
+      )}
+      
+      {/* 强制进入下一阶段按钮 - 全局显示 */}
+      {nextPhaseInfo && currentPhase !== 'Summary' && (
+        <Card variant="bordered" padding="md" className="dashboard__force-next">
+          <div className="dashboard__force-next-header">
+            <h3 className="dashboard__card-title">⚡ 阶段控制</h3>
+            <Badge variant="yellow" size="sm">教师专属</Badge>
+          </div>
+          <div className="dashboard__force-next-info">
+            <span className="dashboard__force-next-current">
+              当前: <strong>{phaseNames[currentPhase]}</strong>
+            </span>
+            <span className="dashboard__force-next-arrow">→</span>
+            <span className="dashboard__force-next-target">
+              下一阶段: <strong>{nextPhaseInfo.name}</strong>
+            </span>
+          </div>
+          <div className="dashboard__force-next-progress">
+            {currentPhase === 'P1' && (
+              <span>当前进度: {currentWordIndex + (studentState.isSubmitted ? 1 : 0)} / {wordList.length} 单词已测试</span>
+            )}
+            {currentPhase === 'P2' && (
+              <span>当前进度: 第{studentState.p2Round}轮 第{studentState.p2WordIndex + 1}词</span>
+            )}
+            {currentPhase === 'P3' && (
+              <span>当前进度: {wordList.filter(w => wordResults[w.id]?.p3Passed !== undefined).length} / {wordList.length} 单词已验收</span>
+            )}
+            {currentPhase === 'RedBox' && (
+              <span>当前进度: {currentRedWordIndex + 1} / {redWords.length} 红词</span>
+            )}
+          </div>
+          <Button 
+            variant="warning"
+            size="lg"
+            className="dashboard__force-next-btn"
+            onClick={() => setShowForceConfirm(true)}
+          >
+            <FastForward size={20} />
+            强制进入下一阶段
+          </Button>
+          <p className="dashboard__force-next-hint">
+            ⚠️ 点击后将立即结束当前阶段，未完成的单词将被跳过
+          </p>
+        </Card>
+      )}
+      
+      {/* 强制进入下一阶段确认弹窗 */}
+      {showForceConfirm && (
+        <div className="dashboard__modal-overlay" onClick={() => setShowForceConfirm(false)}>
+          <div className="dashboard__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="dashboard__modal-header">
+              <AlertTriangle size={24} className="dashboard__modal-icon" />
+              <h3>确认强制进入下一阶段？</h3>
+            </div>
+            <div className="dashboard__modal-body">
+              <p>此操作将：</p>
+              <ul>
+                <li>立即结束 <strong>{phaseNames[currentPhase]}</strong> 阶段</li>
+                <li>进入 <strong>{nextPhaseInfo?.name}</strong> 阶段</li>
+                <li>未完成的单词将被跳过，不会进入后续阶段</li>
+              </ul>
+              {currentPhase === 'P1' && (
+                <p className="dashboard__modal-warning">
+                  当前已测试 <strong>{currentWordIndex + (studentState.isSubmitted ? 1 : 0)}</strong> / {wordList.length} 个单词，
+                  剩余 <strong>{wordList.length - currentWordIndex - (studentState.isSubmitted ? 1 : 0)}</strong> 个单词将被跳过。
+                </p>
+              )}
+              <p className="dashboard__modal-danger">⚠️ 此操作不可撤销！</p>
+            </div>
+            <div className="dashboard__modal-footer">
+              <Button variant="outline" onClick={() => setShowForceConfirm(false)}>
+                取消
+              </Button>
+              <Button 
+                variant="danger"
+                onClick={() => {
+                  const result = forceNextPhase();
+                  setForceResult(result);
+                  setShowForceConfirm(false);
+                  // 3秒后清除结果提示
+                  setTimeout(() => setForceResult(null), 3000);
+                }}
+              >
+                <FastForward size={16} />
+                确认，进入下一阶段
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 操作结果提示 */}
+      {forceResult && (
+        <div className={`dashboard__toast ${forceResult.success ? 'dashboard__toast--success' : 'dashboard__toast--error'}`}>
+          {forceResult.success ? '✅' : '❌'} {forceResult.message}
+        </div>
       )}
 
       {/* 统计面板 */}

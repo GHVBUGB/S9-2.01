@@ -218,4 +218,3 @@ const SplitStep = ({ word, onComplete }) => {
 };
 
 export default SplitStep;
-

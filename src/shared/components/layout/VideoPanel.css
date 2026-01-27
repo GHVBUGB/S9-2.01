@@ -1,34 +1,29 @@
 .video-panel {
-  width: var(--layout-video-width);
-  height: 100vh;
-  background-color: var(--color-bg-secondary);
-  border-left: 1px solid var(--color-border);
+  width: 320px;
+  flex-shrink: 0;
+  background-color: var(--color-bg-secondary, #f5f5f5);
+  border-left: 1px solid var(--color-border, #e0e0e0);
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
 }
 
-.video-panel__inner {
-  flex: 1;
+/* 视频窗口容器 */
+.video-panel__videos {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-4);
-  gap: var(--spacing-4);
+  gap: 12px;
 }
 
-.video-panel__video {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 单个视频包装器 - 确保 16:9 比例 */
+.video-panel__video-wrapper {
+  width: 100%;
+  flex-shrink: 0;
 }
 
-/* 对方视频稍大 */
-.video-panel__video--other {
-  flex: 1.2;
+/* 控制区域（教师端使用） */
+.video-panel__controls {
+  flex-shrink: 0;
 }
-
-/* 自己视频稍小 */
-.video-panel__video--self {
-  flex: 0.8;
-}
-

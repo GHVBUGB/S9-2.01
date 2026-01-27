@@ -1,30 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import RedBoxCard from './RedBoxCard';
 import Card from '../../../../shared/components/ui/Card';
-import Button from '../../../../shared/components/ui/Button';
 import Badge from '../../../../shared/components/ui/Badge';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Trophy } from 'lucide-react';
 import './RedBoxContainer.css';
 
 /**
  * Red Box 攻坚容器
  * 
- * 状态完全由 store 管理，确保双端同步：
- * - redWords: 红词列表
- * - redBoxStep: 当前步骤 (1-4)
- * - currentRedWordIndex: 当前红词索引
+ * 新设计（三步流程）：
+ * - Step 1: 定音定形（听音、看形、建立音形对应）
+ * - Step 2: 精准助记（教师选择武器：音节/词根/口诀/语境）
+ * - Step 3: L4 验收（完整拼写验收）
+ * 
+ * 状态完全由 store 管理，确保双端同步
+ * 支持 readonly 模式（教师端监控）
  */
-const RedBoxContainer = () => {
+const RedBoxContainer = ({ readonly = false }) => {
   const {
     redWords,
     redBoxStep,
     currentRedWordIndex,
     wordResults,
+    redBoxCompleted,
     completeRedBox,
   } = useClassroomStore();
-
-  const [showSummary, setShowSummary] = useState(false);
 
   // 当前处理的红词
   const currentWord = redWords[currentRedWordIndex];
@@ -53,13 +54,13 @@ const RedBoxContainer = () => {
     return stats;
   }, [redWords, wordResults]);
 
-  // 总结界面
-  if (showSummary) {
+  // 完成界面
+  if (redBoxCompleted) {
     return (
       <div className="redbox-summary">
         <Card variant="elevated" padding="lg" className="redbox-summary__card">
           <div className="redbox-summary__icon">
-            {redBoxStats.clearRate >= 80 ? '🎉' : redBoxStats.clearRate >= 50 ? '👍' : '💪'}
+            <Trophy size={48} />
           </div>
           <h2>Red Box 攻坚完成！</h2>
           
@@ -83,14 +84,15 @@ const RedBoxContainer = () => {
             </div>
           </div>
 
-          <Button
-            variant="primary"
-            onClick={() => completeRedBox()}
-            className="redbox-summary__btn"
-          >
-            <Sparkles size={18} />
-            进入新词学习
-          </Button>
+          {!readonly && (
+            <button
+              className="redbox-summary__btn"
+              onClick={() => completeRedBox()}
+            >
+              <Sparkles size={18} />
+              进入新词学习
+            </button>
+          )}
         </Card>
       </div>
     );
@@ -107,6 +109,7 @@ const RedBoxContainer = () => {
         step={redBoxStep}
         totalWords={redWords.length}
         currentIndex={currentRedWordIndex}
+        readonly={readonly}
       />
     </div>
   );

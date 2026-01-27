@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ListenAndChoose from './ListenAndChoose';
 import FlashRecognize from './FlashRecognize';
 import GhostSpelling from './GhostSpelling';
@@ -11,30 +11,61 @@ import './P2Container.css';
  * - 第一轮：所有单词的听音辨形
  * - 第二轮：所有单词的闪视辨析
  * - 第三轮：所有单词的幽灵拼写
+ * 
+ * 每轮逻辑：
+ * 1. 首轮：遍历所有 P2 单词，记录错题
+ * 2. 错题轮：只做错的单词，做对的移除
+ * 3. 全部正确后进入下一轮
+ * 
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const P2Container = () => {
+const P2Container = ({ readonly = false }) => {
   const {
     studentState,
     getP2Words,
     setPhase,
-    setP2RoundAndWord,
     nextP2Round,
     nextP2Word,
+    resetP2WrongWords,
   } = useClassroomStore();
 
-  // 获取需要 P2 训练的单词
-  const p2Words = getP2Words();
+  // 获取需要 P2 训练的单词（全部）
+  const allP2Words = getP2Words();
   
   // 从 store 获取当前轮次和单词索引
   const currentRound = studentState.p2Round;
   const currentWordIndex = studentState.p2WordIndex;
+  const isRetryRound = studentState.p2IsRetryRound;
+  const retryCount = studentState.p2RetryCount;
+  const storeWrongWords = studentState.p2WrongWords;
+  
+  // 本地状态：本轮固定的单词列表（不会在做题过程中变化）
+  const [roundWords, setRoundWords] = useState([]);
+  // 本地状态：本轮的错题收集（做完一轮后才更新到 store）
+  const roundWrongWordsRef = useRef(new Set());
+  
+  // 当轮次或错题轮状态变化时，固定本轮的单词列表
+  useEffect(() => {
+    let wordsForThisRound;
+    if (isRetryRound && storeWrongWords.length > 0) {
+      // 错题轮：使用 store 中的错题列表
+      wordsForThisRound = allP2Words.filter(w => storeWrongWords.includes(w.id));
+    } else {
+      // 首轮：使用全部 P2 单词
+      wordsForThisRound = allP2Words;
+    }
+    setRoundWords(wordsForThisRound);
+    // 重置本轮错题收集
+    roundWrongWordsRef.current = new Set();
+    console.log(`📍 [P2] 本轮单词固定: ${wordsForThisRound.map(w => w.word).join(', ')} (retryCount: ${retryCount})`);
+  }, [currentRound, isRetryRound, retryCount]); // 使用 retryCount 代替 storeWrongWords.length
   
   // 当前训练的单词
-  const currentWord = p2Words[currentWordIndex];
+  const currentWord = roundWords[currentWordIndex];
   
   // 初始化 P2
   useEffect(() => {
-    setP2RoundAndWord(1, 0);
+    console.log(`📍 [P2Container] 挂载，当前进度: 第${currentRound}轮 第${currentWordIndex + 1}词 ${isRetryRound ? '(错题轮)' : '(首轮)'}`);
   }, []);
 
   // 轮次名称
@@ -46,38 +77,58 @@ const P2Container = () => {
 
   // 处理单词完成
   const handleWordComplete = (isCorrect) => {
-    console.log(`📝 [P2] 第${currentRound}轮 单词${currentWordIndex + 1}/${p2Words.length} 完成:`, isCorrect ? '正确 ✓' : '错误 ✗');
+    const totalInCurrentList = roundWords.length;
+    console.log(`📝 [P2] 第${currentRound}轮${isRetryRound ? '(错题)' : ''} 单词${currentWordIndex + 1}/${totalInCurrentList} 完成:`, isCorrect ? '正确 ✓' : '错误 ✗');
     
-    if (isCorrect) {
-      // 检查当前轮次是否还有更多单词
-      if (currentWordIndex < p2Words.length - 1) {
-        // 进入当前轮次的下一个单词
-        setTimeout(() => {
-          nextP2Word();
-        }, 1000);
-      } else {
-        // 当前轮次完成
-        console.log(`✅ [P2] 第${currentRound}轮完成！`);
-        
-        if (currentRound < 3) {
-          // 进入下一轮
-          setTimeout(() => {
-            nextP2Round();
-          }, 2000);
-        } else {
-          // P2 全部完成，进入 P3
-          console.log('✅ [P2] 全部训练完成！进入 Phase 3');
-          setTimeout(() => {
-            setPhase('P3');
-          }, 2000);
-        }
+    // 检查当前单词是否被武器库标记为错误（即使学生答对了）
+    const storeCurrentWrongWords = useClassroomStore.getState().studentState.p2WrongWords;
+    const weaponMarkedWrong = currentWord && storeCurrentWrongWords.includes(currentWord.id);
+    
+    // 记录本题结果到本轮错题集
+    // 如果答错 或 被武器库标记，都算作错题
+    if (((!isCorrect) || weaponMarkedWrong) && currentWord) {
+      roundWrongWordsRef.current.add(currentWord.id);
+      if (weaponMarkedWrong && isCorrect) {
+        console.log(`🚨 [P2] 单词 "${currentWord.word}" 被武器库标记为红灯，即使答对也算错题`);
       }
     }
-    // 错误时由各组件内部处理重试逻辑
+    // 注意：答对且未被武器库标记时，不需要加入错题
+    
+    // 检查当前列表是否还有更多单词
+    if (currentWordIndex < totalInCurrentList - 1) {
+      // 进入当前列表的下一个单词
+      setTimeout(() => {
+        nextP2Word();
+      }, 1500);
+    } else {
+      // 本轮遍历完成
+      const newWrongWords = Array.from(roundWrongWordsRef.current);
+      console.log(`✅ [P2] 第${currentRound}轮${isRetryRound ? '错题轮' : '首轮'}遍历完成！本轮错题: ${newWrongWords.length}`);
+      
+      setTimeout(() => {
+        // 更新 store 中的错题列表为本轮的错题
+        useClassroomStore.getState().setP2WrongWords(newWrongWords);
+        
+        if (newWrongWords.length > 0) {
+          // 还有错题，开始错题重做轮
+          console.log(`🔄 [P2] 还有 ${newWrongWords.length} 个错题，开始重做`);
+          useClassroomStore.getState().startP2RetryRound();
+        } else {
+          // 全部正确，进入下一轮或下一阶段
+          if (currentRound < 3) {
+            console.log(`✅ [P2] 第${currentRound}轮全部正确！进入下一轮`);
+            nextP2Round();
+          } else {
+            console.log('✅ [P2] 全部训练完成！进入 Phase 3');
+            setPhase('P3');
+          }
+        }
+      }, 2000);
+    }
   };
 
   // 如果没有需要训练的单词，直接进入 P3
-  if (p2Words.length === 0) {
+  if (allP2Words.length === 0) {
     return (
       <div className="p2-container p2-container--empty">
         <div className="p2-container__icon">🎉</div>
@@ -93,8 +144,8 @@ const P2Container = () => {
     );
   }
 
-  if (!currentWord) {
-    return <div>加载中...</div>;
+  if (roundWords.length === 0 || !currentWord) {
+    return <div className="p2-container__loading">加载中...</div>;
   }
 
   // 渲染当前轮次的训练组件
@@ -105,6 +156,7 @@ const P2Container = () => {
           <ListenAndChoose 
             word={currentWord}
             onComplete={handleWordComplete}
+            readonly={readonly}
           />
         );
       case 2:
@@ -112,6 +164,7 @@ const P2Container = () => {
           <FlashRecognize 
             word={currentWord}
             onComplete={handleWordComplete}
+            readonly={readonly}
           />
         );
       case 3:
@@ -119,6 +172,7 @@ const P2Container = () => {
           <GhostSpelling 
             word={currentWord}
             onComplete={handleWordComplete}
+            readonly={readonly}
           />
         );
       default:
@@ -126,51 +180,27 @@ const P2Container = () => {
     }
   };
 
+  // 构建进度显示文本
+  const getProgressText = () => {
+    const roundName = roundNames[currentRound];
+    const progress = `单词 ${currentWordIndex + 1}/${roundWords.length}`;
+    if (isRetryRound) {
+      return `${roundName} - ${progress} (错题重做)`;
+    }
+    return `${roundName} - ${progress}`;
+  };
+
   return (
     <div className="p2-container">
-      {/* 顶部进度指示 */}
-      <div className="p2-container__header">
-        <div className="p2-container__phase-badge">
-          Phase 2: 集中训练 📚
-        </div>
-        <div className="p2-container__progress">
-          {roundNames[currentRound]} - 单词 {currentWordIndex + 1}/{p2Words.length}
+      {/* 进度药丸 */}
+      <div className="p2-container__progress-wrapper">
+        <div className={`p2-container__progress-pill ${isRetryRound ? 'p2-container__progress-pill--retry' : ''}`}>
+          {getProgressText()}
         </div>
       </div>
 
-      {/* 轮次指示器 */}
-      <div className="p2-container__rounds">
-        {[1, 2, 3].map((round) => (
-          <div 
-            key={round}
-            className={`p2-container__round ${
-              round === currentRound ? 'p2-container__round--active' : ''
-            } ${round < currentRound ? 'p2-container__round--completed' : ''}`}
-          >
-            <div className="p2-container__round-number">
-              {round < currentRound ? '✓' : `第${round}轮`}
-            </div>
-            <div className="p2-container__round-name">
-              {round === 1 && '🎧 听音辨形'}
-              {round === 2 && '👁 闪视辨析'}
-              {round === 3 && '📝 幽灵拼写'}
-            </div>
-            {round === currentRound && (
-              <div className="p2-container__round-progress">
-                <div 
-                  className="p2-container__round-progress-bar"
-                  style={{ width: `${((currentWordIndex + 1) / p2Words.length) * 100}%` }}
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* ❌ 移除"当前单词信息"，避免泄露答案 */}
-
-      {/* 当前轮次内容 */}
-      <div className="p2-container__content">
+      {/* 白色卡片包裹训练内容 */}
+      <div className="p2-container__card">
         {renderRoundContent()}
       </div>
     </div>

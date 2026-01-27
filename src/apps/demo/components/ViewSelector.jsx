@@ -52,4 +52,3 @@ const ViewSelector = ({ viewMode, onViewModeChange }) => {
 };
 
 export default ViewSelector;
-

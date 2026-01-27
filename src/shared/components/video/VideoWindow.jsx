@@ -55,4 +55,3 @@ const VideoWindow = ({
 };
 
 export default VideoWindow;
-

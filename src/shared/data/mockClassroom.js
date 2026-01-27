@@ -233,4 +233,3 @@ export const REVIEW_CYCLE_CONFIG = {
     accuracy: 0.90
   }
 };
-

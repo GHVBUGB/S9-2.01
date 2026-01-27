@@ -9,8 +9,9 @@ import './ContextProbe.css';
  * 
  * @param {Object} word - 当前单词数据
  * @param {Function} onComplete - 完成回调 (isCorrect) => void
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const ContextProbe = ({ word, onComplete }) => {
+const ContextProbe = ({ word, onComplete, readonly = false }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -25,41 +26,41 @@ const ContextProbe = ({ word, onComplete }) => {
   // 获取例句（使用第一个简单例句）
   const context = word.context?.[0] || {};
   
-  // 生成中文释义选项
+  // 生成中文释义选项（4选1）
   const options = useMemo(() => {
     const correctMeaning = word.meaning?.chinese || '未知';
     
-    // 干扰项
+    // 干扰释义词库
     const commonDistractors = [
       '采用', '接受', '影响', '尝试', '改变', '发展', 
-      '创造', '保护', '破坏', '建立', '维持', '提供'
+      '创造', '保护', '破坏', '建立', '维持', '提供',
+      '紧张的', '有礼貌的', '普通的', '现代的', '古老的', '重要的'
     ];
     
-    const distractors = [];
-    const shuffled = [...commonDistractors].sort(() => Math.random() - 0.5);
-    
-    for (const distractor of shuffled) {
-      if (distractor !== correctMeaning && distractors.length < 2) {
-        distractors.push(distractor);
-      }
-    }
+    // 随机选择3个干扰项（4选1需要3个干扰项）
+    const distractors = commonDistractors
+      .filter(d => d !== correctMeaning) // 排除正确答案
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3); // 取3个
     
     const allOptions = [
       { id: 0, text: correctMeaning, isCorrect: true },
       { id: 1, text: distractors[0], isCorrect: false },
-      { id: 2, text: distractors[1], isCorrect: false }
+      { id: 2, text: distractors[1], isCorrect: false },
+      { id: 3, text: distractors[2], isCorrect: false }
     ];
     
+    // 随机打乱顺序
     return allOptions.sort(() => Math.random() - 0.5);
   }, [word]);
 
-  // 高亮目标单词的例句
-  const highlightedSentence = useMemo(() => {
-    const sentence = context.sentence || '';
+  // 高亮目标单词的短语
+  const highlightedPhrase = useMemo(() => {
+    const phrase = context.phrase || '';
     const targetWord = word.word;
     
     const regex = new RegExp(`\\b(${targetWord})\\b`, 'gi');
-    const parts = sentence.split(regex);
+    const parts = phrase.split(regex);
     
     return parts.map((part, index) => {
       if (part.toLowerCase() === targetWord.toLowerCase()) {
@@ -67,11 +68,11 @@ const ContextProbe = ({ word, onComplete }) => {
       }
       return part;
     });
-  }, [context.sentence, word.word]);
+  }, [context.phrase, word.word]);
 
   // 处理选项点击
   const handleOptionClick = (optionId) => {
-    if (!submitted) {
+    if (!submitted && !readonly) {
       setSelectedOption(optionId);
     }
   };
@@ -81,7 +82,14 @@ const ContextProbe = ({ word, onComplete }) => {
     if (selectedOption === null) return;
     
     const selected = options.find(opt => opt.id === selectedOption);
-    const correct = selected?.isCorrect || false;
+    const correct = selected?.isCorrect === true;
+    
+    console.log('🎯 [ContextProbe] 提交答案:', {
+      selectedOption,
+      selectedText: selected?.text,
+      selectedIsCorrect: selected?.isCorrect,
+      isCorrect: correct
+    });
     
     setIsCorrect(correct);
     setSubmitted(true);
@@ -95,14 +103,14 @@ const ContextProbe = ({ word, onComplete }) => {
     <div className="context-probe">
       {/* 核心内容区域：模仿图1的居中卡片感 */}
       <div className="context-probe__main-card">
-        {/* 例句区域 - 极简设计 */}
+        {/* 短语区域 - 极简设计 */}
         <div className="context-probe__sentence-area">
           <div className="context-probe__sentence-header">
             <span className="context-probe__icon-book">📖</span>
-            例句：
+            短语：
           </div>
           <div className="context-probe__sentence">
-            {highlightedSentence}
+            {highlightedPhrase}
           </div>
         </div>
 
@@ -128,9 +136,9 @@ const ContextProbe = ({ word, onComplete }) => {
             return (
               <button
                 key={option.id}
-                className={`context-probe__option-btn ${statusClass}`}
+                className={`context-probe__option-btn ${statusClass} ${readonly ? 'is-readonly' : ''}`}
                 onClick={() => handleOptionClick(option.id)}
-                disabled={submitted}
+                disabled={submitted || readonly}
               >
                 <span className="context-probe__option-letter">
                   {String.fromCharCode(65 + index)}.
@@ -145,8 +153,8 @@ const ContextProbe = ({ word, onComplete }) => {
           })}
         </div>
 
-        {/* 确认按钮 */}
-        {!submitted && (
+        {/* 确认按钮 - 只读模式下不显示 */}
+        {!submitted && !readonly && (
           <div className="context-probe__action">
             <Button
               variant="primary"
@@ -156,6 +164,13 @@ const ContextProbe = ({ word, onComplete }) => {
             >
               确认答案
             </Button>
+          </div>
+        )}
+        
+        {/* 只读模式提示 */}
+        {readonly && (
+          <div className="context-probe__readonly-hint">
+            👀 教师观看模式 - 等待学生作答
           </div>
         )}
 

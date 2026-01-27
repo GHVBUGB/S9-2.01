@@ -1,138 +1,189 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle2, XCircle, Eye } from 'lucide-react';
+import { CheckCircle2, XCircle, Eye, Zap } from 'lucide-react';
 import Button from '../../../../shared/components/ui/Button';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import './FlashRecognize.css';
 
 /**
- * L2 闪视辨析
- * 单词闪现0.5秒 + 3选1释义
- * 目的：形 → 义，练直觉
+ * L2 闪视辨析 - 方案A：专业Flash训练流程
+ * 阶段1：准备 → 阶段2：倒计时 → 阶段3：闪现 → 阶段4：答题
+ * 
+ * 双端协作模式：
+ * - 教师端：控制"开始闪现"按钮，触发倒计时
+ * - 学生端：等待教师指令，只能选择答案
+ * 
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const FlashRecognize = ({ word, onComplete }) => {
-  // ✅ 从 store 获取状态和 actions
+const FlashRecognize = ({ word, onComplete, readonly = false }) => {
   const { 
     studentState, 
     teacherState,
     studentSelectOption,
     studentSubmitAnswer,
     resetStudentState,
+    setFlashPhase,
   } = useClassroomStore();
 
-  // ✅ 使用 store 的状态
   const selectedOption = studentState.selectedOption;
   const submitted = studentState.isSubmitted;
   const isCorrect = studentState.isCorrect;
   
-  // 闪现阶段状态（仍然用本地状态）
-  const [phase, setPhase] = useState('ready'); // ready, flash, hidden, answer
+  // 从 store 获取闪现阶段（双端同步）
+  const sharedPhase = teacherState.flashPhase || 'ready';
+  
+  // 本地倒计时状态
+  const [countdown, setCountdown] = useState(3);
 
-  // 重置状态并开始闪现
+  // 重置到准备阶段
   useEffect(() => {
-    setPhase('ready');
-    resetStudentState();
-    
-    // 自动开始闪现
-    const timer = setTimeout(() => {
-      startFlash();
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [word.id, resetStudentState]);
-
-  // ✅ 监听教师命令
-  useEffect(() => {
-    if (!teacherState.command) return;
-
-    if (teacherState.command === 'repeat') {
-      // 教师点击重做
+    // 只有教师端可以重置共享阶段
+    if (readonly) {
+      setFlashPhase('ready');
+    }
+    setCountdown(3);
+    if (!readonly) {
       resetStudentState();
-      setPhase('ready');
-      setTimeout(startFlash, 500);
-    } else if (teacherState.showAnswer && !submitted && phase === 'answer') {
-      // 教师点击显示答案
+    }
+  }, [word.id, resetStudentState, readonly, setFlashPhase]);
+
+  // 监听教师命令
+  useEffect(() => {
+    if (teacherState.command === 'repeat') {
+      // 只有教师端可以重置共享阶段
+      if (readonly) {
+        setFlashPhase('ready');
+      }
+      setCountdown(3);
+      if (!readonly) {
+        resetStudentState();
+      }
+    }
+  }, [teacherState.command, resetStudentState, readonly, setFlashPhase]);
+  
+  // 监听闪现阶段变化（学生端响应教师端的阶段变化）
+  useEffect(() => {
+    if (!readonly && sharedPhase === 'countdown') {
+      // 学生端收到倒计时指令，开始本地倒计时动画（只是视觉效果，不改变共享状态）
+      runStudentCountdownAnimation();
+    }
+  }, [sharedPhase, readonly]);
+  
+  // 单独监听教师显示答案（只在教师主动点击时触发，仅学生端响应）
+  useEffect(() => {
+    if (teacherState.showAnswer && !submitted && sharedPhase === 'answer' && !readonly) {
+      // 教师点击显示答案 - 自动选中正确选项并提交
       const correctOpt = options.find(opt => opt.isCorrect);
       if (correctOpt) {
-        handleOptionClick(correctOpt.id);
+        studentSelectOption(correctOpt.id);
         setTimeout(() => {
-          handleSubmit(true); // 强制提交为正确
+          studentSubmitAnswer(true);
+          setTimeout(() => onComplete(true), 1500);
         }, 500);
       }
     }
-  }, [teacherState.command, teacherState.showAnswer, phase]);
+  }, [teacherState.showAnswer, readonly]);
 
-  // 开始闪现
-  const startFlash = () => {
-    setPhase('flash');
+  // 学生端倒计时动画（只更新本地 UI，不改变共享状态）
+  const runStudentCountdownAnimation = () => {
+    setCountdown(3);
     
-    // 0.5秒后隐藏
-    setTimeout(() => {
-      setPhase('hidden');
+    let current = 3;
+    const countdownInterval = setInterval(() => {
+      current--;
+      setCountdown(current);
       
-      // 再0.3秒后显示选项
-      setTimeout(() => {
-        setPhase('answer');
-      }, 300);
-    }, 500);
+      if (current === 0) {
+        clearInterval(countdownInterval);
+        // 学生端不调用 setFlashPhase，由教师端统一控制
+      }
+    }, 1000);
   };
 
-  // 生成释义选项
-  const options = useMemo(() => {
-    const correctMeaning = word.meaning?.definitionCn || '未知';
+  // 教师端倒计时动画（控制共享状态）
+  const runTeacherCountdownAnimation = () => {
+    setCountdown(3);
     
-    // 干扰项
+    let current = 3;
+    const countdownInterval = setInterval(() => {
+      current--;
+      setCountdown(current);
+      
+      if (current === 0) {
+        clearInterval(countdownInterval);
+        // 教师端控制阶段切换
+        setFlashPhase('flash');
+        
+        // 0.5秒后进入答题阶段
+        setTimeout(() => {
+          setFlashPhase('answer');
+        }, 500);
+      }
+    }, 1000);
+  };
+
+  // 教师点击开始闪现
+  const handleStart = () => {
+    // 设置共享阶段为 countdown，双端同步开始倒计时
+    setFlashPhase('countdown');
+    // 教师端运行倒计时动画（控制阶段切换）
+    runTeacherCountdownAnimation();
+  };
+
+  // 生成释义选项（4选1）
+  const options = useMemo(() => {
+    const correctMeaning = word.meaning?.chinese || word.meaning?.definitionCn || '未知';
+    
+    // 干扰释义词库
     const distractors = [
       '采用', '接受', '影响', '尝试', '改变', '发展', 
-      '创造', '保护', '熟练的', '建立', '勇敢的', '完美的'
+      '创造', '保护', '熟练的', '建立', '勇敢的', '完美的',
+      '紧张的', '有礼貌的', '普通的', '现代的', '古老的', '重要的'
     ];
     
+    // 随机选择3个干扰项（4选1需要3个干扰项）
     const shuffled = distractors
-      .filter(d => d !== correctMeaning)
+      .filter(d => d !== correctMeaning) // 排除正确答案
       .sort(() => Math.random() - 0.5)
-      .slice(0, 2);
+      .slice(0, 3); // 取3个
     
     const allOptions = [
       { id: 0, text: correctMeaning, isCorrect: true },
       { id: 1, text: shuffled[0], isCorrect: false },
       { id: 2, text: shuffled[1], isCorrect: false },
+      { id: 3, text: shuffled[2], isCorrect: false },
     ];
     
+    // 随机打乱顺序
     return allOptions.sort(() => Math.random() - 0.5);
   }, [word]);
 
-  // 处理选项点击
+  // 处理选项点击（仅学生端）
   const handleOptionClick = (optionId) => {
-    if (!submitted && phase === 'answer') {
-      studentSelectOption(optionId); // ✅ 更新到 store，教师端立即看到
+    if (!submitted && sharedPhase === 'answer' && !readonly) {
+      studentSelectOption(optionId);
     }
   };
 
-  // 提交答案
-  const handleSubmit = (forceCorrect = false) => {
-    if (selectedOption === null) return;
+  // 提交答案（学生点击确认按钮，仅学生端）
+  const handleSubmit = () => {
+    if (selectedOption === null || readonly) return;
     
     const selected = options.find(opt => opt.id === selectedOption);
-    const correct = forceCorrect || (selected?.isCorrect || false);
+    const correct = selected?.isCorrect === true;
     
-    studentSubmitAnswer(correct); // ✅ 更新到 store，教师端立即看到
+    console.log('🎯 [FlashRecognize] 提交答案:', {
+      selectedOption,
+      selectedText: selected?.text,
+      selectedIsCorrect: selected?.isCorrect,
+      isCorrect: correct
+    });
     
+    studentSubmitAnswer(correct);
+    
+    // 无论对错都进入下一题，错题会在轮次结束后统一重做
     setTimeout(() => {
       onComplete(correct);
-      if (!correct) {
-        // 错误时重新闪现
-        setTimeout(() => {
-          resetStudentState();
-          setPhase('ready');
-          setTimeout(startFlash, 500);
-        }, 2000);
-      }
     }, 1500);
-  };
-
-  // 重新闪现
-  const handleReflash = () => {
-    setPhase('ready');
-    setTimeout(startFlash, 300);
   };
 
   // 获取选项样式
@@ -155,46 +206,84 @@ const FlashRecognize = ({ word, onComplete }) => {
   };
 
   return (
-    <div className="flash-recognize">
-      {/* 闪现区域 */}
-      <div className="flash-recognize__display">
-        {phase === 'ready' && (
-          <div className="flash-recognize__ready">
-            <Eye size={48} />
-            <span>准备好...</span>
+    <div className={`flash-recognize ${readonly ? 'flash-recognize--readonly' : ''}`}>
+      {/* 阶段1：准备阶段 */}
+      {sharedPhase === 'ready' && (
+        <div className="flash-recognize__stage flash-recognize__stage--ready">
+          <div className="flash-recognize__ready-icon">
+            <Eye size={64} strokeWidth={1.5} />
           </div>
-        )}
-        
-        {phase === 'flash' && (
-          <div className="flash-recognize__word">
-            {word.word}
-          </div>
-        )}
-        
-        {phase === 'hidden' && (
-          <div className="flash-recognize__hidden">
-            ???
-          </div>
-        )}
-        
-        {phase === 'answer' && (
-          <div className="flash-recognize__hidden">
-            <span>???</span>
-            <button 
-              className="flash-recognize__reflash-btn"
-              onClick={handleReflash}
-            >
-              再看一次
-            </button>
-          </div>
-        )}
-      </div>
+          
+          {readonly ? (
+            // 教师端：显示开始按钮
+            <>
+              <h2 className="flash-recognize__ready-title">闪视辨析</h2>
+              <p className="flash-recognize__ready-desc">
+                点击按钮开始闪现训练<br />
+                学生将同步看到闪现动画
+              </p>
+              <Button 
+                variant="primary" 
+                onClick={handleStart}
+                className="flash-recognize__start-btn"
+              >
+                <Zap size={20} />
+                开始闪现
+              </Button>
+            </>
+          ) : (
+            // 学生端：等待教师
+            <>
+              <h2 className="flash-recognize__ready-title">准备好了吗？</h2>
+              <p className="flash-recognize__ready-desc">
+                单词将在 <strong>0.5 秒</strong>内闪现<br />
+                请集中注意力！
+              </p>
+              <div className="flash-recognize__waiting">
+                <span className="flash-recognize__waiting-icon">⏳</span>
+                <span>等待老师开始...</span>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
-      {/* 提示文字 */}
-      {phase === 'answer' && (
-        <>
-          <div className="flash-recognize__instruction">
-            刚才看到的单词是什么意思？
+      {/* 阶段2：倒计时（双端同步显示） */}
+      {sharedPhase === 'countdown' && (
+        <div className="flash-recognize__stage flash-recognize__stage--countdown">
+          <div 
+            className={`flash-recognize__countdown flash-recognize__countdown--${countdown}`}
+            key={countdown}
+          >
+            {countdown}
+          </div>
+        </div>
+      )}
+
+      {/* 阶段3：闪现！（双端同步显示） */}
+      {sharedPhase === 'flash' && (
+        <div className="flash-recognize__stage flash-recognize__stage--flash">
+          <div className="flash-recognize__flash-word">
+            {word.word.toUpperCase()}
+          </div>
+        </div>
+      )}
+
+      {/* 阶段4：答题阶段 */}
+      {sharedPhase === 'answer' && (
+        <div className="flash-recognize__stage flash-recognize__stage--answer">
+          {/* 教师端只读提示 */}
+          {readonly && (
+            <div className="flash-recognize__readonly-hint">
+              👀 教师观看模式 - 等待学生作答
+            </div>
+          )}
+          
+          <div className="flash-recognize__question">
+            <span className="flash-recognize__question-icon">🤔</span>
+            <span className="flash-recognize__question-text">
+              刚才闪现的单词是什么意思？
+            </span>
           </div>
 
           {/* 选项列表 */}
@@ -202,9 +291,9 @@ const FlashRecognize = ({ word, onComplete }) => {
             {options.map((option, index) => (
               <button
                 key={option.id}
-                className={getOptionClass(option)}
+                className={`${getOptionClass(option)} ${readonly ? 'flash-recognize__option--readonly' : ''}`}
                 onClick={() => handleOptionClick(option.id)}
-                disabled={submitted}
+                disabled={submitted || readonly}
               >
                 <span className="flash-recognize__option-label">
                   {String.fromCharCode(65 + index)}.
@@ -222,15 +311,15 @@ const FlashRecognize = ({ word, onComplete }) => {
             ))}
           </div>
 
-          {/* 提交按钮 */}
-          {!submitted && (
+          {/* 提交按钮（仅学生端显示） */}
+          {!submitted && !readonly && (
             <Button
               variant="primary"
               onClick={handleSubmit}
               disabled={selectedOption === null}
               className="flash-recognize__submit-btn"
             >
-              确认
+              确认答案
             </Button>
           )}
 
@@ -240,21 +329,20 @@ const FlashRecognize = ({ word, onComplete }) => {
               {isCorrect ? (
                 <>
                   <CheckCircle2 size={24} />
-                  <span>正确！单词是 <strong>{word.word}</strong>，进入下一步...</span>
+                  <span>正确！单词是 <strong>{word.word}</strong></span>
                 </>
               ) : (
                 <>
                   <XCircle size={24} />
-                  <span>错误，单词是 <strong>{word.word}</strong>（{word.meaning?.definitionCn}），再试一次</span>
+                  <span>单词是 <strong>{word.word}</strong>（{word.meaning?.chinese || word.meaning?.definitionCn}），稍后重做</span>
                 </>
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
 };
 
 export default FlashRecognize;
-

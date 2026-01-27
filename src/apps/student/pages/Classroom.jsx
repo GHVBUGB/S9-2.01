@@ -1,9 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Card from '../../../shared/components/ui/Card';
-import Badge from '../../../shared/components/ui/Badge';
-import Button from '../../../shared/components/ui/Button';
-import PhaseNavigator from '../components/PhaseNavigator';
 import ContextProbe from '../components/ContextProbe';
 import P2Container from '../components/phase2/P2Container';
 import P3Container from '../components/phase3/P3Container';
@@ -13,11 +9,12 @@ import useClassroomStore from '../../../shared/store/useClassroomStore';
 import './Classroom.css';
 
 /**
- * 学生端课堂页面
+ * 课堂页面（学生端 + 教师端共用）
  * 使用共享的 useClassroomStore 与教师端联动
  * 支持 Model A（标准新授）和 Model B（攻坚复习）
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const Classroom = () => {
+const Classroom = ({ readonly = false }) => {
   const [searchParams] = useSearchParams();
   const model = searchParams.get('model') || 'A';
 
@@ -73,7 +70,7 @@ const Classroom = () => {
   const renderPhaseContent = () => {
     switch (currentPhase) {
       case 'RedBox':
-        return <RedBoxContainer />;
+        return <RedBoxContainer readonly={readonly} />;
       
       case 'P1':
         if (!currentWord) {
@@ -89,15 +86,16 @@ const Classroom = () => {
             <ContextProbe 
               word={currentWord}
               onComplete={handleP1WordComplete}
+              readonly={readonly}
             />
           </div>
         );
       
       case 'P2':
-        return <P2Container />;
+        return <P2Container readonly={readonly} />;
       
       case 'P3':
-        return <P3Container />;
+        return <P3Container readonly={readonly} />;
       
       default:
         return <div>未知阶段</div>;
@@ -108,27 +106,10 @@ const Classroom = () => {
     <div className="classroom">
       <WeaponPopup />
       
-      {/* 核心导航 */}
-      <div className="classroom__nav-container">
-        <PhaseNavigator 
-          currentPhase={currentPhase}
-          completedPhases={completedPhases}
-          phases={allPhases}
-          showRedBox={classroomMode === 'B'}
-        />
-      </div>
-
-      {/* 学习内容区域 */}
+      {/* 学习内容区域 - 导航栏已移至全局 GlobalHeader */}
       <div className="classroom__main-container">
         {renderPhaseContent()}
       </div>
-      
-      {/* 底部信息 (仅在非核心环节显示，或保持极简) */}
-      {currentPhase !== 'P1' && (
-        <div className="classroom__footer-info">
-          {/* 这里可以保留之前的统计卡片，或者隐藏以保持纯净 */}
-        </div>
-      )}
     </div>
   );
 };

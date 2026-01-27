@@ -1,0 +1,22 @@
+/* ========================================
+   学生端布局
+   ======================================== */
+
+.student-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 主内容区域（导航栏下方） */
+.student-layout__content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 确保 MainLayout 填满剩余空间 */
+.student-layout__content .main-layout {
+  height: 100%;
+}

@@ -13,8 +13,10 @@ import './FullSpelling.css';
  * - 拼对 → Yellow (变灯成功)
  * - 拼错1次 → 再试一次
  * - 拼错2次 → Pending (打回 P2)
+ * 
+ * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
-const FullSpelling = ({ word, wordSource, onComplete }) => {
+const FullSpelling = ({ word, wordSource, onComplete, readonly = false }) => {
   // 从 store 获取状态
   const {
     studentState,
@@ -36,21 +38,21 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
 
   const inputRef = useRef(null);
 
-  // 重置状态
+  // 重置状态（仅学生端）
   useEffect(() => {
-    resetStudentState();
-    setAttempts(0);
-    setShowRetryHint(false);
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 300);
-  }, [word.id, resetStudentState]);
+    if (!readonly) {
+      resetStudentState();
+      setAttempts(0);
+      setShowRetryHint(false);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+    }
+  }, [word.id, resetStudentState, readonly]);
 
-  // 监听教师命令
+  // 监听教师命令（仅学生端响应）
   useEffect(() => {
-    if (!teacherState.command) return;
-
-    if (teacherState.command === 'repeat') {
+    if (teacherState.command === 'repeat' && !readonly) {
       // 重做本题
       resetStudentState();
       setAttempts(0);
@@ -58,53 +60,68 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
       setTimeout(() => {
         inputRef.current?.focus();
       }, 300);
-    } else if (teacherState.showAnswer && !submitted) {
-      // 显示答案
+    }
+  }, [teacherState.command, resetStudentState, readonly]);
+  
+  // 单独监听教师显示答案（仅学生端响应）
+  useEffect(() => {
+    if (teacherState.showAnswer && !submitted && !readonly) {
+      // 教师点击显示答案 - 自动填入正确答案并提交
       studentInputText(word.word);
       setTimeout(() => {
-        handleSubmit(true);
+        studentSubmitAnswer(true);
+        setTimeout(() => onComplete(true, 'yellow'), 1500);
       }, 500);
     }
-  }, [teacherState.command, teacherState.showAnswer]);
+  }, [teacherState.showAnswer, readonly]);
 
-  // 获取语境例句，挖空目标单词
-  const getBlankSentence = () => {
+  // 获取短语，挖空目标单词
+  const getBlankPhrase = () => {
     const context = word.context?.[0] || {};
-    const sentence = context.sentence || '';
+    const phrase = context.phrase || '';
     const targetWord = word.word;
 
-    if (!targetWord) return { before: sentence, after: '' };
+    if (!targetWord) return { before: phrase, after: '' };
 
     // 创建正则表达式匹配目标单词（不区分大小写）
     const regex = new RegExp(`\\b${targetWord}\\b`, 'i');
-    const match = sentence.match(regex);
+    const match = phrase.match(regex);
 
     if (match) {
       const index = match.index;
-      const before = sentence.slice(0, index);
-      const after = sentence.slice(index + targetWord.length);
+      const before = phrase.slice(0, index);
+      const after = phrase.slice(index + targetWord.length);
       return { before, after, blankLength: targetWord.length };
     }
 
-    return { before: sentence, after: '', blankLength: targetWord.length };
+    return { before: phrase, after: '', blankLength: targetWord.length };
   };
 
-  const { before, after, blankLength } = getBlankSentence();
+  const { before, after, blankLength } = getBlankPhrase();
   const context = word.context?.[0] || {};
 
-  // 处理输入
+  // 处理输入（仅学生端）
   const handleInputChange = (e) => {
-    if (!submitted) {
+    if (!submitted && !readonly) {
       studentInputText(e.target.value.toLowerCase());
     }
   };
 
-  // 提交答案
-  const handleSubmit = (forceCorrect = false) => {
-    if (inputValue.trim() === '') return;
+  // 提交答案（学生点击提交验收按钮，仅学生端）
+  const handleSubmit = () => {
+    if (inputValue.trim() === '' || readonly) return;
 
-    const correct = forceCorrect || (inputValue.toLowerCase().trim() === word.word.toLowerCase());
+    const userInput = inputValue.toLowerCase().trim();
+    const expectedWord = word.word.toLowerCase();
+    const correct = userInput === expectedWord;
     const newAttempts = attempts + 1;
+
+    console.log('🎯 [FullSpelling] 提交答案:', {
+      userInput,
+      expectedWord,
+      isCorrect: correct,
+      attempt: newAttempts
+    });
 
     if (correct) {
       // 拼对 → Yellow
@@ -159,25 +176,25 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
   };
 
   return (
-    <div className="full-spelling">
-      {/* 头部信息 */}
-      <div className="full-spelling__header">
-        <div className="full-spelling__source">
-          {wordSource === 'p1_skip' ? (
-            <Badge variant="yellow" size="sm">🏃 P1跳级生 (疑似熟词)</Badge>
-          ) : (
-            <Badge variant="green" size="sm">📚 P2训练生</Badge>
-          )}
+    <div className={`full-spelling ${readonly ? 'full-spelling--readonly' : ''}`}>
+      {/* 教师端只读提示 */}
+      {readonly && (
+        <div className="full-spelling__readonly-hint">
+          👀 教师观看模式 - 实时监控学生输入
         </div>
+      )}
+      
+      {/* 头部信息 - 只保留剩余机会 */}
+      <div className="full-spelling__header">
         <div className="full-spelling__chances">
           <span className="full-spelling__chances-label">剩余机会:</span>
           {renderHearts()}
         </div>
       </div>
 
-      {/* 语境例句 */}
+      {/* 短语 */}
       <div className="full-spelling__context">
-        <p className="full-spelling__context-label">📖 语境例句:</p>
+        <p className="full-spelling__context-label">📖 短语:</p>
         <div className="full-spelling__sentence">
           <span className="full-spelling__sentence-text">
             {before}
@@ -185,14 +202,11 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
             {after}
           </span>
         </div>
-        <p className="full-spelling__sentence-cn">{context.sentenceCn}</p>
+        <p className="full-spelling__sentence-cn">{context.phraseCn}</p>
       </div>
 
       {/* 输入区域 */}
       <div className="full-spelling__input-section">
-        <p className="full-spelling__instruction">
-          🔤 <strong>[无提示盲打]</strong> 请输入正确的单词:
-        </p>
         <div className="full-spelling__input-wrapper">
           <input
             ref={inputRef}
@@ -205,12 +219,13 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
                 : showRetryHint
                   ? 'full-spelling__input--retry'
                   : ''
-            }`}
+            } ${readonly ? 'full-spelling__input--readonly' : ''}`}
             value={inputValue}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
-            placeholder="输入完整单词..."
-            disabled={submitted}
+            placeholder={readonly ? '等待学生输入...' : '输入完整单词...'}
+            disabled={submitted || readonly}
+            readOnly={readonly}
             autoComplete="off"
             autoCapitalize="off"
             spellCheck="false"
@@ -238,8 +253,8 @@ const FullSpelling = ({ word, wordSource, onComplete }) => {
         )}
       </div>
 
-      {/* 提交按钮 */}
-      {!submitted && !showRetryHint && (
+      {/* 提交按钮（仅学生端显示） */}
+      {!submitted && !showRetryHint && !readonly && (
         <Button
           variant="primary"
           onClick={() => handleSubmit()}

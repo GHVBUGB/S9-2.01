@@ -4,7 +4,7 @@
 
 .phase-navigator {
   width: 100%;
-  padding: var(--spacing-4);
+  padding: 12px 0; /* 减少上下 padding */
   display: flex;
   justify-content: center;
 }
@@ -12,8 +12,8 @@
 .phase-navigator__track {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-1);
-  padding: var(--spacing-2);
+  gap: 6px; /* 减少胶囊间距 */
+  padding: 8px 12px; /* 减少内边距 */
   background: linear-gradient(
     135deg,
     rgba(0, 99, 242, 0.15) 0%,
@@ -32,10 +32,10 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
+  gap: 6px; /* 减少图标与文字间距 */
+  padding: 8px 14px; /* 减少内边距 */
   border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
+  font-size: 13px; /* 减小字体 */
   font-weight: var(--font-weight-medium);
   transition: all var(--duration-normal) var(--ease-out);
   cursor: default;
@@ -47,8 +47,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 22px; /* 减小图标尺寸 */
+  height: 22px;
   border-radius: 50%;
   transition: all var(--duration-normal) var(--ease-out);
 }
@@ -79,7 +79,7 @@
    ======================================== */
 
 .phase-navigator__connector {
-  width: 20px;
+  width: 16px; /* 缩短连接线 */
   height: 2px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 1px;
