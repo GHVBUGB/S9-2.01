@@ -1,157 +1,336 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../shared/components/ui/Button';
-import Card from '../../../shared/components/ui/Card';
 import Badge from '../../../shared/components/ui/Badge';
-import { ArrowLeft, Sparkles, BookOpen, FileText, Calendar, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, CheckCircle } from 'lucide-react';
+import useWordStore from '../../../shared/store/useWordStore';
+import { getWordById } from '../../../shared/data/mockWords';
 import './AIContext.css';
 
 /**
  * AI 个性化语境闭环（增值服务）
- * 根据"黄灯词"积累量，自动触发两种不同的实战模式
- * - Mode A: 剧情式微阅读 (Daily)
- * - Mode B: 仿真真题演练 (Weekly)
+ * Mode A: 剧情式微阅读 - 该得爽（Daily）
+ * Mode B: 仿真题演练 - 做得对（Weekly）
  */
 const AIContext = () => {
   const navigate = useNavigate();
-
-  const modes = [
-    {
-      id: 'A',
-      title: 'Mode A: 剧情式微阅读',
-      subtitle: '读得爽',
-      trigger: '每节课后 (Daily)',
-      data: '本节课的新词',
-      experience: '你刚才背的主角，现在就在故事里',
-      icon: <BookOpen size={32} />,
-      iconColor: '#10B981',
-      route: '/story-reading',
-      features: [
-        '📖 消除对长难句的恐惧',
-        '✅ 验证单词在句子里的真实含义',
-        '🎯 通过故事情境加深记忆'
-      ]
-    },
-    {
-      id: 'B',
-      title: 'Mode B: 仿真真题演练',
-      subtitle: '做得对',
-      trigger: '每周日 (Weekly) 或积累满20个词',
-      data: '本周所有🟡黄灯词',
-      experience: '你刚才背的单词，就是这道中考常考题型的答案',
-      icon: <FileText size={32} />,
-      iconColor: '#A855F7',
-      route: '/cloze-practice',
-      features: [
-        '📝 把"背单词"直接转化为"拿分能力"',
-        '👨‍👩‍👧 家长最认可的显性成果',
-        '🎯 仿真中考题型，提前适应'
-      ]
+  
+  const { 
+    initialized, 
+    initializeFromMockData,
+    yellowWords
+  } = useWordStore();
+  
+  const [mode, setMode] = useState('select'); // select | modeA | modeB | completed
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [practiceWords, setPracticeWords] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [stats, setStats] = useState({ correct: 0, total: 0 });
+  
+  useEffect(() => {
+    if (!initialized) {
+      initializeFromMockData();
     }
-  ];
-
-  return (
-    <div className="ai-context">
-      {/* 头部导航 */}
-      <header className="ai-context__header">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="ai-context__back-btn"
-        >
-          <ArrowLeft size={20} />
-          返回首页
-        </Button>
-        <div className="ai-context__header-info">
-          <div className="ai-context__icon">
-            <Sparkles size={32} />
+  }, [initialized, initializeFromMockData]);
+  
+  useEffect(() => {
+    if (initialized && yellowWords.length > 0) {
+      const words = yellowWords.slice(0, 5).map(state => ({
+        wordId: state.wordId
+      }));
+      setPracticeWords(words);
+    }
+  }, [initialized, yellowWords]);
+  
+  const currentWord = practiceWords[currentIndex] ? getWordById(practiceWords[currentIndex].wordId) : null;
+  
+  // Mode A 示例故事
+  const getModeAStory = (word) => {
+    return {
+      title: "Tom 的新生活",
+      content: `Tom moved to a new city. It was hard to ${word.word} to his new school. But soon, he made a new friend, Jerry. They played soccer together.`,
+      blanks: [
+        { text: word.word, isTarget: true },
+        { text: 'adjust', isTarget: false },
+        { text: 'avoid', isTarget: false }
+      ]
+    };
+  };
+  
+  // Mode B 示例题目
+  const getModeBQuestion = (word) => {
+    return {
+      passage: "A chameleon is a special animal. It can change color to fit the [ 1 ]. This helps it to [ 2 ] to different places.",
+      questions: [
+        {
+          num: 1,
+          options: [
+            { label: 'A', text: 'water', isCorrect: false },
+            { label: 'B', text: 'environment', isCorrect: true },
+            { label: 'C', text: 'sky', isCorrect: false }
+          ]
+        },
+        {
+          num: 2,
+          options: [
+            { label: 'A', text: 'fly', isCorrect: false },
+            { label: 'B', text: 'jump', isCorrect: false },
+            { label: 'C', text: word.word, isCorrect: true }
+          ]
+        }
+      ]
+    };
+  };
+  
+  const handleSelectMode = (selectedMode) => {
+    setMode(selectedMode);
+    setCurrentIndex(0);
+    setStats({ correct: 0, total: 0 });
+  };
+  
+  const handleAnswer = (isCorrect) => {
+    setShowResult(true);
+    if (isCorrect) {
+      setStats({ ...stats, correct: stats.correct + 1, total: stats.total + 1 });
+    } else {
+      setStats({ ...stats, total: stats.total + 1 });
+    }
+    
+    setTimeout(() => {
+      if (currentIndex < practiceWords.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        setSelectedOption(null);
+        setShowResult(false);
+      } else {
+        setMode('completed');
+      }
+    }, 2000);
+  };
+  
+  // 选择模式界面
+  if (mode === 'select') {
+    if (!initialized || practiceWords.length === 0) {
+      return (
+        <div className="ai-context-page">
+          <div className="context-header">
+            <Button variant="ghost" onClick={() => navigate('/')}>
+              <ArrowLeft size={20} />
+              返回首页
+            </Button>
+            <div className="header-title">
+              <div className="title-icon yellow">
+                <Sparkles size={24} />
+              </div>
+              <div>
+                <h1>AI 个性化语境闭环</h1>
+                <Badge variant="yellow">增值服务</Badge>
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="ai-context__title">AI 个性化语境闭环</h1>
-            <Badge variant="yellow" size="md">增值服务</Badge>
+          
+          <div className="context-empty">
+            <p>暂无可用的黄灯单词</p>
+            <Button onClick={() => navigate('/')}>返回首页</Button>
           </div>
         </div>
-      </header>
-
-      {/* 主内容区域 */}
-      <div className="ai-context__container">
-        {/* 介绍卡片 */}
-        <Card variant="glass" padding="xl" className="ai-context__intro">
-          <h2 className="ai-context__intro-title">
-            <Sparkles size={24} />
-            两大 AI 战术
-          </h2>
-          <p className="ai-context__intro-desc">
-            我们根据"黄灯词"的积累量，自动触发两种不同的实战模式
-          </p>
-        </Card>
-
-        {/* 模式选择卡片 */}
-        <div className="ai-context__modes">
-          {modes.map((mode) => (
-            <Card 
-              key={mode.id} 
-              variant="glass" 
-              padding="xl" 
-              className="mode-card"
-              onClick={() => navigate(mode.route)}
-            >
-              <div className="mode-card__header">
-                <div 
-                  className="mode-card__icon" 
-                  style={{ color: mode.iconColor }}
-                >
-                  {mode.icon}
-                </div>
-                <div className="mode-card__title-group">
-                  <h3 className="mode-card__title">{mode.title}</h3>
-                  <p className="mode-card__subtitle">—— {mode.subtitle}</p>
-                </div>
-              </div>
-
-              <div className="mode-card__info">
-                <div className="mode-card__info-item">
-                  <Calendar size={16} />
-                  <span><strong>触发：</strong>{mode.trigger}</span>
-                </div>
-                <div className="mode-card__info-item">
-                  <Badge variant="yellow" size="sm">数据源</Badge>
-                  <span>{mode.data}</span>
-                </div>
-              </div>
-
-              <div className="mode-card__experience">
-                <p className="mode-card__experience-label">💬 学生体验：</p>
-                <p className="mode-card__experience-text">"{mode.experience}"</p>
-              </div>
-
-              <div className="mode-card__features">
-                {mode.features.map((feature, index) => (
-                  <div key={index} className="mode-card__feature">
-                    <CheckCircle size={16} />
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Button className="mode-card__btn" size="lg">
-                进入 {mode.title.split(':')[0]}
-              </Button>
-            </Card>
-          ))}
+      );
+    }
+    
+    return (
+      <div className="ai-context-page">
+        <div className="context-header">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft size={20} />
+            返回首页
+          </Button>
+          <div className="header-title">
+            <div className="title-icon yellow">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h1>AI 个性化语境闭环</h1>
+              <Badge variant="yellow">增值服务</Badge>
+            </div>
+          </div>
         </div>
-
-        {/* 说明卡片 */}
-        <Card variant="glass" padding="lg" className="ai-context__note">
-          <h3 className="ai-context__note-title">💡 核心理念</h3>
-          <p className="ai-context__note-desc">
-            所学即所用，打造"输入→理解→输出"的完整学习闭环。
-          </p>
-        </Card>
+        
+        <div className="context-main">
+          <div className="mode-select">
+            <h2 className="select-title">选择练习模式</h2>
+            <div className="mode-cards">
+              <div className="mode-card" onClick={() => handleSelectMode('modeA')}>
+                <BookOpen size={48} className="mode-icon" />
+                <h3>Mode A</h3>
+                <p className="mode-name">剧情式微阅读</p>
+                <p className="mode-desc">该得爽 - 每日故事</p>
+              </div>
+              <div className="mode-card" onClick={() => handleSelectMode('modeB')}>
+                <CheckCircle size={48} className="mode-icon" />
+                <h3>Mode B</h3>
+                <p className="mode-name">仿真题演练</p>
+                <p className="mode-desc">做得对 - 模拟考试</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  
+  // Mode A - 剧情式微阅读
+  if (mode === 'modeA') {
+    if (!currentWord) return <div className="ai-context-page">加载中...</div>;
+    
+    const story = getModeAStory(currentWord);
+    
+    return (
+      <div className="ai-context-page">
+        <div className="context-header">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft size={20} />
+            返回首页
+          </Button>
+          <div className="header-title">
+            <div className="title-icon yellow">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h1>AI 个性化语境闭环</h1>
+              <Badge variant="yellow">Mode A - 剧情式</Badge>
+            </div>
+          </div>
+        </div>
+        
+        <div className="context-main">
+          <div className="progress-info">
+            <Badge variant="yellow">进度: {currentIndex + 1} / {practiceWords.length}</Badge>
+          </div>
+          
+          <div className="story-display">
+            <h3 className="story-title">📖 {story.title}</h3>
+            <p className="story-content">{story.content}</p>
+          </div>
+          
+          <div className="question-box">
+            <p className="question-text">✓ 清晰对长难句的恐惧，验证单词在任意句子的真实义。</p>
+          </div>
+          
+          <div className="action-buttons">
+            <Button size="lg" onClick={() => handleAnswer(true)}>
+              我理解了，下一个
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Mode B - 仿真题演练
+  if (mode === 'modeB') {
+    if (!currentWord) return <div className="ai-context-page">加载中...</div>;
+    
+    const question = getModeBQuestion(currentWord);
+    
+    return (
+      <div className="ai-context-page">
+        <div className="context-header">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft size={20} />
+            返回首页
+          </Button>
+          <div className="header-title">
+            <div className="title-icon yellow">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h1>AI 个性化语境闭环</h1>
+              <Badge variant="yellow">Mode B - 仿真题</Badge>
+            </div>
+          </div>
+        </div>
+        
+        <div className="context-main">
+          <div className="progress-info">
+            <Badge variant="yellow">进度: {currentIndex + 1} / {practiceWords.length}</Badge>
+          </div>
+          
+          <div className="passage-display">
+            <p className="passage-text">{question.passage}</p>
+          </div>
+          
+          <div className="questions-list">
+            {question.questions.map((q, idx) => (
+              <div key={idx} className="question-item">
+                <p className="question-num">{q.num}.</p>
+                <div className="options-list">
+                  {q.options.map((opt) => (
+                    <button
+                      key={opt.label}
+                      className={`option-btn ${selectedOption === `${idx}-${opt.label}` ? 'selected' : ''}`}
+                      onClick={() => {
+                        setSelectedOption(`${idx}-${opt.label}`);
+                        setTimeout(() => handleAnswer(opt.isCorrect), 500);
+                      }}
+                      disabled={showResult}
+                    >
+                      {opt.label}. {opt.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {showResult && (
+            <div className={`result-box ${stats.total > 0 ? 'correct' : ''}`}>
+              <CheckCircle size={24} />
+              <span>回答正确！</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  
+  // 完成界面
+  if (mode === 'completed') {
+    return (
+      <div className="ai-context-page">
+        <div className="context-header">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            <ArrowLeft size={20} />
+            返回首页
+          </Button>
+          <div className="header-title">
+            <div className="title-icon yellow">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h1>AI 个性化语境闭环</h1>
+              <Badge variant="yellow">增值服务</Badge>
+            </div>
+          </div>
+        </div>
+        
+        <div className="context-main">
+          <div className="complete-screen">
+            <Sparkles size={80} className="complete-icon" />
+            <h2>练习完成！</h2>
+            <div className="final-stats">
+              <div className="stat-box">
+                <span className="stat-num">{stats.total}</span>
+                <span className="stat-label">完成题目</span>
+              </div>
+            </div>
+            <Button onClick={() => navigate('/')}>返回首页</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  return null;
 };
 
 export default AIContext;
-

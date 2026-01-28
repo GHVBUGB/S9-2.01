@@ -1,160 +1,328 @@
-/* ================================
-   AI Context - AI 个性化语境闭环（增值服务）
-   采用 Jarvis 卡片式设计
-   ================================ */
+/* AI 个性化语境闭环 - 简洁设计 */
 
-.ai-context {
+.ai-context-page {
   min-height: 100vh;
-  background: #f8fafc;
-  padding: var(--spacing-6);
+  background: linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 100%);
+  padding: 20px;
 }
 
-.ai-context__header {
+/* 头部 */
+.context-header {
   max-width: 1200px;
-  margin: 0 auto var(--spacing-6);
+  margin: 0 auto 30px;
   display: flex;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: 20px;
   background: white;
-  padding: var(--spacing-4);
+  padding: 16px 20px;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.ai-context__back-btn {
-  flex-shrink: 0;
-}
-
-.ai-context__header-info {
+.header-title {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
+  gap: 12px;
   flex: 1;
 }
 
-.ai-context__icon {
+.title-icon {
   width: 48px;
   height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  border-radius: 12px;
   color: white;
-  flex-shrink: 0;
 }
 
-.ai-context__title {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+.title-icon.yellow {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+}
+
+.header-title h1 {
+  font-size: 20px;
+  font-weight: 600;
   color: #1e293b;
-  margin: 0 0 var(--spacing-1) 0;
+  margin: 0 0 4px 0;
 }
 
-.ai-context__container {
-  max-width: 1200px;
+/* 主内容区 */
+.context-main {
+  max-width: 900px;
   margin: 0 auto;
-}
-
-/* ========== Placeholder / 功能卡片 ========== */
-.ai-context__placeholder {
-  background: white;
-  border-radius: 16px;
-  padding: var(--spacing-8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
 }
 
-.ai-context__placeholder-icon {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+/* 空状态 */
+.context-empty {
+  background: white;
   border-radius: 24px;
-  color: #d97706;
-  margin-bottom: var(--spacing-6);
+  padding: 100px 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.ai-context__placeholder-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: #1e293b;
-  margin: 0 0 var(--spacing-4) 0;
-}
-
-.ai-context__placeholder-desc {
-  font-size: var(--font-size-lg);
+.context-empty p {
+  font-size: 24px;
   color: #64748b;
-  margin: 0 0 var(--spacing-6) 0;
+  margin-bottom: 32px;
 }
 
-.ai-context__feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 var(--spacing-8) 0;
+/* 模式选择 */
+.mode-select {
+  background: white;
+  border-radius: 24px;
+  padding: 60px 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.select-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 48px 0;
+}
+
+.mode-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.mode-card {
+  padding: 48px 32px;
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mode-card:hover {
+  border-color: #FBBF24;
+  background: #FFFBEB;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(251, 191, 36, 0.2);
+}
+
+.mode-icon {
+  color: #FBBF24;
+  margin-bottom: 16px;
+}
+
+.mode-card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+
+.mode-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 8px 0;
+}
+
+.mode-desc {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* 进度信息 */
+.progress-info {
+  margin-bottom: 32px;
+}
+
+/* Mode A - 故事显示 */
+.story-display {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.story-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 24px 0;
+}
+
+.story-content {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0;
+}
+
+.question-box {
+  background: #FFFBEB;
+  border: 2px solid #FDE047;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.question-text {
+  font-size: 16px;
+  color: #92400E;
+  margin: 0;
+}
+
+/* Mode B - 阅读理解 */
+.passage-display {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.passage-text {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0;
+}
+
+.questions-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4);
-  align-items: stretch;
-  text-align: left;
-  width: 100%;
-  max-width: 600px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
-.ai-context__feature-list li {
+.question-item {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  text-align: left;
+}
+
+.question-num {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+}
+
+.options-list {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4);
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-btn {
+  padding: 16px 20px;
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
   border-radius: 12px;
-  font-size: var(--font-size-base);
+  font-size: 16px;
   color: #334155;
+  text-align: left;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.ai-context__feature-list li:hover {
-  background: #fef3c7;
-  border-color: #fde047;
-  transform: translateX(4px);
+.option-btn:hover:not(:disabled) {
+  border-color: #FBBF24;
+  background: #FFFBEB;
 }
 
-.ai-context__feature-list svg {
-  flex-shrink: 0;
-  color: #f59e0b;
+.option-btn.selected {
+  border-color: #FBBF24;
+  background: #FEF3C7;
 }
 
-.ai-context__placeholder-hint {
-  padding: var(--spacing-4) var(--spacing-6);
-  background: #fef3c7;
-  border: 1px solid #fde047;
-  border-radius: 12px;
-  color: #92400e;
-  font-size: var(--font-size-sm);
+.option-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
-/* ========== 响应式 ========== */
+/* 结果提示 */
+.result-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.result-box.correct {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  margin-bottom: 24px;
+}
+
+/* 完成界面 */
+.complete-screen {
+  background: white;
+  border-radius: 24px;
+  padding: 80px 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.complete-icon {
+  color: #FBBF24;
+  margin-bottom: 32px;
+}
+
+.complete-screen h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 48px 0;
+}
+
+.final-stats {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-num {
+  font-size: 64px;
+  font-weight: 700;
+  color: #FBBF24;
+}
+
+.stat-label {
+  font-size: 16px;
+  color: #64748b;
+}
+
+/* 响应式 */
 @media (max-width: 768px) {
-  .ai-context {
-    padding: var(--spacing-4);
+  .mode-cards {
+    grid-template-columns: 1fr;
   }
-
-  .ai-context__placeholder {
-    padding: var(--spacing-6);
+  
+  .story-content,
+  .passage-text {
+    font-size: 18px;
   }
-
-  .ai-context__placeholder-icon {
-    width: 80px;
-    height: 80px;
-  }
-
-  .ai-context__feature-list {
-    max-width: 100%;
+  
+  .option-btn {
+    font-size: 14px;
+    padding: 12px 16px;
   }
 }
