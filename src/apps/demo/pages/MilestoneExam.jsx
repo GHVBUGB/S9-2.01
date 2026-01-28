@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../shared/components/ui/Button';
 import Badge from '../../../shared/components/ui/Badge';
-import { ArrowLeft, Trophy, CheckCircle, XCircle, Award } from 'lucide-react';
+import { ArrowLeft, Trophy, CheckCircle, XCircle } from 'lucide-react';
 import useWordStore from '../../../shared/store/useWordStore';
 import { getWordById } from '../../../shared/data/mockWords';
 import './MilestoneExam.css';
 
-/**
- * 里程碑大考（Phase 6）- 绿灯加冕
- * 全过移测试：新语境、无提示、一次机会
- */
 const MilestoneExam = () => {
   const navigate = useNavigate();
   
@@ -29,6 +25,7 @@ const MilestoneExam = () => {
   const [results, setResults] = useState({ passed: 0, failed: 0 });
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [completedCount, setCompletedCount] = useState(0);
   
   useEffect(() => {
     if (!initialized) {
@@ -71,6 +68,8 @@ const MilestoneExam = () => {
       setResults({ ...results, failed: results.failed + 1 });
     }
     
+    setCompletedCount(completedCount + 1);
+    
     setTimeout(() => {
       if (currentIndex < examWords.length - 1) {
         setCurrentIndex(currentIndex + 1);
@@ -97,16 +96,25 @@ const MilestoneExam = () => {
                 <Trophy size={24} />
               </div>
               <div>
-                <h1>里程碑大考 —— 绿灯加冕</h1>
+                <h1>里程碑大考</h1>
                 <Badge variant="green">Phase 6</Badge>
               </div>
             </div>
           </div>
           
-          <div className="exam-empty">
-            <Trophy size={80} style={{ color: '#cbd5e1' }} />
-            <p>暂无达到大考标准的单词</p>
-            <Button onClick={() => navigate('/')}>返回首页</Button>
+          <div className="exam-content">
+            <h2 className="section-title">今日计划</h2>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <p className="stat-label">已考核</p>
+                <div className="stat-value">
+                  <span className="current">0</span>
+                  <span className="divider">/</span>
+                  <span className="total">0</span>
+                </div>
+                <Button size="lg" onClick={() => navigate('/')}>返回首页</Button>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -124,21 +132,26 @@ const MilestoneExam = () => {
               <Trophy size={24} />
             </div>
             <div>
-              <h1>里程碑大考 —— 绿灯加冕</h1>
+              <h1>里程碑大考</h1>
               <Badge variant="green">Phase 6</Badge>
             </div>
           </div>
         </div>
         
-        <div className="exam-main">
-          <div className="start-screen">
-            <Trophy size={80} className="trophy-big" />
-            <p className="congrats-text">🎉 恭喜！达到大考标准</p>
-            <h2 className="exam-count">{examWords.length}</h2>
-            <p className="exam-label">个单词待考核</p>
-            <Button size="lg" onClick={() => setExamState('testing')}>
-              开始大考
-            </Button>
+        <div className="exam-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已考核</p>
+              <div className="stat-value">
+                <span className="current">0</span>
+                <span className="divider">/</span>
+                <span className="total">{examWords.length}</span>
+              </div>
+              <Button size="lg" className="action-btn" onClick={() => setExamState('testing')}>
+                大考
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -161,62 +174,71 @@ const MilestoneExam = () => {
               <Trophy size={24} />
             </div>
             <div>
-              <h1>里程碑大考 —— 绿灯加冕</h1>
+              <h1>里程碑大考</h1>
               <Badge variant="green">Phase 6</Badge>
             </div>
           </div>
         </div>
         
-        <div className="exam-main">
-          <div className="progress-info">
-            <Badge variant="green">第 {currentIndex + 1} / {examWords.length} 题</Badge>
-          </div>
-          
-          <div className="exam-question">
-            <div className="question-sentence">
-              {generateNewContextSentence(currentWord)}
+        <div className="exam-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已考核</p>
+              <div className="stat-value">
+                <span className="current">{completedCount}</span>
+                <span className="divider">/</span>
+                <span className="total">{examWords.length}</span>
+              </div>
             </div>
-            <p className="exam-hint">⚠️ 无首字母提示，无中文翻译，全新语境</p>
           </div>
           
-          <div className="answer-input">
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !showResult && handleSubmit()}
-              placeholder="请输入单词拼写..."
-              disabled={showResult}
-              autoFocus
-            />
-          </div>
-          
-          <div className="action-buttons">
-            <Button size="lg" onClick={handleSubmit} disabled={!userInput.trim() || showResult}>
-              提交答案
-            </Button>
-          </div>
-          
-          {showResult && (
-            <div className={`result-feedback ${isCorrect ? 'correct' : 'incorrect'}`}>
-              {isCorrect ? (
-                <>
-                  <CheckCircle size={48} />
-                  <h3>✓ 答对了，变🟢绿灯</h3>
-                  <p>恭喜！{currentWord.word} 已永久掌握</p>
-                </>
-              ) : (
-                <>
-                  <XCircle size={48} />
-                  <h3>✗ 答错了，变🔴红灯</h3>
-                  <div className="answer-reveal">
-                    <p><strong>正确答案：</strong>{currentWord.word}</p>
-                    <p className="word-def">{currentWord.meaning?.definitionCn}</p>
-                  </div>
-                </>
-              )}
+          <div className="word-practice">
+            <div className="word-display">
+              <div className="sentence-blank">
+                {generateNewContextSentence(currentWord)}
+              </div>
+              <p className="exam-hint">⚠️ 无首字母提示，无中文翻译，全新语境</p>
             </div>
-          )}
+            
+            <div className="answer-section">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !showResult && handleSubmit()}
+                placeholder="请输入单词拼写..."
+                disabled={showResult}
+                autoFocus
+              />
+              <Button size="lg" onClick={handleSubmit} disabled={!userInput.trim() || showResult}>
+                提交答案
+              </Button>
+            </div>
+            
+            {showResult && (
+              <div className={`result-box ${isCorrect ? 'correct' : 'incorrect'}`}>
+                {isCorrect ? (
+                  <>
+                    <CheckCircle size={32} />
+                    <div>
+                      <h3>✓ 答对了，变🟢绿灯</h3>
+                      <p>恭喜！{currentWord.word} 已永久掌握</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <XCircle size={32} />
+                    <div>
+                      <h3>✗ 答错了，变🔴红灯</h3>
+                      <p><strong>正确答案：</strong>{currentWord.word}</p>
+                      <p className="word-def">{currentWord.meaning?.definitionCn}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -236,27 +258,40 @@ const MilestoneExam = () => {
               <Trophy size={24} />
             </div>
             <div>
-              <h1>里程碑大考 —— 完成</h1>
+              <h1>里程碑大考</h1>
               <Badge variant="green">Phase 6</Badge>
             </div>
           </div>
         </div>
         
-        <div className="exam-main">
-          <div className="complete-screen">
-            <Award size={80} className="award-icon" />
-            <h2>🎉 大考完成</h2>
-            <div className="results-display">
-              <div className="result-item pass">
-                <span className="result-num">{results.passed}</span>
-                <span className="result-text">🟢 通过（绿灯）</span>
+        <div className="exam-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已考核</p>
+              <div className="stat-value completed">
+                <span className="current">{examWords.length}</span>
+                <span className="divider">/</span>
+                <span className="total">{examWords.length}</span>
               </div>
-              <div className="result-item fail">
-                <span className="result-num">{results.failed}</span>
-                <span className="result-text">🔴 未通过（红灯）</span>
+              <div className="complete-message">
+                <Trophy size={24} />
+                <span>大考完成！</span>
               </div>
+              <div className="result-summary">
+                <div className="result-item">
+                  <span className="result-label">🟢 通过（绿灯）</span>
+                  <span className="result-num">{results.passed}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">🔴 未通过（红灯）</span>
+                  <span className="result-num">{results.failed}</span>
+                </div>
+              </div>
+              <Button size="lg" className="action-btn" onClick={() => navigate('/')}>
+                返回首页
+              </Button>
             </div>
-            <Button onClick={() => navigate('/')}>返回首页</Button>
           </div>
         </div>
       </div>

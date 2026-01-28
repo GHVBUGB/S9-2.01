@@ -7,10 +7,6 @@ import useWordStore from '../../../shared/store/useWordStore';
 import { getWordById } from '../../../shared/data/mockWords';
 import './SmartReview.css';
 
-/**
- * 智能复习与容错（Phase 4）
- * 双轨制 + 三级容错机制
- */
 const SmartReview = () => {
   const navigate = useNavigate();
   
@@ -31,6 +27,7 @@ const SmartReview = () => {
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [stats, setStats] = useState({ total: 0, passed: 0, reset: 0, failed: 0 });
+  const [completedCount, setCompletedCount] = useState(0);
   
   useEffect(() => {
     if (!initialized) {
@@ -86,6 +83,7 @@ const SmartReview = () => {
         reviewSuccessWithReset(currentWord.id);
         setStats({ ...stats, reset: stats.reset + 1 });
       }
+      setCompletedCount(completedCount + 1);
       setTimeout(() => moveToNext(), 2000);
     } else {
       if (errorLevel === 0) {
@@ -102,6 +100,7 @@ const SmartReview = () => {
         setFeedback({ type: 'level3', message: '❌ 熔断锁定 - 变红灯，需要老师修复' });
         reviewFailToRed(currentWord.id, []);
         setStats({ ...stats, failed: stats.failed + 1 });
+        setCompletedCount(completedCount + 1);
       }
     }
   };
@@ -143,9 +142,19 @@ const SmartReview = () => {
             </div>
           </div>
           
-          <div className="review-empty">
-            <p>暂无复习任务</p>
-            <Button onClick={() => navigate('/')}>返回首页</Button>
+          <div className="review-content">
+            <h2 className="section-title">今日计划</h2>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <p className="stat-label">已复习</p>
+                <div className="stat-value">
+                  <span className="current">0</span>
+                  <span className="divider">/</span>
+                  <span className="total">0</span>
+                </div>
+                <Button size="lg" onClick={() => navigate('/')}>返回首页</Button>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -169,14 +178,20 @@ const SmartReview = () => {
           </div>
         </div>
         
-        <div className="review-main">
-          <div className="start-screen">
-            <p className="today-task">今日复习任务</p>
-            <h2 className="word-count">{reviewWords.length}</h2>
-            <p className="word-label">待复习单词</p>
-            <Button size="lg" onClick={() => setReviewState('reviewing')}>
-              开始复习
-            </Button>
+        <div className="review-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已复习</p>
+              <div className="stat-value">
+                <span className="current">0</span>
+                <span className="divider">/</span>
+                <span className="total">{reviewWords.length}</span>
+              </div>
+              <Button size="lg" className="action-btn" onClick={() => setReviewState('reviewing')}>
+                复习
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -205,57 +220,64 @@ const SmartReview = () => {
           </div>
         </div>
         
-        <div className="review-main">
-          <div className="progress-info">
-            <Badge variant="blue">单词进度: {currentIndex + 1} / {reviewWords.length}</Badge>
-          </div>
-          
-          <div className="word-display">
-            <div className="sentence-blank">
-              {currentWord.context?.[0]?.sentence ? 
-                generateBlankSentence(currentWord.context[0].sentence, currentWord.word) : 
-                '请拼写单词：___________'
-              }
+        <div className="review-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已复习</p>
+              <div className="stat-value">
+                <span className="current">{completedCount}</span>
+                <span className="divider">/</span>
+                <span className="total">{reviewWords.length}</span>
+              </div>
             </div>
-            <div className="word-meaning">{currentWord.meaning?.definitionCn || currentWord.meaning?.chinese}</div>
           </div>
           
-          {showSkeleton && errorLevel === 2 && (
-            <div className="skeleton-display">
-              <p className="skeleton-title">💡 骨架提示</p>
-              {renderSkeleton(currentWord.word)}
+          <div className="word-practice">
+            <div className="word-display">
+              <div className="sentence-blank">
+                {currentWord.context?.[0]?.sentence ? 
+                  generateBlankSentence(currentWord.context[0].sentence, currentWord.word) : 
+                  '请拼写单词：___________'
+                }
+              </div>
+              <div className="word-meaning">{currentWord.meaning?.definitionCn || currentWord.meaning?.chinese}</div>
             </div>
-          )}
-          
-          <div className="answer-input">
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              placeholder="请输入单词拼写..."
-              disabled={errorLevel === 3}
-              autoFocus
-            />
-          </div>
-          
-          <div className="action-buttons">
-            <Button size="lg" onClick={handleSubmit} disabled={!userInput.trim() || errorLevel === 3}>
-              提交
-            </Button>
-          </div>
-          
-          {feedback && (
-            <div className={`feedback-message ${feedback.type}`}>
-              {feedback.message}
-              {feedback.type === 'level3' && (
-                <div className="failed-detail">
-                  <p><strong>正确答案：</strong>{currentWord.word}</p>
-                  <Button onClick={moveToNext}>下一个</Button>
-                </div>
-              )}
+            
+            {showSkeleton && errorLevel === 2 && (
+              <div className="skeleton-display">
+                <p className="skeleton-title">💡 骨架提示</p>
+                {renderSkeleton(currentWord.word)}
+              </div>
+            )}
+            
+            <div className="answer-section">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                placeholder="请输入单词拼写..."
+                disabled={errorLevel === 3}
+                autoFocus
+              />
+              <Button size="lg" onClick={handleSubmit} disabled={!userInput.trim() || errorLevel === 3}>
+                提交
+              </Button>
             </div>
-          )}
+            
+            {feedback && (
+              <div className={`feedback-box ${feedback.type}`}>
+                {feedback.message}
+                {feedback.type === 'level3' && (
+                  <div className="failed-info">
+                    <p><strong>正确答案：</strong>{currentWord.word}</p>
+                    <Button onClick={moveToNext}>下一个</Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -281,25 +303,38 @@ const SmartReview = () => {
           </div>
         </div>
         
-        <div className="review-main">
-          <div className="complete-screen">
-            <CheckCircle size={80} className="complete-icon" />
-            <h2>今日复习完成！</h2>
-            <div className="stats-display">
-              <div className="stat-item">
-                <span className="stat-num">{stats.passed}</span>
-                <span className="stat-text">完美保黄</span>
+        <div className="review-content">
+          <h2 className="section-title">今日计划</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-label">已复习</p>
+              <div className="stat-value completed">
+                <span className="current">{reviewWords.length}</span>
+                <span className="divider">/</span>
+                <span className="total">{reviewWords.length}</span>
               </div>
-              <div className="stat-item">
-                <span className="stat-num">{stats.reset}</span>
-                <span className="stat-text">勉强保黄</span>
+              <div className="complete-message">
+                <CheckCircle size={24} />
+                <span>今日复习完成！</span>
               </div>
-              <div className="stat-item">
-                <span className="stat-num">{stats.failed}</span>
-                <span className="stat-text">变红灯</span>
+              <div className="result-summary">
+                <div className="result-item">
+                  <span className="result-label">完美保黄</span>
+                  <span className="result-num">{stats.passed}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">勉强保黄</span>
+                  <span className="result-num">{stats.reset}</span>
+                </div>
+                <div className="result-item">
+                  <span className="result-label">变红灯</span>
+                  <span className="result-num">{stats.failed}</span>
+                </div>
               </div>
+              <Button size="lg" className="action-btn" onClick={() => navigate('/')}>
+                返回首页
+              </Button>
             </div>
-            <Button onClick={() => navigate('/')}>返回首页</Button>
           </div>
         </div>
       </div>
