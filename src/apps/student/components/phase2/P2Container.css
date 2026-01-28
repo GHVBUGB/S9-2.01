@@ -1,5 +1,5 @@
 /* ========================================
-   P2Container - Phase 2 训练容器（模仿 Phase 1 布局）
+   P2Container - Phase 2 训练容器（极简风格）
    ======================================== */
 
 .p2-container {
@@ -7,54 +7,29 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+  height: 100%;
+  flex: 1;
   padding: 0;
   animation: fadeIn 0.5s ease-out;
 }
 
-/* 进度药丸 - 模仿 Phase 1 */
+/* 进度药丸 - 统一样式（正常文档流） */
 .p2-container__progress-wrapper {
   margin-bottom: 16px;
 }
 
 .p2-container__progress-pill {
-  background: #f1f5f9;
-  color: #64748b;
+  background: rgba(0, 99, 242, 0.1); /* 51Talk Blue 浅色 */
+  color: #0063f2; /* 51Talk Blue */
   padding: 6px 16px;
   border-radius: 100px;
   font-size: 13px;
   font-weight: 600;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 99, 242, 0.1);
   white-space: nowrap;
   transition: all 0.3s ease;
 }
 
-/* 错题重做轮的样式 */
-.p2-container__progress-pill--retry {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #b45309;
-  border: 1px solid #f59e0b;
-  animation: retryPulse 2s ease-in-out infinite;
-}
-
-@keyframes retryPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
-  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
-}
-
-/* 白色卡片包裹训练内容 - 模仿 Phase 1 */
-.p2-container__card {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 20px 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  position: relative;
-  overflow: hidden;
-}
 
 @keyframes fadeIn {
   from { opacity: 0; }

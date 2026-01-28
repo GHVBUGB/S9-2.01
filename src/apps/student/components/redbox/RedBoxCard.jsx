@@ -88,20 +88,42 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
 
   // 提交验收
   const handleSubmit = () => {
-    if (inputValue.trim() === '' || readonly) return;
-    const correct = inputValue.toLowerCase().trim() === word.word.toLowerCase();
-    studentSubmitAnswer(correct);
-    
+    if (inputValue.trim() === '' || readonly || submitted) return;
+
+    const userInput = inputValue.toLowerCase().trim();
+    const expectedWord = word.word.toLowerCase();
+    const correct = userInput === expectedWord;
+
+    console.log('🎯 [RedBox验收] 提交:', {
+      userInput,
+      expectedWord,
+      isCorrect: correct,
+      attemptsLeft: attempts
+    });
+
     if (correct) {
+      // 拼对 → 攻克成功
+      studentSubmitAnswer(true);
       updateWordResult(word.id, 'redbox', true);
     } else {
-      setAttempts(prev => {
-        const newAttempts = prev - 1;
-        if (newAttempts <= 0) {
-          updateWordResult(word.id, 'redbox', false);
-        }
-        return newAttempts;
-      });
+      // 拼错 → 减少生命值
+      const newAttempts = attempts - 1;
+      setAttempts(newAttempts);
+      
+      if (newAttempts <= 0) {
+        // 生命值用完 → 失败
+        studentSubmitAnswer(false);
+        updateWordResult(word.id, 'redbox', false);
+      } else {
+        // 还有生命值 → 再试一次
+        studentSubmitAnswer(false);
+        setTimeout(() => {
+          resetStudentState();
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
+        }, 800);
+      }
     }
   };
 
@@ -125,13 +147,24 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
     ));
   };
 
-  // 生成语境挖空句
-  const getBlankSentence = useMemo(() => {
-    if (!word?.context?.[0]?.sentence) return '';
-    return word.context[0].sentence.replace(
-      new RegExp(`\\b${word.word}\\b`, 'gi'),
-      '_______'
-    );
+  // 生成语境挖空句（拆分为前后两部分，用于内嵌输入框）
+  const getBlankPhrase = useMemo(() => {
+    const sentence = word?.context?.[0]?.sentence || '';
+    const targetWord = word.word;
+
+    if (!targetWord) return { before: sentence, after: '' };
+
+    const regex = new RegExp(`\\b${targetWord}\\b`, 'i');
+    const match = sentence.match(regex);
+
+    if (match) {
+      const index = match.index;
+      const before = sentence.slice(0, index);
+      const after = sentence.slice(index + targetWord.length);
+      return { before, after };
+    }
+
+    return { before: sentence, after: '' };
   }, [word]);
 
   // 武器图标映射
@@ -146,18 +179,10 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
 
   return (
     <div className={`redbox-card ${readonly ? 'redbox-card--readonly' : ''}`}>
-      {/* 顶部进度条 */}
-      <div className="redbox-card__header">
-        <div className="redbox-card__progress-bar">
-          {[...Array(totalWords)].map((_, i) => (
-            <div 
-              key={i}
-              className={`redbox-card__progress-dot ${i === currentIndex ? 'is-active' : ''} ${i < currentIndex ? 'is-done' : ''}`}
-            />
-          ))}
-        </div>
-        <div className="redbox-card__progress-text">
-          红词 {currentIndex + 1}/{totalWords}
+      {/* 顶部进度药丸 - 统一格式 */}
+      <div className="redbox-card__progress-wrapper">
+        <div className="redbox-card__progress-pill">
+          单词进度: {currentIndex + 1} / {totalWords}
         </div>
       </div>
 
@@ -167,6 +192,16 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
         {/* Step 1: 定音定形 */}
         {step === 1 && (
           <div className="redbox-card__step1">
+            {/* 音频按钮 - 单独在上方 */}
+            <button 
+              className={`redbox-card__audio-btn ${isPlaying ? 'is-playing' : ''}`}
+              onClick={handlePlayAudio}
+              disabled={isPlaying}
+            >
+              <Volume2 size={24} />
+            </button>
+
+            {/* 单词显示 */}
             <div className="redbox-card__word-display">
               {redBoxUI.showSyllables ? (
                 <span className="redbox-card__word redbox-card__word--syllables">
@@ -175,13 +210,6 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
               ) : (
                 <span className="redbox-card__word">{word.word}</span>
               )}
-              <button 
-                className={`redbox-card__audio-btn ${isPlaying ? 'is-playing' : ''}`}
-                onClick={handlePlayAudio}
-                disabled={isPlaying}
-              >
-                <Volume2 size={24} />
-              </button>
             </div>
             
             {redBoxUI.showPhonetic && (
@@ -189,12 +217,15 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
             )}
 
             <div className="redbox-card__meaning">
+              {word.meaning?.partOfSpeech && (
+                <span className="redbox-card__pos">{word.meaning.partOfSpeech}</span>
+              )}
               {word.meaning?.definitionCn}
             </div>
 
             {!redBoxUI.audioPlayed && !redBoxUI.showSyllables && !redBoxUI.showPhonetic && (
               <div className="redbox-card__hint">
-                👆 等待老师操作
+                等待老师操作
               </div>
             )}
           </div>
@@ -203,14 +234,17 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
         {/* Step 2: 精准助记 */}
         {step === 2 && (
           <div className="redbox-card__step2">
+            {/* 音频按钮 - 单独在上方 */}
+            <button 
+              className={`redbox-card__audio-btn-sm ${isPlaying ? 'is-playing' : ''}`}
+              onClick={handlePlayAudio}
+            >
+              <Volume2 size={20} />
+            </button>
+
+            {/* 单词显示 */}
             <div className="redbox-card__word-mini">
               {word.word}
-              <button 
-                className={`redbox-card__audio-btn-sm ${isPlaying ? 'is-playing' : ''}`}
-                onClick={handlePlayAudio}
-              >
-                <Volume2 size={18} />
-              </button>
             </div>
 
             {redBoxUI.selectedWeapon ? (
@@ -267,78 +301,64 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
               </div>
             ) : (
               <div className="redbox-card__waiting">
-                <div className="redbox-card__waiting-icon">🛠️</div>
                 <p>等待老师选择助记武器...</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Step 3: L4 验收 */}
+        {/* Step 3: L4 验收 - 内嵌输入框设计 */}
         {step === 3 && (
           <div className="redbox-card__step3">
-            {/* 语境提示 */}
-            <div className="redbox-card__test-context">
-              <p className="redbox-card__test-sentence">{getBlankSentence}</p>
-              <p className="redbox-card__test-cn">{word.context?.[0]?.sentenceCn}</p>
+            {/* 挖空例句 - 内嵌输入框 */}
+            <div className="redbox-card__test-phrase">
+              <span className="redbox-card__test-phrase-text">
+                {getBlankPhrase.before}
+              </span>
+              <input
+                ref={inputRef}
+                type="text"
+                className={`redbox-card__inline-input ${
+                  submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
+                } ${readonly ? 'is-readonly' : ''}`}
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder=""
+                disabled={submitted || readonly}
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                size={Math.max(word.word?.length || 8, 8)}
+              />
+              <span className="redbox-card__test-phrase-text">
+                {getBlankPhrase.after}
+              </span>
             </div>
 
-            {/* 输入区 */}
-            <div className="redbox-card__input-section">
-              <div className="redbox-card__input-wrapper">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className={`redbox-card__input ${
-                    submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
-                  }`}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder={readonly ? '监控学生输入...' : '输入完整单词...'}
-                  disabled={submitted || readonly}
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  spellCheck="false"
+            {/* 中文翻译 */}
+            <div className="redbox-card__test-cn">
+              {word.context?.[0]?.sentenceCn}
+            </div>
+
+            {/* 错误时显示正确答案 */}
+            {submitted && !isCorrect && (
+              <div className="redbox-card__answer">
+                正确答案：<strong>{word.word}</strong>
+              </div>
+            )}
+
+            {/* 生命值 - 显示已用次数 */}
+            <div className="redbox-card__attempts">
+              {[...Array(2)].map((_, i) => (
+                <Heart
+                  key={i}
+                  size={20}
+                  className={i < (2 - attempts) ? 'is-filled' : ''}
+                  fill={i < (2 - attempts) ? '#ef4444' : 'none'}
+                  stroke={i < (2 - attempts) ? '#ef4444' : '#d1d5db'}
                 />
-                {submitted && (
-                  <span className="redbox-card__input-icon">
-                    {isCorrect ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
-                  </span>
-                )}
-              </div>
-
-              {/* 错误时显示正确答案 */}
-              {submitted && !isCorrect && (
-                <div className="redbox-card__answer">
-                  正确答案：<strong>{word.word}</strong>
-                </div>
-              )}
-            </div>
-
-            {/* 状态信息 */}
-            <div className="redbox-card__status">
-              <div className="redbox-card__attempts">
-                {[...Array(2)].map((_, i) => (
-                  <Heart
-                    key={i}
-                    size={20}
-                    className={i < attempts ? 'is-filled' : ''}
-                    fill={i < attempts ? '#ef4444' : 'none'}
-                    stroke={i < attempts ? '#ef4444' : '#d1d5db'}
-                  />
-                ))}
-              </div>
-              
-              {!readonly && !submitted && (
-                <button 
-                  className="redbox-card__submit-btn"
-                  onClick={handleSubmit}
-                  disabled={!inputValue.trim()}
-                >
-                  提交验收
-                </button>
-              )}
+              ))}
             </div>
 
             {/* 结果反馈 */}
@@ -347,7 +367,7 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
                 {isCorrect ? (
                   <>
                     <CheckCircle2 size={24} />
-                    <span>🎉 红词攻克成功！</span>
+                    <span>攻克成功！</span>
                   </>
                 ) : attempts > 0 ? (
                   <>
@@ -357,7 +377,7 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
                 ) : (
                   <>
                     <XCircle size={24} />
-                    <span>💪 下节课继续攻坚</span>
+                    <span>下节课继续攻坚</span>
                   </>
                 )}
               </div>

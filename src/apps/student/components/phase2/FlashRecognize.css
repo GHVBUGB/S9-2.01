@@ -1,348 +1,323 @@
 /* ========================================
-   Flash Recognize - 闪视辨析（方案A：专业训练流程）
+   FlashRecognize - 闪视辨析 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
    ======================================== */
 
 .flash-recognize {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 400px;
-}
-
-.flash-recognize__stage {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 350px;
-}
-
-/* ========================================
-   阶段1：准备阶段
-   ======================================== */
-
-.flash-recognize__stage--ready {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: 40px 24px;
+  padding-top: 8%;
   animation: fadeIn 0.5s ease-out;
 }
 
-.flash-recognize__ready-icon {
-  color: #3b82f6;
-  margin-bottom: 24px;
-  animation: pulse 2s ease-in-out infinite;
+/* ========================================
+   准备阶段 - 眼睛动画 + 开始按钮
+   ======================================== */
+
+.flash-recognize__ready {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
 }
 
-@keyframes pulse {
+.flash-recognize__eye {
+  color: #0063F2;
+  animation: eyePulse 2s ease-in-out infinite;
+}
+
+@keyframes eyePulse {
   0%, 100% {
-    opacity: 1;
     transform: scale(1);
+    opacity: 1;
   }
   50% {
+    transform: scale(1.15);
     opacity: 0.7;
-    transform: scale(1.1);
   }
 }
 
-.flash-recognize__ready-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 16px;
-}
-
-.flash-recognize__ready-desc {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #64748b;
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.flash-recognize__ready-desc strong {
-  color: #f97316;
-  font-weight: 700;
-}
-
+/* 教师端开始按钮 */
 .flash-recognize__start-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 180px;
-  height: 54px;
+  padding: 16px 48px;
+  background: var(--color-primary, #0063F2);
+  border: none;
+  border-radius: 100px;
+  color: white;
   font-size: 18px;
   font-weight: 600;
-  animation: bounce 1s ease-in-out infinite;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0, 99, 242, 0.3);
 }
 
-@keyframes bounce {
-  0%, 100% {
+.flash-recognize__start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 99, 242, 0.4);
+}
+
+.flash-recognize__start-btn:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   主内容区 - 卡片 + 选项
+   ======================================== */
+
+.flash-recognize__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  width: 100%;
+}
+
+/* ========================================
+   卡片区域（含再闪按钮）
+   ======================================== */
+
+.flash-recognize__card-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 再闪按钮 */
+.flash-recognize__reflash-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.flash-recognize__reflash-btn:hover {
+  background: #0063F2;
+  border-color: #0063F2;
+  color: white;
+  transform: rotate(-30deg);
+}
+
+/* ========================================
+   翻转卡片
+   ======================================== */
+
+.flash-recognize__card {
+  width: 280px;
+  height: 160px;
+  perspective: 1000px;
+}
+
+.flash-recognize__card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flash-recognize__card.is-flipped .flash-recognize__card-inner {
+  transform: rotateY(180deg);
+}
+
+.flash-recognize__card-front,
+.flash-recognize__card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片正面 - 单词 */
+.flash-recognize__card-front {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid rgba(0, 99, 242, 0.1);
+}
+
+.flash-recognize__word {
+  font-size: 36px;
+  font-weight: 700;
+  color: #0063F2;
+  font-family: var(--font-family-en);
+  letter-spacing: 1px;
+}
+
+/* 卡片背面 - 问号 */
+.flash-recognize__card-back {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  transform: rotateY(180deg);
+}
+
+.flash-recognize__question-mark {
+  font-size: 64px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* ========================================
+   选项区 - 横排 3 选项（与 ListenAndChoose 一致）
+   ======================================== */
+
+.flash-recognize__options {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 520px;
+  justify-content: center;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-/* ========================================
-   阶段2：倒计时
-   ======================================== */
-
-.flash-recognize__stage--countdown {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 20px;
-}
-
-.flash-recognize__countdown {
-  font-size: 120px;
-  font-weight: 900;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  animation: countdownPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes countdownPop {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* 倒计时颜色 */
-.flash-recognize__countdown--3 {
-  color: #10b981; /* 绿色 */
-  text-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
-}
-
-.flash-recognize__countdown--2 {
-  color: #f59e0b; /* 黄色 */
-  text-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
-}
-
-.flash-recognize__countdown--1 {
-  color: #ef4444; /* 红色 */
-  text-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
-}
-
-/* ========================================
-   阶段3：闪现！
-   ======================================== */
-
-.flash-recognize__stage--flash {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
-  border-radius: 20px;
-  animation: flashBurst 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 
-    0 0 40px rgba(251, 191, 36, 0.6),
-    0 0 80px rgba(251, 191, 36, 0.4),
-    0 0 120px rgba(251, 191, 36, 0.2);
-}
-
-@keyframes flashBurst {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 
-      0 0 60px rgba(251, 191, 36, 0.8),
-      0 0 120px rgba(251, 191, 36, 0.6);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.flash-recognize__flash-word {
-  font-size: 72px;
-  font-weight: 900;
-  color: #78350f;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing: 4px;
-  text-shadow: 
-    0 2px 10px rgba(0, 0, 0, 0.1),
-    0 0 30px rgba(255, 255, 255, 0.8);
-  animation: wordGlow 0.5s ease-out;
-}
-
-@keyframes wordGlow {
-  0% {
-    transform: scale(0.7) rotate(-5deg);
-    opacity: 0;
-    filter: blur(10px);
-  }
-  50% {
-    transform: scale(1.1) rotate(2deg);
-    filter: blur(0);
-  }
-  100% {
-    transform: scale(1) rotate(0);
-    opacity: 1;
-  }
-}
-
-/* ========================================
-   阶段4：答题阶段
-   ======================================== */
-
-.flash-recognize__stage--answer {
-  animation: fadeIn 0.4s ease-out;
-  gap: 20px;
-}
-
-.flash-recognize__question {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 12px;
-}
-
-.flash-recognize__question-icon {
-  font-size: 28px;
-}
-
-/* 选项列表 */
-.flash-recognize__options {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
 }
 
 .flash-recognize__option {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  background: #f8fafc;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 24px;
+  min-height: 52px;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: left;
-  font-size: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.flash-recognize__option:hover:not(:disabled) {
-  border-color: #f97316;
-  background: rgba(249, 115, 22, 0.05);
+.flash-recognize__option:hover:not(:disabled):not(.is-readonly) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 99, 242, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.12);
 }
 
-.flash-recognize__option--selected {
-  border-color: #f97316;
-  background: rgba(249, 115, 22, 0.1);
-}
-
-.flash-recognize__option--correct {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.flash-recognize__option--wrong {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+.flash-recognize__option:active:not(:disabled):not(.is-readonly) {
+  transform: translateY(0);
 }
 
 .flash-recognize__option-label {
-  font-weight: 700;
-  color: #64748b;
-  min-width: 24px;
-}
-
-.flash-recognize__option--selected .flash-recognize__option-label {
-  color: #f97316;
-}
-
-.flash-recognize__option--correct .flash-recognize__option-label {
-  color: #10b981;
-}
-
-.flash-recognize__option--wrong .flash-recognize__option-label {
-  color: #ef4444;
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
 .flash-recognize__option-text {
-  flex: 1;
-  color: #1e293b;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.2s;
 }
 
 .flash-recognize__option-icon {
   flex-shrink: 0;
 }
 
-.flash-recognize__option--correct .flash-recognize__option-icon {
-  color: #10b981;
+/* ----------------------------------------
+   选项状态
+   ---------------------------------------- */
+
+/* 选中态 */
+.flash-recognize__option.is-selected {
+  background: rgba(0, 99, 242, 0.08);
+  border-color: #0063F2;
 }
 
-.flash-recognize__option--wrong .flash-recognize__option-icon {
+.flash-recognize__option.is-selected .flash-recognize__option-label,
+.flash-recognize__option.is-selected .flash-recognize__option-text {
+  color: #0063F2;
+}
+
+/* 正确态 */
+.flash-recognize__option.is-correct {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  animation: correctPulse 0.4s ease-out;
+}
+
+.flash-recognize__option.is-correct .flash-recognize__option-label,
+.flash-recognize__option.is-correct .flash-recognize__option-text {
+  color: #16a34a;
+}
+
+.flash-recognize__option.is-correct .flash-recognize__option-icon {
+  color: #22c55e;
+}
+
+/* 错误态 */
+.flash-recognize__option.is-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  animation: wrongShake 0.4s ease-out;
+}
+
+.flash-recognize__option.is-wrong .flash-recognize__option-label,
+.flash-recognize__option.is-wrong .flash-recognize__option-text {
+  color: #dc2626;
+}
+
+.flash-recognize__option.is-wrong .flash-recognize__option-icon {
   color: #ef4444;
 }
 
-/* 提交按钮 */
-.flash-recognize__submit-btn {
-  min-width: 180px;
-  height: 48px;
-  font-size: 16px;
+/* 暗淡态 */
+.flash-recognize__option.is-dimmed {
+  opacity: 0.4;
 }
 
-/* 反馈信息 */
-.flash-recognize__feedback {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
-  margin-top: 16px;
-  animation: slideUp 0.3s ease-out;
+/* 只读态 */
+.flash-recognize__option.is-readonly {
+  cursor: default;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.flash-recognize__feedback--correct {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-  border: 2px solid #10b981;
-}
-
-.flash-recognize__feedback--wrong {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 2px solid #ef4444;
-}
-
-.flash-recognize__feedback strong {
-  font-weight: 700;
+.flash-recognize__option.is-readonly:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* ========================================
-   通用动画
+   只读模式提示
+   ======================================== */
+
+.flash-recognize__readonly {
+  margin-top: 24px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ========================================
+   动画
    ======================================== */
 
 @keyframes fadeIn {
@@ -356,91 +331,65 @@
   }
 }
 
-/* ========================================
-   等待教师提示（学生端）
-   ======================================== */
-
-.flash-recognize__waiting {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 100px;
-  color: #92400e;
-  font-size: 16px;
-  font-weight: 500;
-  animation: pulse 2s ease-in-out infinite;
+@keyframes correctPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-.flash-recognize__waiting-icon {
-  font-size: 20px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* ========================================
-   只读模式（教师端）
-   ======================================== */
-
-.flash-recognize__readonly-hint {
-  text-align: center;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: var(--radius-md);
-  color: #92400e;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 16px;
-}
-
-.flash-recognize__option--readonly {
-  cursor: not-allowed;
-  opacity: 0.8;
-}
-
-.flash-recognize__option--readonly:hover {
-  transform: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+@keyframes wrongShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
 }
 
 /* ========================================
    响应式
    ======================================== */
 
-@media (max-width: 768px) {
-  .flash-recognize__ready-title {
-    font-size: 24px;
+@media (max-width: 640px) {
+  .flash-recognize {
+    padding: 24px 16px;
+    padding-top: 6%;
   }
 
-  .flash-recognize__ready-desc {
-    font-size: 14px;
+  .flash-recognize__card {
+    width: 240px;
+    height: 140px;
   }
 
-  .flash-recognize__countdown {
-    font-size: 80px;
+  .flash-recognize__word {
+    font-size: 28px;
   }
 
-  .flash-recognize__flash-word {
+  .flash-recognize__question-mark {
     font-size: 48px;
   }
 
-  .flash-recognize__question {
-    font-size: 16px;
+  .flash-recognize__options {
+    flex-direction: column;
+    max-width: 280px;
   }
 
   .flash-recognize__option {
-    font-size: 14px;
-    padding: 12px 16px;
+    padding: 12px 20px;
+    min-height: 48px;
+    min-width: 100%;
+  }
+
+  .flash-recognize__option-text {
+    font-size: 15px;
   }
 }

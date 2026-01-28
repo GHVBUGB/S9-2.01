@@ -4,21 +4,41 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: #FFFFFF;
+  background: linear-gradient(
+    135deg, 
+    rgba(0, 180, 238, 0.08) 0%,      /* 左上角：浅蓝色 8% 透明 */
+    rgba(0, 180, 238, 0.12) 40%,     /* 蓝色渐深 12% 透明 */
+    rgba(253, 231, 0, 0.1) 70%,      /* 过渡到淡黄色 10% 透明 */
+    rgba(253, 231, 0, 0.15) 100%     /* 右下角：黄色 15% 透明 */
+  );
   position: relative;
 }
 
-/* 学生端背景 - 纯白色 */
+/* 学生端背景 - 蓝黄渐变 */
 .content-area--student {
-  background-color: #FFFFFF;
+  background: linear-gradient(
+    135deg, 
+    rgba(0, 180, 238, 0.08) 0%, 
+    rgba(0, 180, 238, 0.12) 40%, 
+    rgba(253, 231, 0, 0.1) 70%, 
+    rgba(253, 231, 0, 0.15) 100%
+  );
 }
 
-/* 教师端背景 */
+/* 教师端背景 - 相同渐变 */
 .content-area--teacher {
-  background-color: var(--color-bg-secondary);
+  background: linear-gradient(
+    135deg, 
+    rgba(0, 180, 238, 0.08) 0%, 
+    rgba(0, 180, 238, 0.12) 40%, 
+    rgba(253, 231, 0, 0.1) 70%, 
+    rgba(253, 231, 0, 0.15) 100%
+  );
 }
 
 .content-area__inner {
+  display: flex;
+  flex-direction: column;
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-8);

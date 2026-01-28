@@ -13,9 +13,9 @@ const ModelCards = ({ selectedModel, onSelectModel }) => {
   const models = [
     {
       id: 'A',
-      name: 'Model A',
-      subtitle: '标准新授课',
-      description: '正常推进新课，核心指标是 Input（吞吐量）',
+      name: 'Model A (N)',
+      subtitle: '正常推进新课',
+      description: '核心指标是 Input（吞吐量）',
       duration: '55分钟',
       condition: '无红词积压',
       indicator: 'Input 吞吐量',
@@ -34,9 +34,9 @@ const ModelCards = ({ selectedModel, onSelectModel }) => {
     },
     {
       id: 'B',
-      name: 'Model B',
-      subtitle: '攻坚复习课',
-      description: '优先偿还认知负债，核心指标是 Clearance（销项率）',
+      name: 'Model B (N+1)',
+      subtitle: '优先偿还认知负债',
+      description: '核心指标是 Clearance（销项率）',
       duration: '55分钟',
       condition: '有红词积压',
       indicator: 'Clearance 销项率',
@@ -123,13 +123,6 @@ const ModelCards = ({ selectedModel, onSelectModel }) => {
               ))}
             </ul>
 
-            {/* 选中状态指示 */}
-            {selectedModel === model.id && (
-              <div className="model-card__selected-badge">
-                <CheckCircle size={20} />
-                <span>已选择</span>
-              </div>
-            )}
           </Card>
         ))}
       </div>

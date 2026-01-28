@@ -87,7 +87,7 @@ const Home = () => {
           >
             <Play size={20} />
             {selectedModel 
-              ? `进入 ${selectedModel === 'A' ? '标准新授课' : '攻坚复习课'} (${viewMode === 'demo' ? '双屏' : viewMode === 'student' ? '学生' : '教师'})`
+              ? `进入 ${selectedModel === 'A' ? 'Model A (N)' : 'Model B (N+1)'} (${viewMode === 'demo' ? '双屏' : viewMode === 'student' ? '学生' : '教师'})`
               : '请先选择课程模式'
             }
           </Button>

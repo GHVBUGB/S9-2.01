@@ -60,9 +60,9 @@
   --color-info: #2196F3;
   
   /* ========== 字体系统 ========== */
-  /* 字体族 */
-  --font-family-cn: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-  --font-family-en: 'DIN Alternate', 'Arial', 'Helvetica', sans-serif;
+  /* 字体族 - 英文用 Merriweather（衬线），中文用 Inter（无衬线）*/
+  --font-family-cn: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-family-en: 'Merriweather', 'Georgia', 'Times New Roman', serif;
   --font-family-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
   
   /* 字号 */
@@ -160,6 +160,7 @@ html {
 
 body {
   margin: 0;
+  /* 默认使用 Inter（中文 + UI 界面）*/
   font-family: var(--font-family-cn);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
@@ -168,8 +169,13 @@ body {
   overflow-x: hidden;
 }
 
-/* 英文字体 */
-body.en, .en {
+/* 英文内容字体 - Merriweather（衬线体）*/
+.en, .word, .sentence, .example {
+  font-family: var(--font-family-en);
+}
+
+/* 为带有 lang="en" 属性的元素应用英文字体 */
+[lang="en"] {
   font-family: var(--font-family-en);
 }
 

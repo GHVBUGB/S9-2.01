@@ -150,6 +150,7 @@
   font-style: italic;
   margin: 0;
   line-height: var(--line-height-relaxed);
+  font-family: var(--font-family-en); /* 英文例句使用 Merriweather */
 }
 
 /* ========================================

@@ -123,7 +123,7 @@ const SplitStep = ({ word, onComplete }) => {
         {/* 音节拆解区 */}
         <Card variant="outline" padding="md" className="split-step__syllables-section">
           <div className="split-step__section-label">
-            ✂️ 音节拆解
+            音节拆解
           </div>
           {showSyllables ? (
             <div className="split-step__syllables-display">
@@ -151,7 +151,7 @@ const SplitStep = ({ word, onComplete }) => {
               onClick={handleRevealSyllables}
               className="split-step__reveal-btn"
             >
-              👆 点击查看音节拆解
+              点击查看音节拆解
             </Button>
           )}
         </Card>
@@ -168,7 +168,7 @@ const SplitStep = ({ word, onComplete }) => {
               </p>
               {word.logic?.confusables && word.logic.confusables.length > 0 && (
                 <div className="split-step__confusables">
-                  <span className="split-step__confusables-label">⚠️ 易混淆词:</span>
+                  <span className="split-step__confusables-label">易混淆词:</span>
                   {word.logic.confusables.map((conf, idx) => (
                     <span key={idx} className="split-step__confusable-word">
                       {conf}
@@ -183,7 +183,7 @@ const SplitStep = ({ word, onComplete }) => {
               onClick={handleRevealEtymology}
               className="split-step__reveal-btn"
             >
-              👆 点击查看词源分析
+              点击查看词源分析
             </Button>
           )}
         </Card>
@@ -209,7 +209,7 @@ const SplitStep = ({ word, onComplete }) => {
           </Button>
         ) : (
           <div className="split-step__hint">
-            💡 请完成以上所有步骤后继续
+            请完成以上所有步骤后继续
           </div>
         )}
       </div>

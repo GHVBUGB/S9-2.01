@@ -1,234 +1,267 @@
 /* ========================================
-   ListenAndChoose - L2 听音辨形
+   ListenAndChoose - L2 听音辨形 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
    ======================================== */
 
 .listen-choose {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-6);
-  padding: var(--spacing-4);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: 40px 24px;
+  padding-top: 12%;
+  animation: fadeIn 0.5s ease-out;
 }
 
 /* ========================================
-   音频播放区域
+   播放按钮 - 视觉焦点
    ======================================== */
 
-.listen-choose__audio-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-8);
-  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
-  border-radius: var(--radius-lg);
-}
-
-.listen-choose__audio-btn {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: none;
-  background: var(--color-primary);
-  color: white;
-  cursor: pointer;
+.listen-choose__audio {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--duration-normal) var(--ease-out);
-  box-shadow: 0 4px 20px rgba(0, 99, 242, 0.3);
+  width: 96px;
+  height: 96px;
+  margin-bottom: 56px;
+  background: var(--color-primary, #0063F2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0, 99, 242, 0.3);
 }
 
-.listen-choose__audio-btn:hover:not(:disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(0, 99, 242, 0.4);
+.listen-choose__audio:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 12px 40px rgba(0, 99, 242, 0.4);
 }
 
-.listen-choose__audio-btn--playing {
-  animation: pulse 1s infinite;
+.listen-choose__audio:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
-@keyframes pulse {
+.listen-choose__audio.is-playing {
+  animation: audioPulse 1s ease-in-out infinite;
+}
+
+.listen-choose__audio.is-playing svg {
+  animation: audioWave 0.6s ease-in-out infinite;
+}
+
+@keyframes audioPulse {
   0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 20px rgba(0, 99, 242, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 99, 242, 0.3);
   }
   50% {
-    transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(0, 99, 242, 0.5);
+    box-shadow: 0 8px 48px rgba(0, 99, 242, 0.5);
   }
 }
 
-.listen-choose__ipa {
-  font-size: var(--font-size-xl);
-  font-family: var(--font-family-en);
-  color: var(--color-text-secondary);
-}
-
-.listen-choose__replay-btn {
-  padding: var(--spacing-2) var(--spacing-4);
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.listen-choose__replay-btn:hover:not(:disabled) {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+@keyframes audioWave {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
 }
 
 /* ========================================
-   提示文字
-   ======================================== */
-
-.listen-choose__instruction {
-  text-align: center;
-  font-size: var(--font-size-lg);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-/* ========================================
-   选项列表 (2x2 网格)
+   选项区 - 横排 3 选项
    ======================================== */
 
 .listen-choose__options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-3);
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  justify-content: center;
 }
 
 .listen-choose__option {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-4);
-  background: white;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
+  justify-content: center;
+  gap: 0;
+  padding: 16px 28px;
+  min-height: 56px;
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 28px;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
-  font-size: var(--font-size-lg);
-  text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
-.listen-choose__option:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
+.listen-choose__option-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.listen-choose__option:hover:not(:disabled):not(.is-readonly) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 99, 242, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.12);
+}
+
+.listen-choose__option:active:not(:disabled):not(.is-readonly) {
+  transform: translateY(0);
 }
 
 .listen-choose__option-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-sm);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #94a3b8;
+  font-family: var(--font-family-en);
 }
 
 .listen-choose__option-text {
-  flex: 1;
+  font-size: 17px;
+  font-weight: 600;
+  color: #334155;
   font-family: var(--font-family-en);
-  font-weight: var(--font-weight-medium);
+  transition: color 0.2s;
 }
 
 .listen-choose__option-icon {
   flex-shrink: 0;
 }
 
-/* 选中状态 */
-.listen-choose__option--selected {
-  border-color: var(--color-primary);
-  background: rgba(0, 99, 242, 0.05);
+/* ----------------------------------------
+   选项状态
+   ---------------------------------------- */
+
+/* 选中态 */
+.listen-choose__option.is-selected {
+  background: rgba(0, 99, 242, 0.08);
+  border-color: #0063F2;
 }
 
-.listen-choose__option--selected .listen-choose__option-label {
-  background: var(--color-primary);
-  color: white;
+.listen-choose__option.is-selected .listen-choose__option-label,
+.listen-choose__option.is-selected .listen-choose__option-text {
+  color: #0063F2;
 }
 
-/* 正确答案 */
-.listen-choose__option--correct {
-  border-color: var(--color-green);
-  background: var(--color-green-light);
+/* 正确态 */
+.listen-choose__option.is-correct {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  animation: correctPulse 0.4s ease-out;
 }
 
-.listen-choose__option--correct .listen-choose__option-label {
-  background: var(--color-green);
-  color: white;
+.listen-choose__option.is-correct .listen-choose__option-label,
+.listen-choose__option.is-correct .listen-choose__option-text {
+  color: #16a34a;
 }
 
-.listen-choose__option--correct .listen-choose__option-icon {
-  color: var(--color-green);
+.listen-choose__option.is-correct .listen-choose__option-icon {
+  color: #22c55e;
 }
 
-/* 错误答案 */
-.listen-choose__option--wrong {
-  border-color: var(--color-red);
-  background: var(--color-red-light);
+/* 扩展态（选错时正确选项展开显示翻译） */
+.listen-choose__option.is-expanded {
+  padding-bottom: 14px;
+  gap: 6px;
+  animation: expandPill 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.listen-choose__option--wrong .listen-choose__option-label {
-  background: var(--color-red);
-  color: white;
+/* 翻译显示 */
+.listen-choose__option-meaning {
+  font-size: 13px;
+  font-weight: 500;
+  color: #16a34a;
+  font-family: var(--font-family-cn);
+  opacity: 0;
+  animation: meaningFadeIn 0.3s ease-out 0.15s forwards;
 }
 
-.listen-choose__option--wrong .listen-choose__option-icon {
-  color: var(--color-red);
+.listen-choose__option-pos {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #86efac;
+  font-style: italic;
+}
+
+@keyframes expandPill {
+  0% {
+    padding-bottom: 16px;
+  }
+  100% {
+    padding-bottom: 14px;
+  }
+}
+
+@keyframes meaningFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 错误态 */
+.listen-choose__option.is-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  animation: wrongShake 0.4s ease-out;
+}
+
+.listen-choose__option.is-wrong .listen-choose__option-label,
+.listen-choose__option.is-wrong .listen-choose__option-text {
+  color: #dc2626;
+}
+
+.listen-choose__option.is-wrong .listen-choose__option-icon {
+  color: #ef4444;
+}
+
+/* 暗淡态（其他选项） */
+.listen-choose__option.is-dimmed {
+  opacity: 0.4;
+}
+
+/* 只读态 */
+.listen-choose__option.is-readonly {
+  cursor: default;
+}
+
+.listen-choose__option.is-readonly:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* ========================================
-   提交按钮
+   只读模式提示
    ======================================== */
 
-.listen-choose__submit-btn {
-  width: 100%;
-  padding: var(--spacing-4);
-  font-size: var(--font-size-lg);
+.listen-choose__readonly {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 /* ========================================
-   反馈信息
+   动画
    ======================================== */
 
-.listen-choose__feedback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-4);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  animation: fadeInUp var(--duration-normal) var(--ease-out);
-}
-
-.listen-choose__feedback--correct {
-  background: var(--color-green-light);
-  color: var(--color-green);
-  border: 2px solid var(--color-green);
-}
-
-.listen-choose__feedback--wrong {
-  background: var(--color-red-light);
-  color: var(--color-red);
-  border: 2px solid var(--color-red);
-}
-
-.listen-choose__feedback strong {
-  color: var(--color-primary);
-}
-
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -239,27 +272,61 @@
   }
 }
 
+@keyframes correctPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wrongShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
 /* ========================================
-   只读模式（教师端）
+   响应式
    ======================================== */
 
-.listen-choose__readonly-hint {
-  text-align: center;
-  padding: var(--spacing-3) var(--spacing-4);
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: var(--radius-md);
-  color: #92400e;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  margin-bottom: var(--spacing-4);
-}
+@media (max-width: 640px) {
+  .listen-choose {
+    padding: 24px 16px;
+    padding-top: 10%;
+  }
 
-.listen-choose__option--readonly {
-  cursor: not-allowed;
-  opacity: 0.8;
-}
+  .listen-choose__audio {
+    width: 80px;
+    height: 80px;
+  }
 
-.listen-choose__option--readonly:hover {
-  transform: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  .listen-choose__replay {
+    margin-bottom: 32px;
+  }
+
+  .listen-choose__options {
+    flex-direction: column;
+    max-width: 300px;
+  }
+
+  .listen-choose__option {
+    padding: 14px 24px;
+    min-height: 52px;
+    min-width: 100%;
+  }
+
+  .listen-choose__option-text {
+    font-size: 16px;
+  }
 }

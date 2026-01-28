@@ -82,7 +82,7 @@ const RedBoxSpelling = ({ word, onComplete }) => {
 
     if (correct) {
       // 通过！红词攻克成功
-      console.log(`🎉 Red Box 验收通过: ${word.word}`);
+      console.log(`Red Box 验收通过: ${word.word}`);
       setTimeout(() => onComplete(true), 2000);
     } else {
       // 错误
@@ -127,14 +127,13 @@ const RedBoxSpelling = ({ word, onComplete }) => {
   return (
     <div className="redbox-spelling">
       <div className="redbox-spelling__title">
-        <span className="redbox-spelling__title-icon">✍️</span>
         Step 3: L4 验收
         <span className="redbox-spelling__title-desc">完整拼写验收</span>
       </div>
 
       {/* 语境例句 */}
       <Card variant="outline" padding="md" className="redbox-spelling__context">
-        <div className="redbox-spelling__context-label">📖 语境例句</div>
+        <div className="redbox-spelling__context-label">语境例句</div>
         <p className="redbox-spelling__context-sentence">{contextSentence}</p>
         <p className="redbox-spelling__context-translation">
           {word.context?.[0]?.sentenceCn || word.meaning?.definitionCn}
@@ -144,7 +143,7 @@ const RedBoxSpelling = ({ word, onComplete }) => {
       {/* 提示区（可选显示） */}
       {showHint && (
         <div className="redbox-spelling__hint">
-          <span className="redbox-spelling__hint-label">💡 骨架提示：</span>
+          <span className="redbox-spelling__hint-label">骨架提示：</span>
           <span className="redbox-spelling__hint-skeleton">
             {generateGhostHint()}
           </span>
@@ -223,7 +222,7 @@ const RedBoxSpelling = ({ word, onComplete }) => {
           disabled={inputValue.trim() === ''}
           className="redbox-spelling__submit-btn"
         >
-          🎯 提交验收
+          提交验收
         </Button>
       )}
 
@@ -238,7 +237,7 @@ const RedBoxSpelling = ({ word, onComplete }) => {
             <>
               <CheckCircle2 size={32} />
               <div className="redbox-spelling__feedback-text">
-                <h4>🎉 红词攻克成功！</h4>
+                <h4>红词攻克成功！</h4>
                 <p>Red → Yellow，进入艾宾浩斯复习轨道</p>
               </div>
             </>

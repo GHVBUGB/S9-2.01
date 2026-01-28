@@ -36,11 +36,14 @@ const Classroom = ({ readonly = false }) => {
     getRedBoxProgress,
   } = useClassroomStore();
 
+  // 只在首次加载时初始化，视角切换不重新初始化
   useEffect(() => {
-    if (sessionStatus === 'waiting' || wordList.length === 0) {
-      initClassroom(model, 30); // 使用完整的30个单词
+    // 只有当没有数据时才初始化
+    if (wordList.length === 0) {
+      initClassroom(model, 30);
     }
-  }, [model]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空依赖数组，只在组件首次挂载时执行
 
   const currentWord = getCurrentWord();
   const wordStats = getWordStats();

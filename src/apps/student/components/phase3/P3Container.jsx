@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { CheckCircle2, XCircle, Clock } from 'lucide-react';
-import Badge from '../../../../shared/components/ui/Badge';
 import Button from '../../../../shared/components/ui/Button';
 import FullSpelling from './FullSpelling';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
@@ -47,8 +45,11 @@ const P3Container = ({ readonly = false }) => {
     
     if (p3RetryWords.length > 0) {
       // 只验收从 P3 失败返回后需要重新验收的词
-      wordsToVerify = wordList.filter(w => p3RetryWords.includes(w.id));
-      console.log(`📍 [P3] 只验收返回的 ${wordsToVerify.length} 个词`);
+      // 注意：确保类型匹配（p3RetryWords 可能是字符串或数字）
+      wordsToVerify = wordList.filter(w => 
+        p3RetryWords.some(retryId => Number(retryId) === w.id)
+      );
+      console.log(`📍 [P3] 只验收返回的 ${wordsToVerify.length} 个词, p3RetryWords:`, p3RetryWords);
     }
     
     return wordsToVerify.map(word => {
@@ -155,11 +156,11 @@ const P3Container = ({ readonly = false }) => {
     return { passed, failed, pending };
   }, [p3Results, p3Words.length]);
   
-  // 获取失败的单词 ID 列表
+  // 获取失败的单词 ID 列表（确保是数字类型）
   const failedWordIds = useMemo(() => {
     return Object.entries(p3Results)
       .filter(([_, result]) => !result.passed)
-      .map(([id, _]) => id);
+      .map(([id, _]) => Number(id));
   }, [p3Results]);
   
   // 返回 P2 重练失败的词
@@ -209,72 +210,44 @@ const P3Container = ({ readonly = false }) => {
     );
   }
 
-  // P3 完成界面
+  // P3 完成界面 - 极简风格
   if (isCompleted) {
+    const passRate = p3Words.length > 0 
+      ? Math.round((stats.passed / p3Words.length) * 100) 
+      : 0;
+
     return (
       <div className="p3-container p3-container--completed">
-        <div className="p3-container__summary">
-          <div className="p3-container__summary-icon">🚪</div>
-          <h2>门神验收完成！</h2>
+        <div className="p3-complete">
+          {/* 标题 */}
+          <h2 className="p3-complete__title">验收完成</h2>
           
-          {/* 统计卡片 */}
-          <div className="p3-container__stats">
-            <div className="p3-container__stat p3-container__stat--passed">
-              <CheckCircle2 size={24} />
-              <span className="p3-container__stat-value">{stats.passed}</span>
-              <span className="p3-container__stat-label">🟡 Yellow</span>
-              <span className="p3-container__stat-desc">变灯成功</span>
-            </div>
-            <div className="p3-container__stat p3-container__stat--failed">
-              <XCircle size={24} />
-              <span className="p3-container__stat-value">{stats.failed}</span>
-              <span className="p3-container__stat-label">⚪ Pending</span>
-              <span className="p3-container__stat-desc">打回 P2</span>
-            </div>
-          </div>
-
-          {/* 单词列表 */}
-          <div className="p3-container__word-list">
-            <h3>验收详情</h3>
-            <div className="p3-container__word-items">
-              {p3Words.map(word => {
-                const result = p3Results[word.id];
-                return (
-                  <div 
-                    key={word.id} 
-                    className={`p3-container__word-item ${result?.passed ? 'p3-container__word-item--passed' : 'p3-container__word-item--failed'}`}
-                  >
-                    <span className="p3-container__word-text">{word.word}</span>
-                    <Badge variant={word.source === 'p1_skip' ? 'yellow' : 'green'} size="sm">
-                      {word.source === 'p1_skip' ? '跳级' : '训练'}
-                    </Badge>
-                    {result?.passed ? (
-                      <Badge variant="yellow" size="sm">🟡 Yellow</Badge>
-                    ) : (
-                      <Badge variant="gray" size="sm">⚪ Pending</Badge>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* 通过率 */}
+          <div className="p3-complete__rate">{passRate}%</div>
+          
+          {/* 统计 */}
+          <p className="p3-complete__stats">
+            {stats.passed} 通过
+            {stats.failed > 0 && <span className="p3-complete__stats-sep">·</span>}
+            {stats.failed > 0 && <span className="p3-complete__stats-failed">{stats.failed} 待重练</span>}
+          </p>
 
           {/* 操作按钮 */}
-          <div className="p3-container__actions">
-            {stats.failed > 0 ? (
-              <Button
-                variant="outline"
+          <div className="p3-complete__actions">
+            {stats.failed > 0 && (
+              <button
+                className="p3-complete__btn p3-complete__btn--outline"
                 onClick={() => handleReturnToP2()}
               >
-                返回 P2 重练 ({stats.failed}个)
-              </Button>
-            ) : null}
-            <Button
-              variant="primary"
+                重练 ({stats.failed})
+              </button>
+            )}
+            <button
+              className="p3-complete__btn p3-complete__btn--primary"
               onClick={() => handleComplete()}
             >
-              🎉 完成本节课
-            </Button>
+              完成本节课
+            </button>
           </div>
         </div>
       </div>
@@ -283,24 +256,22 @@ const P3Container = ({ readonly = false }) => {
 
   return (
     <div className="p3-container">
-      {/* 进度药丸 - 模仿 Phase 1/2 */}
+      {/* 进度药丸 - 统一格式 */}
       <div className="p3-container__progress-wrapper">
         <div className="p3-container__progress-pill">
-          单词 {currentP3Index + 1}/{p3Words.length}
+          单词进度: {currentP3Index + 1} / {p3Words.length}
         </div>
       </div>
 
-      {/* 白色卡片包裹验收内容 - 模仿 Phase 1/2 */}
-      <div className="p3-container__card">
-        {currentWord && (
-          <FullSpelling
-            word={currentWord}
-            wordSource={currentWord.source}
-            onComplete={handleWordComplete}
-            readonly={readonly}
-          />
-        )}
-      </div>
+      {/* 验收内容（无卡片包裹，直接显示在背景上） */}
+      {currentWord && (
+        <FullSpelling
+          word={currentWord}
+          wordSource={currentWord.source}
+          onComplete={handleWordComplete}
+          readonly={readonly}
+        />
+      )}
     </div>
   );
 };

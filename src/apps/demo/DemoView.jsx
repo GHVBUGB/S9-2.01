@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import StudentLayout from '../student/StudentLayout';
 import TeacherLayout from '../teacher/TeacherLayout';
 import Badge from '../../shared/components/ui/Badge';
+import ViewSwitcher from '../../shared/components/ui/ViewSwitcher';
 import './DemoView.css';
 
 /**
@@ -53,6 +54,9 @@ const DemoView = () => {
           <TeacherLayout model={model} standalone />
         </div>
       </div>
+      
+      {/* 视角切换按钮 - 左下角 */}
+      <ViewSwitcher />
     </div>
   );
 };

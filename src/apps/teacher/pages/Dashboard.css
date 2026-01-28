@@ -178,12 +178,12 @@
 
 /* Red Box Card */
 .dashboard__card--redbox {
-  border-color: var(--color-red);
-  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .dashboard__card--redbox .dashboard__card-title {
-  color: var(--color-red);
+  color: #1e293b;
 }
 
 .dashboard__redbox-stats {
@@ -226,7 +226,7 @@
 }
 
 .dashboard__progress-bar--red {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .dashboard__progress-fill {
@@ -237,7 +237,7 @@
 }
 
 .dashboard__progress-fill--red {
-  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
 }
 
 .dashboard__progress-text {

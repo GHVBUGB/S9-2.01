@@ -313,10 +313,6 @@
   border: 2px solid #8b5cf6;
 }
 
-.toolbox-mnemonic-emoji {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
 
 .toolbox-mnemonic-text {
   font-size: var(--font-size-md);

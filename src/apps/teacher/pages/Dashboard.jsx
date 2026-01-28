@@ -87,7 +87,7 @@ const Dashboard = () => {
 
   // 阶段名称映射
   const phaseNames = {
-    RedBox: '🔴 Red Box 攻坚',
+    RedBox: '武器库',
     P1: '精准筛查',
     P2: '集中训练',
     P3: '门神验收',
@@ -104,14 +104,14 @@ const Dashboard = () => {
   const renderModelBadge = () => {
     if (classroomMode === 'B') {
       return (
-        <Badge variant="red" className="dashboard__model-badge">
-          🔴 Model B 攻坚复习课
+        <Badge variant="blue" className="dashboard__model-badge">
+          Model B 攻坚复习课
         </Badge>
       );
     }
     return (
       <Badge variant="green" className="dashboard__model-badge">
-        🟢 Model A 标准新授课
+        Model A 标准新授课
       </Badge>
     );
   };
@@ -347,7 +347,7 @@ const Dashboard = () => {
         {/* Red Box 进度（仅 Model B） */}
         {classroomMode === 'B' && (
           <Card variant="bordered" padding="md" className="dashboard__card--redbox">
-            <h3 className="dashboard__card-title">🔴 Red Box 攻坚进度</h3>
+            <h3 className="dashboard__card-title">武器库进度</h3>
             <div className="dashboard__progress-bar dashboard__progress-bar--red">
               <div 
                 className="dashboard__progress-fill dashboard__progress-fill--red"

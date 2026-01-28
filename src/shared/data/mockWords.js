@@ -415,7 +415,7 @@ const mockWords = [
     },
     context: [
       {
-        phrase: 'communication skills',
+        phrase: 'communication skill',
         phraseCn: '沟通技巧',
         sentence: 'Cooking is a useful life skill.',
         sentenceCn: '烹饪是一项有用的生活技能。',

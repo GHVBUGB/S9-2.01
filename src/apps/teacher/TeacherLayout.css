@@ -20,3 +20,10 @@
 .teacher-layout__content .main-layout {
   height: 100%;
 }
+
+/* 内容区包装器 - 用于定位底部工具栏 */
+.teacher-layout__main-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

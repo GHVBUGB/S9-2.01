@@ -13,6 +13,14 @@
   position: relative; /* 让弹出面板相对于此定位 */
 }
 
+/* 简化版（只显示状态栏） */
+.teacher-video-controls--simple {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 0;
+}
+
 /* 状态信息栏 */
 .teacher-video-controls__status {
   display: flex;
@@ -308,8 +316,8 @@
    ======================================== */
 
 .teacher-video-controls--redbox {
-  background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 /* 标题栏 */
@@ -326,11 +334,7 @@
   gap: 6px;
   font-size: 14px;
   font-weight: 700;
-  color: #dc2626;
-}
-
-.redbox-panel__badge {
-  font-size: 16px;
+  color: #1e293b;
 }
 
 .redbox-panel__progress {
@@ -340,30 +344,6 @@
   background: white;
   padding: 4px 10px;
   border-radius: 12px;
-}
-
-/* 当前单词 */
-.redbox-panel__word {
-  text-align: center;
-  padding: 12px 16px;
-  background: white;
-  border-radius: 10px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.redbox-panel__word-text {
-  display: block;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1e293b;
-  font-family: 'Georgia', serif;
-  margin-bottom: 2px;
-}
-
-.redbox-panel__word-meaning {
-  font-size: 12px;
-  color: #64748b;
 }
 
 /* 步骤指示器 */
@@ -387,8 +367,8 @@
 }
 
 .redbox-panel__step.is-active {
-  border-color: #dc2626;
-  background: #fef2f2;
+  border-color: #3b82f6;
+  background: #eff6ff;
 }
 
 .redbox-panel__step.is-done {
@@ -410,7 +390,7 @@
 }
 
 .redbox-panel__step.is-active .redbox-panel__step-num {
-  background: #dc2626;
+  background: #3b82f6;
   color: white;
 }
 
@@ -427,7 +407,7 @@
 }
 
 .redbox-panel__step.is-active .redbox-panel__step-name {
-  color: #dc2626;
+  color: #3b82f6;
 }
 
 .redbox-panel__step.is-done .redbox-panel__step-name {

@@ -105,7 +105,7 @@ const ToolboxStep = ({ word, onComplete }) => {
               ))}
             </div>
             <div className="toolbox-tip">
-              💡 仔细观察它们的拼写差异！
+              仔细观察它们的拼写差异
             </div>
           </div>
         );
@@ -168,10 +168,9 @@ const ToolboxStep = ({ word, onComplete }) => {
         // 视觉锚点：助记口诀 + 图像
         return (
           <div className="toolbox-content toolbox-content--visual">
-            <h4>🎨 视觉锚点</h4>
+            <h4>视觉锚点</h4>
             <div className="toolbox-visual-mnemonic">
               <div className="toolbox-mnemonic-card">
-                <span className="toolbox-mnemonic-emoji">💡</span>
                 <p className="toolbox-mnemonic-text">
                   {word.logic?.mnemonic || '暂无助记口诀'}
                 </p>
@@ -180,7 +179,7 @@ const ToolboxStep = ({ word, onComplete }) => {
             {word.visual?.imageDescription && (
               <div className="toolbox-visual-image">
                 <div className="toolbox-image-placeholder">
-                  🖼️ {word.visual.imageDescription}
+                  {word.visual.imageDescription}
                 </div>
               </div>
             )}
@@ -208,7 +207,6 @@ const ToolboxStep = ({ word, onComplete }) => {
   return (
     <div className="toolbox-step">
       <div className="toolbox-step__title">
-        <span className="toolbox-step__title-icon">🛠️</span>
         Step 2: 精准助记
         <span className="toolbox-step__title-desc">
           {weaponRevealed ? '请仔细学习' : '等待老师选择助记工具...'}

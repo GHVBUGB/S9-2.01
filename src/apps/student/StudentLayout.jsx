@@ -19,14 +19,17 @@ const StudentLayout = ({ model = 'A', standalone = false, children }) => {
       {/* 7:3 主布局区域 */}
       <div className="student-layout__content">
         <MainLayout role="student">
-          {children || <Classroom model={model} />}
+          {/* 与教师端保持一致的包裹结构 */}
+          <div className="student-layout__main-area">
+            {children || <Classroom model={model} />}
+          </div>
         </MainLayout>
       </div>
       
       <WeaponPopup />
       
       {/* 视角切换按钮 - 左下角 */}
-      <ViewSwitcher />
+      {!standalone && <ViewSwitcher />}
     </div>
   );
 };

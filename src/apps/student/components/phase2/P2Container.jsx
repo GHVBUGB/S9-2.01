@@ -46,19 +46,24 @@ const P2Container = ({ readonly = false }) => {
   
   // 当轮次或错题轮状态变化时，固定本轮的单词列表
   useEffect(() => {
+    // 直接从 store 获取最新的数据（避免闭包问题）
+    const latestState = useClassroomStore.getState();
+    const latestWrongWords = latestState.studentState.p2WrongWords;
+    const latestP2Words = latestState.getP2Words();
+    
     let wordsForThisRound;
-    if (isRetryRound && storeWrongWords.length > 0) {
+    if (isRetryRound && latestWrongWords.length > 0) {
       // 错题轮：使用 store 中的错题列表
-      wordsForThisRound = allP2Words.filter(w => storeWrongWords.includes(w.id));
+      wordsForThisRound = latestP2Words.filter(w => latestWrongWords.includes(w.id));
     } else {
       // 首轮：使用全部 P2 单词
-      wordsForThisRound = allP2Words;
+      wordsForThisRound = latestP2Words;
     }
     setRoundWords(wordsForThisRound);
     // 重置本轮错题收集
     roundWrongWordsRef.current = new Set();
-    console.log(`📍 [P2] 本轮单词固定: ${wordsForThisRound.map(w => w.word).join(', ')} (retryCount: ${retryCount})`);
-  }, [currentRound, isRetryRound, retryCount]); // 使用 retryCount 代替 storeWrongWords.length
+    console.log(`📍 [P2] 本轮单词固定: ${wordsForThisRound.map(w => w.word).join(', ')} (retryCount: ${retryCount}, wrongWords: ${latestWrongWords.length})`);
+  }, [currentRound, isRetryRound, retryCount]);
   
   // 当前训练的单词
   const currentWord = roundWords[currentWordIndex];
@@ -68,12 +73,6 @@ const P2Container = ({ readonly = false }) => {
     console.log(`📍 [P2Container] 挂载，当前进度: 第${currentRound}轮 第${currentWordIndex + 1}词 ${isRetryRound ? '(错题轮)' : '(首轮)'}`);
   }, []);
 
-  // 轮次名称
-  const roundNames = {
-    1: '第一轮：听音辨形 🎧',
-    2: '第二轮：闪视辨析 👁',
-    3: '第三轮：幽灵拼写 📝',
-  };
 
   // 处理单词完成
   const handleWordComplete = (isCorrect) => {
@@ -88,8 +87,9 @@ const P2Container = ({ readonly = false }) => {
     // 如果答错 或 被武器库标记，都算作错题
     if (((!isCorrect) || weaponMarkedWrong) && currentWord) {
       roundWrongWordsRef.current.add(currentWord.id);
+      console.log(`❌ [P2] 单词 "${currentWord.word}" 记入本轮错题集 (当前错题: ${Array.from(roundWrongWordsRef.current).length})`);
       if (weaponMarkedWrong) {
-        console.log(`🚨 [P2] 单词 "${currentWord.word}" 被武器库标记为红灯，算作错题`);
+        console.log(`🚨 [P2] 单词 "${currentWord.word}" 被武器库标记为红灯`);
         // 清除武器库标记（已处理）
         useClassroomStore.getState().updateWordResults({
           [currentWord.id]: {
@@ -98,8 +98,9 @@ const P2Container = ({ readonly = false }) => {
           }
         });
       }
+    } else if (isCorrect && currentWord) {
+      console.log(`✅ [P2] 单词 "${currentWord.word}" 答对，不计入错题`);
     }
-    // 注意：答对且未被武器库标记时，不需要加入错题（做对了就过了）
     
     // 检查当前列表是否还有更多单词
     if (currentWordIndex < totalInCurrentList - 1) {
@@ -187,29 +188,17 @@ const P2Container = ({ readonly = false }) => {
     }
   };
 
-  // 构建进度显示文本
-  const getProgressText = () => {
-    const roundName = roundNames[currentRound];
-    const progress = `单词 ${currentWordIndex + 1}/${roundWords.length}`;
-    if (isRetryRound) {
-      return `${roundName} - ${progress} (错题重做)`;
-    }
-    return `${roundName} - ${progress}`;
-  };
-
   return (
     <div className="p2-container">
-      {/* 进度药丸 */}
+      {/* 进度药丸 - 统一格式 */}
       <div className="p2-container__progress-wrapper">
-        <div className={`p2-container__progress-pill ${isRetryRound ? 'p2-container__progress-pill--retry' : ''}`}>
-          {getProgressText()}
+        <div className="p2-container__progress-pill">
+          单词进度: {currentWordIndex + 1} / {roundWords.length}
         </div>
       </div>
 
-      {/* 白色卡片包裹训练内容 */}
-      <div className="p2-container__card">
-        {renderRoundContent()}
-      </div>
+      {/* 训练内容（无卡片包裹，直接显示在背景上） */}
+      {renderRoundContent()}
     </div>
   );
 };

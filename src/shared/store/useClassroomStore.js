@@ -1059,33 +1059,19 @@ const useClassroomStore = create((set, get) => ({
         }));
         console.log(`❌ [P2] 武器库触发 - 单词 "${word.word}" 标记为红灯`);
       } else if (currentPhase === 'P3') {
-        // P3 阶段：标记为 P3 失败，需要回 P2 重学
+        // P3 阶段：只标记 weaponUsed，让 P3Container 在 handleWordComplete 时处理
+        // 注意：不要在这里修改 p3RetryWords，否则会导致 p3Words 列表立即变化
         const currentResult = wordResults[word.id] || {};
         set((state) => ({
           wordResults: {
             ...state.wordResults,
             [word.id]: {
               ...currentResult,
-              p3Passed: false,
-              p3FailedToP2: true,
-              needP2: true,
-              status: 'pending',
-              weaponUsed: true, // 标记使用了武器库
+              weaponUsed: true, // 只标记使用了武器库
             },
           },
         }));
-        
-        // 同时添加到 P3 重新验收列表
-        const currentRetryWords = studentState.p3RetryWords || [];
-        if (!currentRetryWords.includes(word.id)) {
-          set((state) => ({
-            studentState: {
-              ...state.studentState,
-              p3RetryWords: [...state.studentState.p3RetryWords, word.id],
-            },
-          }));
-        }
-        console.log(`❌ [P3] 武器库触发 - 单词 "${word.word}" 标记为失败，需回 P2 重学`);
+        console.log(`🛠️ [P3] 武器库触发 - 单词 "${word.word}" 标记为武器库使用`);
       }
     }
     

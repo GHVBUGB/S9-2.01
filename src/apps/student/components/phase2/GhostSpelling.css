@@ -1,213 +1,213 @@
 /* ========================================
-   GhostSpelling - L3 幽灵拼写（重构版）
-   直接在单词上挖空填写
+   GhostSpelling - 幽灵拼写 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
    ======================================== */
 
 .ghost-spelling {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-8);
-  padding: var(--spacing-6);
-}
-
-/* ========================================
-   单词容器
-   ======================================== */
-
-.ghost-spelling__word-container {
-  display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
-  padding: var(--spacing-10) var(--spacing-6);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: var(--radius-xl);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.ghost-spelling__word {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+  height: 100%;
+  flex: 1;
+  padding: 40px 24px;
+  padding-bottom: 15%;
+  animation: fadeIn 0.5s ease-out;
 }
 
 /* ========================================
-   字母样式 - 固定显示的字母
+   中文翻译
    ======================================== */
 
-.ghost-spelling__letter {
-  width: 48px;
-  height: 56px;
+.ghost-spelling__meaning {
+  font-size: 28px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 32px;
+  font-family: var(--font-family-cn);
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.ghost-spelling__pos {
+  font-size: 16px;
+  font-weight: 400;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ========================================
+   单词骨架 - 超大字体
+   ======================================== */
+
+.ghost-spelling__skeleton {
+  display: flex;
+  align-items: flex-end;
   justify-content: center;
-  font-size: 32px;
-  font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
-  font-weight: 700;
+  gap: 8px;
+}
+
+/* 固定显示的字母 */
+.ghost-spelling__char {
+  font-size: 56px;
+  font-weight: 600;
+  font-family: var(--font-family-en);
+  color: #1e293b;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.ghost-spelling__char--fixed.is-correct {
+  color: #22c55e;
+}
+
+.ghost-spelling__char--fixed.is-wrong {
+  color: #ef4444;
+}
+
+/* ========================================
+   可输入的空位
+   ======================================== */
+
+.ghost-spelling__blank {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ghost-spelling__input {
+  width: 48px;
+  height: 64px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 56px;
+  font-weight: 600;
+  font-family: var(--font-family-en);
+  color: #0063F2;
+  text-align: center;
   text-transform: lowercase;
-  border-radius: 8px;
+  outline: none;
+  box-shadow: none;
+  caret-color: #0063F2;
   transition: all 0.2s ease;
 }
 
-.ghost-spelling__letter--fixed {
-  background: transparent;
-  color: #1e293b;
-  border-bottom: 3px solid #cbd5e1;
-}
-
-.ghost-spelling__letter--fixed.is-correct {
-  color: #059669;
-  border-bottom-color: #059669;
-}
-
-.ghost-spelling__letter--fixed.is-wrong {
-  color: #dc2626;
-  border-bottom-color: #dc2626;
-}
-
-/* ========================================
-   字母样式 - 可输入的空位
-   ======================================== */
-
-.ghost-spelling__letter--input {
-  background: white;
-  color: #0063F2;
-  border: 2px solid #e2e8f0;
-  border-bottom: 3px solid #94a3b8;
-  outline: none;
-  text-align: center;
-  caret-color: #0063F2;
-  cursor: text;
-}
-
-.ghost-spelling__letter--input::placeholder {
+.ghost-spelling__input::placeholder {
   color: transparent;
 }
 
-.ghost-spelling__letter--input:focus {
-  border-color: #0063F2;
-  border-bottom-color: #0063F2;
-  box-shadow: 0 0 0 3px rgba(0, 99, 242, 0.15);
-  background: #f0f7ff;
+.ghost-spelling__input:focus {
+  color: #0063F2;
+  outline: none;
+  box-shadow: none;
 }
 
-.ghost-spelling__letter--input.has-value {
-  background: #f0f7ff;
-  border-color: #0063F2;
-  border-bottom-color: #0063F2;
+.ghost-spelling__input:focus + .ghost-spelling__underline {
+  background: #0063F2;
+  height: 4px;
+}
+
+.ghost-spelling__input.has-value {
+  color: #0063F2;
+}
+
+.ghost-spelling__input.has-value + .ghost-spelling__underline {
+  background: #0063F2;
+}
+
+/* 下划线 */
+.ghost-spelling__underline {
+  width: 40px;
+  height: 3px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  margin-top: -4px;
 }
 
 /* 正确状态 */
-.ghost-spelling__letter--input.is-correct {
-  background: #ecfdf5;
-  color: #059669;
-  border-color: #059669;
-  border-bottom-color: #059669;
+.ghost-spelling__input.is-correct {
+  color: #22c55e;
+}
+
+.ghost-spelling__input.is-correct + .ghost-spelling__underline {
+  background: #22c55e;
+  height: 4px;
 }
 
 /* 错误状态 */
-.ghost-spelling__letter--input.is-wrong {
-  background: #fef2f2;
-  color: #dc2626;
-  border-color: #dc2626;
-  border-bottom-color: #dc2626;
-  animation: shake 0.4s ease;
+.ghost-spelling__input.is-wrong {
+  color: #ef4444;
+  animation: wrongShake 0.5s ease;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
+.ghost-spelling__input.is-wrong + .ghost-spelling__underline,
+.ghost-spelling__underline.is-wrong {
+  background: #ef4444;
+  height: 4px;
+  animation: wrongShake 0.5s ease;
 }
 
-/* ========================================
-   提交按钮
-   ======================================== */
+/* 只读状态 */
+.ghost-spelling__input.is-readonly {
+  cursor: default;
+}
 
-.ghost-spelling__submit-btn {
-  width: 100%;
-  max-width: 320px;
-  padding: var(--spacing-4);
-  font-size: var(--font-size-lg);
+.ghost-spelling__input.is-readonly.has-value {
+  color: #0ea5e9;
 }
 
 /* ========================================
-   反馈信息
+   反馈图标
    ======================================== */
 
 .ghost-spelling__feedback {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4) var(--spacing-5);
-  border-radius: var(--radius-lg);
-  animation: fadeInUp 0.3s ease;
-  width: 100%;
-  max-width: 400px;
+  margin-top: 48px;
+  animation: feedbackPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.ghost-spelling__feedback--correct {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 2px solid #10b981;
+.ghost-spelling__feedback.is-correct {
+  color: #22c55e;
 }
 
-.ghost-spelling__feedback--correct svg {
-  color: #059669;
-  flex-shrink: 0;
+.ghost-spelling__feedback.is-wrong {
+  color: #ef4444;
 }
 
-.ghost-spelling__feedback--wrong {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  border: 2px solid #ef4444;
+@keyframes feedbackPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.ghost-spelling__feedback--wrong svg {
-  color: #dc2626;
-  flex-shrink: 0;
+/* ========================================
+   只读模式提示
+   ======================================== */
+
+.ghost-spelling__readonly {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
-.ghost-spelling__feedback-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+/* ========================================
+   动画
+   ======================================== */
 
-.ghost-spelling__feedback-content span:first-child {
-  font-size: var(--font-size-base);
-  font-weight: 600;
-}
-
-.ghost-spelling__feedback--correct .ghost-spelling__feedback-content span:first-child {
-  color: #059669;
-}
-
-.ghost-spelling__feedback--wrong .ghost-spelling__feedback-content span:first-child {
-  color: #dc2626;
-}
-
-.ghost-spelling__feedback-content strong {
-  color: #0063F2;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 1px;
-}
-
-.ghost-spelling__feedback-word {
-  font-size: var(--font-size-lg);
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  color: #0063F2;
-}
-
-.ghost-spelling__feedback-retry {
-  font-size: var(--font-size-sm);
-  color: #6b7280;
-}
-
-@keyframes fadeInUp {
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -218,45 +218,56 @@
   }
 }
 
-/* ========================================
-   只读模式（教师端）
-   ======================================== */
-
-.ghost-spelling__readonly-hint {
-  text-align: center;
-  padding: var(--spacing-3) var(--spacing-4);
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: var(--radius-md);
-  color: #92400e;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  margin-bottom: var(--spacing-2);
-}
-
-.ghost-spelling__letter--input.is-readonly {
-  background: #f8fafc;
-  cursor: not-allowed;
-  border-color: #e2e8f0;
-}
-
-.ghost-spelling__letter--input.is-readonly.has-value {
-  background: #e0f2fe;
-  border-color: #7dd3fc;
-  color: #0284c7;
+@keyframes wrongShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 50%, 90% {
+    transform: translateX(-6px);
+  }
+  30%, 70% {
+    transform: translateX(6px);
+  }
 }
 
 /* ========================================
-   响应式适配
+   响应式
    ======================================== */
 
 @media (max-width: 640px) {
-  .ghost-spelling__letter {
-    width: 40px;
-    height: 48px;
-    font-size: 24px;
+  .ghost-spelling {
+    padding: 24px 16px;
+    padding-bottom: 10%;
   }
   
-  .ghost-spelling__word {
-    gap: 2px;
+  .ghost-spelling__meaning {
+    font-size: 22px;
+    gap: 8px;
+  }
+  
+  .ghost-spelling__pos {
+    font-size: 14px;
+  }
+
+  .ghost-spelling__skeleton {
+    gap: 4px;
+  }
+
+  .ghost-spelling__char {
+    font-size: 40px;
+  }
+
+  .ghost-spelling__input {
+    width: 36px;
+    height: 48px;
+    font-size: 40px;
+  }
+
+  .ghost-spelling__underline {
+    width: 32px;
+  }
+
+  .ghost-spelling__feedback {
+    margin-top: 32px;
   }
 }

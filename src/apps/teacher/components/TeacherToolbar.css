@@ -1,0 +1,259 @@
+/* ========================================
+   教师端底部工具栏 - 毛玻璃悬浮设计
+   ======================================== */
+
+.teacher-toolbar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+/* ========================================
+   武器区
+   ======================================== */
+
+.teacher-toolbar__weapons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.teacher-toolbar__weapon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 100px;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.teacher-toolbar__weapon:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.6);
+  color: #1e293b;
+}
+
+.teacher-toolbar__weapon.is-active {
+  background: white;
+  color: #0063F2;
+  box-shadow: 0 2px 8px rgba(0, 99, 242, 0.15);
+}
+
+.teacher-toolbar__weapon.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   下一阶段按钮 - 圆形
+   ======================================== */
+
+.teacher-toolbar__next {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.teacher-toolbar__next:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.teacher-toolbar__next:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   确认弹窗
+   ======================================== */
+
+.teacher-toolbar__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.teacher-toolbar__confirm {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease;
+}
+
+.teacher-toolbar__confirm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teacher-toolbar__confirm-close:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.teacher-toolbar__confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teacher-toolbar__confirm h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px;
+}
+
+.teacher-toolbar__confirm p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.teacher-toolbar__confirm strong {
+  color: #1e293b;
+}
+
+.teacher-toolbar__confirm-warning {
+  font-size: 12px;
+  color: #f59e0b;
+  margin-top: 12px;
+}
+
+.teacher-toolbar__confirm-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.teacher-toolbar__confirm-actions button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teacher-toolbar__confirm-actions button:first-child {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.teacher-toolbar__confirm-actions button:first-child:hover {
+  background: #e2e8f0;
+}
+
+.teacher-toolbar__confirm-actions button.is-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.teacher-toolbar__confirm-actions button.is-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ========================================
+   动画
+   ======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+  .teacher-toolbar {
+    bottom: 16px;
+    padding: 4px;
+    gap: 8px;
+  }
+
+  .teacher-toolbar__weapon {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .teacher-toolbar__weapon span {
+    display: none;
+  }
+
+  .teacher-toolbar__next {
+    width: 44px;
+    height: 44px;
+  }
+}

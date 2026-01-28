@@ -33,12 +33,20 @@ const VideoPanel = ({ role = 'student', controls = null }) => {
       <div className="video-panel__videos">
         {/* 对方视频 */}
         <div className="video-panel__video-wrapper">
-          <VideoWindow {...topVideo} />
+          <VideoWindow 
+            {...topVideo} 
+            layoutId={isStudent ? 'teacher-video' : 'student-video'}
+            showOnlineStatus={true}
+          />
         </div>
         
         {/* 自己视频 */}
         <div className="video-panel__video-wrapper">
-          <VideoWindow {...bottomVideo} />
+          <VideoWindow 
+            {...bottomVideo} 
+            layoutId={isStudent ? 'student-video' : 'teacher-video'}
+            showOnlineStatus={true}
+          />
         </div>
       </div>
       

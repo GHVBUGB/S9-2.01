@@ -20,3 +20,10 @@
 .student-layout__content .main-layout {
   height: 100%;
 }
+
+/* 内容区包装器 - 与教师端保持一致 */
+.student-layout__main-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

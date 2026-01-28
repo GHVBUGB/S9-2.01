@@ -1,56 +1,82 @@
-import React from 'react';
-import { User, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { User, Volume2, VolumeX } from 'lucide-react';
 import './VideoWindow.css';
 
 /**
- * 单个视频窗口组件
+ * 视频窗口组件 - 支持跨阶段平滑过渡动画
+ * 使用 Framer Motion 的 layoutId 实现共享元素动画
  */
 const VideoWindow = ({ 
+  // 新增 props
+  layoutId,
+  className = '',
+  showOnlineStatus = true,
+  statusText = '在线',
+  placeholderText = '视频连线中...',
+  disableLayoutAnimation = false,
+  style = {},
+  
+  // 兼容旧 props
   name = '', 
-  role = 'student',  // 'student' | 'teacher'
-  avatar = null, 
-  isCurrent = false, // 是否是当前用户
+  role = 'student',
+  avatar = null,
+  isCurrent = false,
   isMicOn = true,
   isVideoOn = true
 }) => {
+  const [isMuted, setIsMuted] = useState(false);
+
+  // 如果传入了 name，优先使用 name 作为占位文字
+  const finalPlaceholderText = name ? `${name} 连线中...` : placeholderText;
+  
+  // 角色文字映射
+  const finalStatusText = statusText || (role === 'teacher' ? '教师在线' : '学生在线');
+
   return (
-    <div className={`video-window ${isCurrent ? 'video-window--current' : ''}`}>
-      {/* 视频区域 */}
-      <div className="video-window__video">
+    <motion.div
+      layoutId={disableLayoutAnimation ? undefined : layoutId}
+      className={`video-window ${className}`}
+      style={style}
+      transition={{
+        layout: {
+          duration: 0.4,
+          ease: [0.4, 0, 0.2, 1] // cubic-bezier 缓动
+        }
+      }}
+    >
+      {/* 背景渐变 */}
+      <div className="video-window__background">
         {avatar ? (
           <img src={avatar} alt={name} className="video-window__avatar" />
         ) : (
           <div className="video-window__placeholder">
-            <User size={48} strokeWidth={1.5} />
+            <div className="video-window__placeholder-icon">
+              <User size={28} />
+            </div>
+            <p className="video-window__placeholder-text">{finalPlaceholderText}</p>
           </div>
         )}
       </div>
-      
-      {/* 信息叠加层 */}
-      <div className="video-window__overlay">
-        {/* 角色标签 */}
-        <div className="video-window__role-badge">
-          {role === 'teacher' ? '教师' : '学生'}
+
+      {/* 左上角：在线状态（毛玻璃效果）*/}
+      {showOnlineStatus && (
+        <div className="video-window__status">
+          <span className="video-window__status-dot" />
+          <span className="video-window__status-text">{finalStatusText}</span>
         </div>
-        
-        {/* 底部信息栏 */}
-        <div className="video-window__info">
-          <span className="video-window__name">{name}</span>
-          <div className="video-window__controls">
-            {isMicOn ? (
-              <Mic size={14} />
-            ) : (
-              <MicOff size={14} className="video-window__control--off" />
-            )}
-            {isVideoOn ? (
-              <Video size={14} />
-            ) : (
-              <VideoOff size={14} className="video-window__control--off" />
-            )}
-          </div>
-        </div>
+      )}
+
+      {/* 右下角：静音按钮（毛玻璃效果）*/}
+      <div className="video-window__mute-btn-wrapper">
+        <button 
+          className={`video-window__mute-btn ${isMuted ? 'video-window__mute-btn--muted' : ''}`}
+          onClick={() => setIsMuted(!isMuted)}
+        >
+          {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+        </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

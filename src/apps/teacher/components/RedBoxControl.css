@@ -22,7 +22,7 @@
   font-size: 28px;
   font-weight: 700;
   color: #1e293b;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-en); /* 英文单词使用 Merriweather */
   margin-bottom: 4px;
 }
 

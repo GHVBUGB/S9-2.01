@@ -1,248 +1,310 @@
+/* ========================================
+   ContextProbe - 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
+   ======================================== */
+
 .context-probe {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0; /* 移除外边距 */
+  height: 100%;
+  flex: 1;
+  padding: 40px 24px;
+  padding-top: 15%; /* 整体下移 */
   animation: fadeIn 0.5s ease-out;
 }
 
-/* 主卡片容器：白色背景包裹做题内容 */
-.context-probe__main-card {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95); /* 半透明白色背景 */
-  backdrop-filter: blur(10px); /* 轻微模糊效果 */
-  border-radius: 20px; /* 圆角 */
-  padding: 20px 24px; /* 内边距 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 轻微阴影 */
-  border: 1px solid rgba(255, 255, 255, 0.8); /* 细边框 */
-  position: relative;
-  overflow: hidden;
+/* ========================================
+   核心短语 - 视觉焦点（放大）
+   ======================================== */
+
+.context-probe__phrase {
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e293b;
+  font-family: var(--font-family-en);
+  text-align: center;
+  margin-bottom: 32px;
+  max-width: 800px;
+  letter-spacing: -0.02em;
 }
 
-/* 顶部阶段标签 - 已移除（由外部组件管理） */
-/* .context-probe__stage-label { ... } */
-
-.context-probe__description {
-  display: none;
-}
-
-/* 短语区域 - 紧凑化 */
-.context-probe__sentence-area {
-  background: rgba(38, 183, 255, 0.05); /* Sky Blue 浅色 */
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(0, 99, 242, 0.1); /* 51Talk Blue 浅边框 */
-  box-shadow: none;
-}
-
-.context-probe__sentence-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px; /* 减小字体 */
-  color: var(--neutral-400);
-  margin-bottom: 10px; /* 减小间距 */
-}
-
-.context-probe__sentence {
-  font-size: 16px; /* 大幅减小字体 */
-  line-height: 1.6;
-  color: var(--neutral-800);
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 500;
-  text-align: left;
-}
-
+/* 高亮目标单词 */
 .context-probe__highlight {
-  color: #0063f2; /* 51Talk Blue */
-  background: rgba(255, 190, 27, 0.2); /* Toki Yellow 浅色背景 */
+  color: #0063F2;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(255, 190, 27, 0.4) 60%
+  );
   padding: 0 4px;
-  border-radius: 4px;
   font-weight: 700;
-  border-bottom: 2px solid #ffbe1b; /* Toki Yellow */
+  border-radius: 2px;
 }
 
-/* 提问区域 - 紧凑化 */
-.context-probe__question-box {
-  margin-bottom: 16px; /* 减小底部间距 */
-  padding-left: 4px;
-}
+/* ========================================
+   音频播放按钮 - 纯图标
+   ======================================== */
 
-.context-probe__question-prompt {
-  font-size: 14px; /* 减小字体 */
-  color: var(--neutral-700);
+.context-probe__audio {
   display: flex;
   align-items: center;
-  gap: 8px; /* 减小间距 */
-}
-
-.context-probe__word-target {
-  color: var(--brand-primary);
-  font-weight: 700;
-  font-size: 14px; /* 减小字体 */
-}
-
-/* 选项网格 - 紧凑化 */
-.context-probe__options-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px; /* 减小间距 */
-  margin-bottom: 18px; /* 减小底部间距 */
-}
-
-.context-probe__option-btn {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px; /* 大幅减小内边距 */
-  background: white;
-  border: 2px solid #f1f5f9;
-  border-radius: 12px; /* 减小圆角 */
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #94a3b8;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: left;
-  position: relative;
-  min-height: 48px; /* 固定最小高度 */
+  transition: all 0.2s ease;
 }
 
-.context-probe__option-btn:hover:not(:disabled) {
-  border-color: #0063f2; /* 51Talk Blue */
-  background: rgba(0, 99, 242, 0.02);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 99, 242, 0.1);
-}
-
-.context-probe__option-btn.is-selected {
-  border-color: #0063f2; /* 51Talk Blue */
-  background: rgba(0, 99, 242, 0.05);
-}
-
-.context-probe__option-btn.is-correct {
-  border-color: #0063f2; /* 51Talk Blue - 正确 */
+.context-probe__audio:hover:not(:disabled) {
+  color: #0063F2;
   background: rgba(0, 99, 242, 0.08);
 }
 
-.context-probe__option-btn.is-wrong {
-  border-color: #3e3a39; /* Font Gray - 错误 */
-  background: rgba(62, 58, 57, 0.05);
+.context-probe__audio:active:not(:disabled) {
+  transform: scale(0.92);
 }
 
-.context-probe__option-letter {
-  font-weight: 700;
-  color: var(--neutral-400);
-  margin-right: 12px; /* 减小间距 */
-  font-size: 14px; /* 减小字体 */
+.context-probe__audio.is-playing {
+  color: #0063F2;
 }
 
-.context-probe__option-text {
-  flex: 1;
-  font-size: 14px; /* 减小字体 */
-  color: var(--neutral-700);
+.context-probe__audio.is-playing svg {
+  animation: audioWave 0.8s ease-in-out infinite;
+}
+
+@keyframes audioWave {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* ========================================
+   极简提示
+   ======================================== */
+
+.context-probe__hint {
+  font-size: 15px;
+  color: #94a3b8;
+  margin-bottom: 40px;
   font-weight: 500;
 }
 
-.icon-status {
-  margin-left: 12px;
+.context-probe__target-word {
+  color: #0063F2;
+  font-family: var(--font-family-en);
+  font-weight: 700;
 }
 
-.is-correct .context-probe__option-text,
-.is-correct .context-probe__option-letter {
-  color: var(--status-green);
-}
+/* ========================================
+   选项区 - 2x2 网格
+   ======================================== */
 
-.is-wrong .context-probe__option-text,
-.is-wrong .context-probe__option-letter {
-  color: var(--status-red);
-}
-
-/* 操作区域 - 紧凑化 */
-.context-probe__action {
+.context-probe__options {
   display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
   justify-content: center;
-  margin-top: 4px; /* 减小顶部间距 */
 }
 
-.context-probe__confirm-btn {
-  min-width: 180px; /* 减小宽度 */
-  height: 44px; /* 减小高度 */
-  border-radius: 100px;
-  font-size: 15px; /* 减小字体 */
-  font-weight: 600;
-}
-
-/* 反馈遮罩层 */
-.context-probe__feedback-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(4px);
-  z-index: 10;
-  text-align: center;
-  padding: 40px;
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.feedback-icon {
-  margin-bottom: 20px;
-}
-
-.is-pass .feedback-icon { color: var(--status-green); }
-.is-fail .feedback-icon { color: var(--status-red); }
-
-.feedback-content h4 {
-  font-size: 24px;
-  margin-bottom: 12px;
-  color: var(--neutral-800);
-}
-
-.feedback-content p {
-  font-size: 16px;
-  color: var(--neutral-500);
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* ========== 只读模式样式（教师端） ========== */
-.context-probe__option-btn.is-readonly {
-  cursor: default;
-  opacity: 0.8;
-}
-
-.context-probe__option-btn.is-readonly:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: #f1f5f9;
-  background: white;
-}
-
-.context-probe__readonly-hint {
+.context-probe__option {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, rgba(255, 190, 27, 0.1), rgba(0, 99, 242, 0.1));
-  border-radius: 12px;
-  font-size: 14px;
-  color: var(--color-text-secondary);
+  padding: 16px 32px;
+  min-height: 52px;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px; /* 胶囊形 */
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.context-probe__option:hover:not(:disabled):not(.is-readonly) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 99, 242, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.12);
+}
+
+.context-probe__option:active:not(:disabled):not(.is-readonly) {
+  transform: translateY(0);
+}
+
+.context-probe__option-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.2s;
+}
+
+.context-probe__option-icon {
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------
+   选项状态
+   ---------------------------------------- */
+
+/* 选中态 */
+.context-probe__option.is-selected {
+  background: rgba(0, 99, 242, 0.08);
+  border-color: #0063F2;
+}
+
+.context-probe__option.is-selected .context-probe__option-text {
+  color: #0063F2;
+}
+
+/* 正确态 */
+.context-probe__option.is-correct {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  animation: correctPulse 0.4s ease-out;
+}
+
+.context-probe__option.is-correct .context-probe__option-text {
+  color: #16a34a;
+}
+
+.context-probe__option.is-correct .context-probe__option-icon {
+  color: #22c55e;
+}
+
+/* 错误态 */
+.context-probe__option.is-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  animation: wrongShake 0.4s ease-out;
+}
+
+.context-probe__option.is-wrong .context-probe__option-text {
+  color: #dc2626;
+}
+
+.context-probe__option.is-wrong .context-probe__option-icon {
+  color: #ef4444;
+}
+
+/* 暗淡态（其他选项） */
+.context-probe__option.is-dimmed {
+  opacity: 0.4;
+}
+
+/* 只读态 */
+.context-probe__option.is-readonly {
+  cursor: default;
+}
+
+.context-probe__option.is-readonly:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ========================================
+   只读模式提示
+   ======================================== */
+
+.context-probe__readonly {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #94a3b8;
   font-weight: 500;
-  margin-top: 8px;
+}
+
+/* ========================================
+   动画
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes correctPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wrongShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+  .context-probe {
+    padding: 24px 16px;
+  }
+
+  .context-probe__phrase {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+
+  .context-probe__audio {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 20px;
+  }
+
+  .context-probe__hint {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .context-probe__options {
+    flex-direction: column;
+    max-width: 280px;
+  }
+
+  .context-probe__option {
+    padding: 14px 24px;
+    min-height: 48px;
+    min-width: 100%;
+  }
+
+  .context-probe__option-text {
+    font-size: 15px;
+  }
 }

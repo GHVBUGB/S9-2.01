@@ -7,7 +7,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  padding: var(--spacing-lg) var(--spacing-2xl);
+  padding: 24px;
   background: transparent;
 }
 
@@ -20,44 +20,24 @@
 }
 
 /* ========================================
-   顶部进度条 - 极简风格
+   顶部进度药丸 - 统一格式
    ======================================== */
 
-.redbox-card__header {
+.redbox-card__progress-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--spacing-lg);
-  flex-shrink: 0; /* 不收缩 */
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
-.redbox-card__progress-bar {
-  display: flex;
-  gap: 8px;
-  flex: 1;
-  max-width: 100%;
-}
-
-.redbox-card__progress-dot {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: #e5e7eb;
-  transition: all 0.4s ease;
-}
-
-.redbox-card__progress-dot.is-active {
-  background: #ef4444;
-}
-
-.redbox-card__progress-dot.is-done {
-  background: #22c55e;
-}
-
-.redbox-card__progress-text {
+.redbox-card__progress-pill {
+  background: rgba(0, 99, 242, 0.1);
+  color: #0063f2;
+  padding: 6px 16px;
+  border-radius: 100px;
   font-size: 13px;
   font-weight: 600;
-  color: #dc2626;
+  box-shadow: inset 0 1px 3px rgba(0, 99, 242, 0.1);
   white-space: nowrap;
 }
 
@@ -82,21 +62,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2xl);
+  justify-content: center;
+  gap: 24px;
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .redbox-card__word-display {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
+  text-align: center;
 }
 
 .redbox-card__word {
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 700;
   color: #1e293b;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-en); /* 英文单词使用 Merriweather */
   letter-spacing: -0.02em;
 }
 
@@ -110,12 +91,12 @@
 }
 
 .redbox-card__audio-btn {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
-  background: #f1f5f9;
-  color: #64748b;
+  background: transparent;
+  color: #94a3b8;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -124,38 +105,59 @@
 }
 
 .redbox-card__audio-btn:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: rgba(0, 99, 242, 0.08);
+  color: #0063F2;
+}
+
+.redbox-card__audio-btn:active {
+  transform: scale(0.92);
 }
 
 .redbox-card__audio-btn.is-playing {
-  background: #3b82f6;
-  color: white;
-  animation: audioPulse 1s ease-in-out infinite;
+  color: #0063F2;
 }
 
-@keyframes audioPulse {
+.redbox-card__audio-btn.is-playing svg {
+  animation: audioWave 0.8s ease-in-out infinite;
+}
+
+@keyframes audioWave {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50% { transform: scale(1.2); }
 }
 
 .redbox-card__phonetic {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #94a3b8;
   font-family: var(--font-family-mono, monospace);
   animation: fadeIn 0.3s ease;
 }
 
 .redbox-card__meaning {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #64748b;
   text-align: center;
+  line-height: 1.6;
+  font-family: var(--font-family-cn);
+}
+
+.redbox-card__pos {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0063F2;
+  background: rgba(0, 99, 242, 0.08);
+  padding: 2px 10px;
+  border-radius: 6px;
+  margin-right: 10px;
+  font-family: var(--font-family-en);
+  vertical-align: middle;
 }
 
 .redbox-card__hint {
-  font-size: 14px;
+  font-size: 15px;
   color: #94a3b8;
-  margin-top: var(--spacing-lg);
+  margin-top: 24px;
 }
 
 /* ========================================
@@ -166,26 +168,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2xl);
+  justify-content: center;
+  gap: 24px;
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .redbox-card__word-mini {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
   color: #1e293b;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-en); /* 英文单词使用 Merriweather */
+  text-align: center;
 }
 
 .redbox-card__audio-btn-sm {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
-  background: #f1f5f9;
+  background: transparent;
   color: #94a3b8;
   cursor: pointer;
   display: flex;
@@ -195,21 +198,31 @@
 }
 
 .redbox-card__audio-btn-sm:hover {
-  background: #e2e8f0;
-  color: #64748b;
+  background: rgba(0, 99, 242, 0.08);
+  color: #0063F2;
+}
+
+.redbox-card__audio-btn-sm:active {
+  transform: scale(0.92);
 }
 
 .redbox-card__audio-btn-sm.is-playing {
-  background: #3b82f6;
-  color: white;
+  color: #0063F2;
+}
+
+.redbox-card__audio-btn-sm.is-playing svg {
+  animation: audioWave 0.8s ease-in-out infinite;
 }
 
 /* 武器内容区 - 去背景框 */
 .redbox-card__weapon-content {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   text-align: center;
   animation: fadeIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @keyframes slideUp {
@@ -226,29 +239,29 @@
 .redbox-card__weapon-header {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 8px;
+  font-size: 14px;
   font-weight: 500;
   color: #8b5cf6;
   background: #f5f3ff;
-  padding: 6px 14px;
+  padding: 8px 18px;
   border-radius: 20px;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 24px;
 }
 
 /* 音节拆解 - 更大更清晰 */
 .redbox-card__phonics {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: 20px;
   flex-wrap: wrap;
 }
 
 .redbox-card__phonics-part {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #7c3aed;
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: 16px 28px;
   background: #f5f3ff;
   border-radius: 16px;
   animation: popIn 0.3s ease;
@@ -274,46 +287,54 @@
 /* 语境记忆 */
 .redbox-card__context {
   text-align: center;
-  max-width: 500px;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
 }
 
 .redbox-card__context-en {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #1e293b;
   line-height: 1.8;
-  margin: 0 0 var(--spacing-md) 0;
+  margin: 0 0 20px 0;
+  font-family: var(--font-family-en);
 }
 
 .redbox-card__context-cn {
-  font-size: 1rem;
+  font-size: 1.125rem;
   color: #94a3b8;
   margin: 0;
+  line-height: 1.6;
+  font-family: var(--font-family-cn);
 }
 
 /* 记忆口诀 - 更突出 */
 .redbox-card__mnemonic {
   text-align: center;
-  max-width: 500px;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
 }
 
 .redbox-card__mnemonic p {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: #475569;
   line-height: 1.8;
   margin: 0;
+  font-family: var(--font-family-cn);
 }
 
 /* 形近对比 - 卡片式 */
 .redbox-card__compare {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: 20px;
   flex-wrap: wrap;
 }
 
 .redbox-card__compare-item {
-  min-width: 120px;
-  padding: var(--spacing-lg) var(--spacing-xl);
+  min-width: 140px;
+  padding: 20px 28px;
   background: #f8fafc;
   border-radius: 16px;
   text-align: center;
@@ -328,20 +349,21 @@
 
 .redbox-card__compare-item span {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  font-family: 'Georgia', serif;
+  font-family: var(--font-family-en); /* 英文单词使用 Merriweather */
   color: #1e293b;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .redbox-card__compare-item small {
-  font-size: 13px;
+  font-size: 14px;
   color: #94a3b8;
 }
 
 .redbox-card__compare-item--target small {
   color: #22c55e;
+  font-weight: 500;
 }
 
 /* 等待状态 - 更轻量 */
@@ -349,140 +371,138 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: 24px;
   color: #cbd5e1;
-}
-
-.redbox-card__waiting-icon {
-  font-size: 3rem;
-  opacity: 0.6;
+  padding: 40px 0;
 }
 
 .redbox-card__waiting p {
   margin: 0;
-  font-size: 15px;
+  font-size: 1.125rem;
   color: #94a3b8;
 }
 
 /* ========================================
-   Step 3: L4 验收 - 聚焦输入
+   Step 3: L4 验收 - 门神式内嵌设计
    ======================================== */
 
 .redbox-card__step3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-2xl);
+  justify-content: center;
+  gap: 32px;
   width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.redbox-card__test-context {
+/* 挖空例句 - 内嵌输入框 */
+.redbox-card__test-phrase {
+  margin-bottom: 16px;
   text-align: center;
-  max-width: 550px;
+  max-width: 900px;
 }
 
-.redbox-card__test-sentence {
-  font-size: 1.35rem;
+.redbox-card__test-phrase-text {
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.4;
   color: #1e293b;
-  line-height: 1.8;
-  margin: 0 0 var(--spacing-md) 0;
+  font-family: var(--font-family-en);
+  letter-spacing: -0.02em;
+  display: inline;
 }
 
+/* 内嵌输入框 - 完全模仿门神阶段 */
+.redbox-card__inline-input {
+  display: inline-block;
+  padding: 0;
+  margin: 0 4px;
+  border: none;
+  border-bottom: 3px solid #cbd5e1;
+  background: transparent;
+  font-size: 42px;
+  font-weight: 600;
+  font-family: var(--font-family-en);
+  color: #0063F2;
+  text-align: center;
+  text-transform: lowercase;
+  outline: none;
+  box-shadow: none;
+  caret-color: #0063F2;
+  transition: all 0.3s ease;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  min-width: 2em;
+  vertical-align: baseline;
+}
+
+.redbox-card__inline-input:focus {
+  border-bottom-color: #0063F2;
+  border-bottom-width: 4px;
+  outline: none;
+  box-shadow: none;
+}
+
+.redbox-card__inline-input.is-correct {
+  color: #22c55e;
+  border-bottom-color: #22c55e;
+  border-bottom-width: 4px;
+}
+
+.redbox-card__inline-input.is-wrong {
+  color: #ef4444;
+  border-bottom-color: #ef4444;
+  border-bottom-width: 4px;
+  animation: wrongShake 0.5s ease;
+}
+
+.redbox-card__inline-input.is-readonly {
+  cursor: default;
+  color: #94a3b8;
+  border-bottom-color: #cbd5e1;
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(8px); }
+}
+
+/* 中文翻译 */
 .redbox-card__test-cn {
-  font-size: 1rem;
+  font-size: 1.125rem;
   color: #94a3b8;
   margin: 0;
-}
-
-/* 输入区 - 更宽更大气 */
-.redbox-card__input-section {
-  width: 100%;
-  max-width: 400px;
-}
-
-.redbox-card__input-wrapper {
-  position: relative;
-}
-
-.redbox-card__input {
-  width: 100%;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  font-size: 1.75rem;
-  font-family: 'Georgia', serif;
+  line-height: 1.6;
   text-align: center;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  outline: none;
-  transition: all 0.2s ease;
-  background: #f8fafc;
+  font-family: var(--font-family-cn);
 }
 
-.redbox-card__input:focus {
-  border-color: #3b82f6;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-}
-
-.redbox-card__input.is-correct {
-  border-color: #22c55e;
-  background: #f0fdf4;
-}
-
-.redbox-card__input.is-wrong {
-  border-color: #ef4444;
-  background: #fef2f2;
-  animation: shake 0.4s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  75% { transform: translateX(6px); }
-}
-
-.redbox-card__input-icon {
-  position: absolute;
-  right: var(--spacing-lg);
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.redbox-card__input-icon svg {
-  display: block;
-}
-
-.redbox-card__input.is-correct + .redbox-card__input-icon {
-  color: #22c55e;
-}
-
-.redbox-card__input.is-wrong + .redbox-card__input-icon {
-  color: #ef4444;
-}
-
+/* 正确答案提示 */
 .redbox-card__answer {
   text-align: center;
-  margin-top: var(--spacing-md);
-  font-size: 15px;
+  margin-top: 8px;
+  font-size: 1rem;
   color: #ef4444;
+  font-family: var(--font-family-cn);
 }
 
 .redbox-card__answer strong {
-  font-family: 'Georgia', serif;
-  font-weight: 600;
+  font-family: var(--font-family-en);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #0063F2;
 }
 
-/* 状态区 */
-.redbox-card__status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 400px;
-}
-
+/* 生命值 - 居中显示 */
 .redbox-card__attempts {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  justify-content: center;
 }
 
 .redbox-card__attempts svg {
@@ -493,37 +513,18 @@
   filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.2));
 }
 
-.redbox-card__submit-btn {
-  padding: var(--spacing-md) var(--spacing-2xl);
-  font-size: 15px;
-  font-weight: 600;
-  color: white;
-  background: #3b82f6;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.redbox-card__submit-btn:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-.redbox-card__submit-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 /* 结果反馈 */
 .redbox-card__feedback {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-xl);
+  gap: 10px;
+  padding: 14px 28px;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
   animation: fadeIn 0.3s ease;
+  margin-top: 8px;
+  font-family: var(--font-family-cn);
 }
 
 @keyframes fadeIn {

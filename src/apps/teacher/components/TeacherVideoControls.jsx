@@ -115,21 +115,25 @@ const TeacherVideoControls = () => {
   };
 
   const handleShowSyllables = () => {
-    updateRedBoxUI({ showSyllables: true });
-    teacherSendCommand('showSyllables');
+    const newState = !redBoxUI.showSyllables;
+    updateRedBoxUI({ showSyllables: newState });
+    teacherSendCommand(newState ? 'showSyllables' : 'hideSyllables');
   };
 
   const handleShowPhonetic = () => {
-    updateRedBoxUI({ showPhonetic: true });
-    teacherSendCommand('showPhonetic');
+    const newState = !redBoxUI.showPhonetic;
+    updateRedBoxUI({ showPhonetic: newState });
+    teacherSendCommand(newState ? 'showPhonetic' : 'hidePhonetic');
   };
 
   // ========================================
   // RedBox Step 2: 精准助记操作
   // ========================================
   const handleSelectWeapon = (weaponId) => {
-    updateRedBoxUI({ selectedWeapon: weaponId });
-    teacherSelectWeapon(weaponId);
+    // 如果点击的是当前已选中的武器，则取消选择
+    const newWeapon = redBoxUI.selectedWeapon === weaponId ? null : weaponId;
+    updateRedBoxUI({ selectedWeapon: newWeapon });
+    teacherSelectWeapon(newWeapon);
   };
 
   // ========================================
@@ -154,21 +158,12 @@ const TeacherVideoControls = () => {
         {/* 标题栏 */}
         <div className="redbox-panel__header">
           <div className="redbox-panel__title">
-            <span className="redbox-panel__badge">🔴</span>
-            Red Box 攻坚
+            武器库
           </div>
           <div className="redbox-panel__progress">
             {currentRedWordIndex + 1} / {redWords.length}
           </div>
         </div>
-
-        {/* 当前单词 */}
-        {currentRedWord && (
-          <div className="redbox-panel__word">
-            <span className="redbox-panel__word-text">{currentRedWord.word}</span>
-            <span className="redbox-panel__word-meaning">{currentRedWord.meaning?.definitionCn}</span>
-          </div>
-        )}
 
         {/* 步骤指示器 */}
         <div className="redbox-panel__steps">
@@ -186,7 +181,7 @@ const TeacherVideoControls = () => {
         {/* Step 1: 定音定形操作 */}
         {redBoxStep === 1 && (
           <div className="redbox-panel__actions">
-            <div className="redbox-panel__action-label">👂 听音识形</div>
+            <div className="redbox-panel__action-label">听音识形</div>
             <div className="redbox-panel__action-grid">
               <button 
                 className={`redbox-panel__action-btn ${redBoxUI.audioPlayed ? 'is-done' : ''}`}
@@ -200,14 +195,14 @@ const TeacherVideoControls = () => {
                 onClick={handleShowSyllables}
               >
                 <Layers size={18} />
-                <span>显示音节</span>
+                <span>{redBoxUI.showSyllables ? '隐藏音节' : '显示音节'}</span>
               </button>
               <button 
                 className={`redbox-panel__action-btn ${redBoxUI.showPhonetic ? 'is-done' : ''}`}
                 onClick={handleShowPhonetic}
               >
                 <Eye size={18} />
-                <span>显示音标</span>
+                <span>{redBoxUI.showPhonetic ? '隐藏音标' : '显示音标'}</span>
               </button>
             </div>
           </div>
@@ -216,7 +211,7 @@ const TeacherVideoControls = () => {
         {/* Step 2: 精准助记操作 */}
         {redBoxStep === 2 && (
           <div className="redbox-panel__actions">
-            <div className="redbox-panel__action-label">🛠️ 选择助记武器</div>
+            <div className="redbox-panel__action-label">选择助记武器</div>
             <div className="redbox-panel__weapon-grid">
               {redBoxWeapons.map((weapon) => (
                 <button
@@ -235,11 +230,12 @@ const TeacherVideoControls = () => {
         {/* Step 3: L4 验收操作 */}
         {redBoxStep === 3 && (
           <div className="redbox-panel__actions">
-            <div className="redbox-panel__action-label">✍️ 验收操作</div>
+            <div className="redbox-panel__action-label">验收操作</div>
             <div className="redbox-panel__action-grid">
               <button 
                 className={`redbox-panel__action-btn ${redBoxUI.showAnswer ? 'is-done' : ''}`}
                 onClick={handleShowAnswer}
+                disabled={redBoxUI.showAnswer}
               >
                 <Eye size={18} />
                 <span>显示答案</span>
@@ -263,7 +259,7 @@ const TeacherVideoControls = () => {
                   variant={studentState.isCorrect ? 'green' : 'red'} 
                   size="sm"
                 >
-                  {studentState.isCorrect ? '✅ 正确' : '❌ 错误'}
+                  {studentState.isCorrect ? '正确' : '错误'}
                 </Badge>
               )}
             </div>
@@ -279,8 +275,8 @@ const TeacherVideoControls = () => {
           {redBoxStep < 3 
             ? `进入 Step ${redBoxStep + 1}: ${redBoxStepNames[redBoxStep]}` 
             : (currentRedWordIndex < redWords.length - 1 
-                ? '下一个红词' 
-                : '🎓 完成红盒，进入新词')}
+                ? '下一个单词' 
+                : '完成，进入新词学习')}
         </button>
 
         {/* 跳过按钮 */}
@@ -289,7 +285,7 @@ const TeacherVideoControls = () => {
           onClick={() => setShowForceConfirm(true)}
         >
           <SkipForward size={14} />
-          跳过 Red Box
+          跳过武器库
         </button>
 
         {/* 确认弹窗 */}
@@ -298,12 +294,12 @@ const TeacherVideoControls = () => {
             <div className="teacher-video-controls__confirm" onClick={(e) => e.stopPropagation()}>
               <div className="teacher-video-controls__confirm-header">
                 <AlertTriangle size={20} />
-                <span>确认跳过 Red Box？</span>
+                <span>确认跳过武器库？</span>
               </div>
               <div className="teacher-video-controls__confirm-body">
                 <p>跳过后将直接进入 <strong>精准筛查</strong> 阶段</p>
                 <p className="teacher-video-controls__confirm-warning">
-                  未完成的红词将保持 Red 状态
+                  未完成的单词将保持待攻克状态
                 </p>
               </div>
               <div className="teacher-video-controls__confirm-actions">
@@ -320,110 +316,9 @@ const TeacherVideoControls = () => {
   }
 
   // ========================================
-  // 其他阶段：常规控制面板
+  // 其他阶段：不显示控制面板（武器库移到底部工具栏）
   // ========================================
-  return (
-    <div className="teacher-video-controls">
-      {/* 当前状态信息 */}
-      <div className="teacher-video-controls__status">
-        <span className="teacher-video-controls__phase">{phaseNames[currentPhase]}</span>
-        <span className="teacher-video-controls__progress">{getProgress()}</span>
-        {currentWord && (
-          <span className="teacher-video-controls__word">{currentWord.word}</span>
-        )}
-      </div>
-
-      {/* 控制按钮区 */}
-      <div className="teacher-video-controls__buttons">
-        {/* 武器库按钮 */}
-        <div className="teacher-video-controls__weapon-wrapper">
-          <button
-            className={`teacher-video-controls__btn teacher-video-controls__btn--weapon ${showWeapons ? 'is-active' : ''}`}
-            onClick={() => setShowWeapons(!showWeapons)}
-          >
-            <Wrench size={18} />
-            <span>武器库</span>
-          </button>
-
-          {/* 武器库弹出面板 */}
-          {showWeapons && (
-            <div className="teacher-video-controls__weapon-popup">
-              <div className="teacher-video-controls__weapon-header">
-                <span>选择武器</span>
-                <button onClick={() => setShowWeapons(false)}>
-                  <X size={16} />
-                </button>
-              </div>
-              <div className="teacher-video-controls__weapon-grid">
-                {weapons.map((weapon) => {
-                  const available = isResourceAvailable(weapon.field);
-                  const isActive = weaponPopup.isOpen && weaponPopup.weaponId === weapon.id;
-                  
-                  return (
-                    <button
-                      key={weapon.id}
-                      className={`teacher-video-controls__weapon-btn ${!available ? 'is-disabled' : ''} ${isActive ? 'is-active' : ''}`}
-                      onClick={() => handleWeaponClick(weapon.id)}
-                      disabled={!available}
-                    >
-                      {weapon.icon}
-                      <span>{weapon.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {weaponPopup.isOpen && (
-                <button 
-                  className="teacher-video-controls__close-popup"
-                  onClick={closeWeaponPopup}
-                >
-                  关闭弹窗
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* 下一阶段按钮 */}
-        {nextPhaseInfo && (
-          <button
-            className="teacher-video-controls__btn teacher-video-controls__btn--next"
-            onClick={() => setShowForceConfirm(true)}
-          >
-            <FastForward size={18} />
-            <span>下一阶段</span>
-          </button>
-        )}
-      </div>
-
-      {/* 确认弹窗 */}
-      {showForceConfirm && (
-        <div className="teacher-video-controls__confirm-overlay" onClick={() => setShowForceConfirm(false)}>
-          <div className="teacher-video-controls__confirm" onClick={(e) => e.stopPropagation()}>
-            <div className="teacher-video-controls__confirm-header">
-              <AlertTriangle size={20} />
-              <span>确认进入下一阶段？</span>
-            </div>
-            <div className="teacher-video-controls__confirm-body">
-              <p>
-                当前: <strong>{phaseNames[currentPhase]}</strong> → 
-                下一阶段: <strong>{nextPhaseInfo?.name}</strong>
-              </p>
-              <p className="teacher-video-controls__confirm-warning">
-                未完成的单词将被跳过
-              </p>
-            </div>
-            <div className="teacher-video-controls__confirm-actions">
-              <button onClick={() => setShowForceConfirm(false)}>取消</button>
-              <button className="is-danger" onClick={handleForceNext}>
-                确认
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return null;
 };
 
 export default TeacherVideoControls;
