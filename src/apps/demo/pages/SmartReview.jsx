@@ -39,7 +39,6 @@ const SmartReview = () => {
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
   
   // 初始化
   useEffect(() => {
@@ -554,18 +553,6 @@ const SmartReview = () => {
           </div>
         </Card>
       </div>
-      
-      {/* 退出确认弹窗 */}
-      <ConfirmDialog
-        isOpen={showExitConfirm}
-        onClose={() => setShowExitConfirm(false)}
-        onConfirm={() => navigate('/')}
-        title="确定要退出吗？"
-        message={`当前进度：已复习 ${completedCount}/${reviewWords.length} 个单词。退出后进度将会保存。`}
-        confirmText="退出复习"
-        cancelText="继续复习"
-        variant="warning"
-      />
     </div>
   );
 };
