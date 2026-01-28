@@ -1,0 +1,113 @@
+/* ================================
+   统一设计主题 - L2 蓝白风格
+   ================================ */
+
+:root {
+  /* 主色调 - 蓝色系 */
+  --theme-primary: #2196F3;
+  --theme-primary-light: #64B5F6;
+  --theme-primary-dark: #1976D2;
+  
+  /* 背景渐变 */
+  --theme-bg-gradient: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  --theme-page-bg: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); /* 深色页面背景 */
+  
+  /* 卡片背景 */
+  --theme-card-bg: rgba(255, 255, 255, 0.95);
+  --theme-card-bg-hover: rgba(255, 255, 255, 1);
+  --theme-card-border: rgba(33, 150, 243, 0.2);
+  
+  /* 文字颜色 */
+  --theme-text-primary: rgba(0, 0, 0, 0.87);
+  --theme-text-secondary: rgba(0, 0, 0, 0.6);
+  --theme-text-hint: rgba(0, 0, 0, 0.38);
+  --theme-text-white: #ffffff;
+  
+  /* 高亮色 */
+  --theme-highlight: #FCD34D;
+  --theme-success: #10B981;
+  --theme-error: #EF4444;
+  --theme-warning: #F59E0B;
+  
+  /* 阴影 */
+  --theme-shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+  --theme-shadow-md: 0 4px 16px rgba(33, 150, 243, 0.15);
+  --theme-shadow-lg: 0 8px 24px rgba(33, 150, 243, 0.2);
+}
+
+/* 统一页面容器 */
+.unified-page {
+  min-height: 100vh;
+  background: var(--theme-page-bg);
+  padding: var(--spacing-6);
+}
+
+/* 统一页面头部 */
+.unified-header {
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-8);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.unified-header__icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(33, 150, 243, 0.2);
+  border-radius: var(--radius-lg);
+  color: var(--theme-primary);
+}
+
+.unified-header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--theme-text-white);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+/* 统一内容卡片 */
+.unified-card {
+  background: var(--theme-card-bg);
+  border: 1px solid var(--theme-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--theme-shadow-md);
+  transition: all 0.3s ease;
+}
+
+.unified-card:hover {
+  box-shadow: var(--theme-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* 统一模块区域背景 */
+.unified-section {
+  padding: var(--spacing-8);
+  background: var(--theme-bg-gradient);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-4);
+}
+
+/* 统一按钮样式 */
+.unified-btn-primary {
+  background: var(--theme-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-3) var(--spacing-6);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.unified-btn-primary:hover {
+  background: var(--theme-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+}
