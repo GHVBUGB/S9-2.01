@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../../shared/components/ui/Button';
 import Card from '../../../shared/components/ui/Card';
 import Badge from '../../../shared/components/ui/Badge';
-import ConfirmDialog from '../../../shared/components/ui/ConfirmDialog';
 import { ArrowLeft, RotateCcw, Clock, CheckCircle, XCircle, AlertTriangle, Calendar } from 'lucide-react';
 import useWordStore from '../../../shared/store/useWordStore';
 import { getWordById } from '../../../shared/data/mockWords';
