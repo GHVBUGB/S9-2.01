@@ -1,20 +1,24 @@
 /* ================================
-   Smart Review - 智能复习与容错（Phase 4）
-   【负责人：同事】
+   Smart Review - 智能复习与容错 (Phase 4)
+   采用 Jarvis 卡片式设计
    ================================ */
 
 .smart-review {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: #f8fafc;
   padding: var(--spacing-6);
 }
 
 .smart-review__header {
   max-width: 1200px;
-  margin: 0 auto var(--spacing-8);
+  margin: 0 auto var(--spacing-6);
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
+  background: white;
+  padding: var(--spacing-4);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .smart-review__back-btn {
@@ -24,25 +28,27 @@
 .smart-review__header-info {
   display: flex;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: var(--spacing-3);
+  flex: 1;
 }
 
 .smart-review__icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(33, 150, 243, 0.2);
-  border-radius: var(--radius-lg);
-  color: #2196F3;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  border-radius: 12px;
+  color: white;
+  flex-shrink: 0;
 }
 
 .smart-review__title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: #fff;
-  margin: 0 0 var(--spacing-2) 0;
+  color: #1e293b;
+  margin: 0 0 var(--spacing-1) 0;
 }
 
 .smart-review__container {
@@ -50,69 +56,479 @@
   margin: 0 auto;
 }
 
-/* Placeholder Content */
-.smart-review__placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--spacing-10) var(--spacing-6);
+/* ========== 预览界面 ========== */
+.review-preview,
+.review-loading {
+  background: white;
+  border-radius: 16px;
+  padding: var(--spacing-8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.smart-review__placeholder-icon {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 50%;
-  color: var(--color-primary);
+.preview-header {
+  text-align: center;
   margin-bottom: var(--spacing-6);
 }
 
-.smart-review__placeholder-title {
-  font-size: var(--font-size-3xl);
+.preview-icon {
+  color: #00B4EE;
+  margin-bottom: var(--spacing-3);
+}
+
+.preview-title {
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  color: #fff;
+  color: #1e293b;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.preview-subtitle {
+  font-size: var(--font-size-base);
+  color: #64748b;
+  margin: 0;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.preview-stat-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: var(--spacing-4);
+  text-align: center;
+}
+
+.preview-stat-number {
+  display: block;
+  font-size: 32px;
+  font-weight: var(--font-weight-bold);
+  color: #00B4EE;
+  margin-bottom: var(--spacing-2);
+}
+
+.preview-stat-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: #64748b;
+}
+
+/* 单词列表 */
+.preview-words {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.preview-words-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: #1e293b;
   margin: 0 0 var(--spacing-4) 0;
 }
 
-.smart-review__placeholder-desc {
+.preview-words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-2);
+}
+
+.preview-word-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.preview-word-item:hover {
+  border-color: #00B4EE;
+  transform: translateY(-2px);
+}
+
+.preview-word-number {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: #00B4EE;
+  flex-shrink: 0;
+}
+
+.preview-word-text {
+  font-size: var(--font-size-sm);
+  color: #334155;
+  font-weight: var(--font-weight-medium);
+}
+
+/* 规则说明 */
+.preview-rules {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+}
+
+.preview-rules-title {
   font-size: var(--font-size-lg);
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: var(--font-weight-semibold);
+  color: #1e293b;
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.preview-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.preview-rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: #334155;
+}
+
+.preview-start-btn {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: block;
+}
+
+/* ========== 复习卡片 ========== */
+.review-card {
+  background: white;
+  border-radius: 16px;
+  padding: var(--spacing-8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: var(--spacing-4);
+}
+
+.review-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.review-card__hint {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin: 0;
+}
+
+.review-card__question {
+  margin-bottom: var(--spacing-6);
+}
+
+.review-card__context {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: #1e293b;
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-4) 0;
+  padding: var(--spacing-4);
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #00B4EE;
+}
+
+.review-card__translation {
+  font-size: var(--font-size-base);
+  color: #64748b;
+  margin: 0;
+}
+
+/* 骨架提示 */
+.review-card__skeleton {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: #fefce8;
+  border: 1px solid #fde047;
+  border-radius: 12px;
+}
+
+.review-card__skeleton h3 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: #713f12;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.skeleton-container {
+  display: flex;
+  gap: var(--spacing-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.skeleton-char {
+  display: inline-flex;
+}
+
+.skeleton-char-shown {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #22c55e;
+}
+
+.skeleton-char-hidden {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #fbbf24;
+}
+
+/* 输入区域 */
+.review-card__input-section {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.review-card__input {
+  flex: 1;
+  padding: var(--spacing-4);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  color: #1e293b;
+  transition: all 0.2s;
+}
+
+.review-card__input:focus {
+  outline: none;
+  border-color: #00B4EE;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 180, 238, 0.1);
+}
+
+.review-card__input::placeholder {
+  color: #cbd5e1;
+}
+
+/* 反馈状态 */
+.review-feedback {
+  padding: var(--spacing-4);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  text-align: center;
+}
+
+.review-feedback--level1 {
+  background: #fef3c7;
+  border: 1px solid #fde047;
+}
+
+.review-feedback--level1 svg {
+  color: #f59e0b;
+}
+
+.review-feedback--level2 {
+  background: #fed7aa;
+  border: 1px solid #fb923c;
+}
+
+.review-feedback--level2 svg {
+  color: #ea580c;
+}
+
+.review-feedback--level3 {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+
+.review-feedback--level3 svg {
+  color: #dc2626;
+}
+
+.review-feedback--correct {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.review-feedback--correct svg {
+  color: #16a34a;
+}
+
+.review-feedback--correct-reset {
+  background: #fef3c7;
+  border: 1px solid #fde047;
+}
+
+.review-feedback--correct-reset svg {
+  color: #ca8a04;
+}
+
+.review-feedback__hint {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin: var(--spacing-2) 0 0 0;
+}
+
+.review-feedback__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.review-feedback__answer-box {
+  width: 100%;
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: white;
+  border-radius: 12px;
+}
+
+.review-feedback__answer-label {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.review-feedback__answer-word {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #dc2626;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.review-feedback__answer-meaning {
+  font-size: var(--font-size-base);
+  color: #334155;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.review-feedback__answer-context {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
+}
+
+.level3-next-btn {
+  margin-top: var(--spacing-4);
+}
+
+/* 指南卡片 */
+.review-guide {
+  background: white;
+  border-radius: 16px;
+  padding: var(--spacing-6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.review-guide__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: #1e293b;
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.review-guide__levels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.guide-level {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  color: #334155;
+}
+
+/* 完成界面 */
+.review-completed {
+  background: white;
+  border-radius: 16px;
+  padding: var(--spacing-8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.review-completed__icon {
+  color: #22c55e;
+  margin-bottom: var(--spacing-4);
+}
+
+.review-completed__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #1e293b;
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.review-completed__desc {
+  font-size: var(--font-size-base);
+  color: #64748b;
   margin: 0 0 var(--spacing-6) 0;
 }
 
-.smart-review__feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 var(--spacing-8) 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-  align-items: flex-start;
-  text-align: left;
+.review-completed__stats {
+  margin-bottom: var(--spacing-6);
 }
 
-.smart-review__feature-list li {
+.stat-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-  font-size: var(--font-size-base);
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.smart-review__feature-list svg {
-  flex-shrink: 0;
-  color: var(--color-primary);
-}
-
-.smart-review__placeholder-hint {
-  padding: var(--spacing-4) var(--spacing-6);
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: var(--radius-md);
-  color: #FCD34D;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background: #f8fafc;
+  border-radius: 12px;
   font-size: var(--font-size-sm);
+  color: #334155;
+}
+
+/* 震动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .smart-review {
+    padding: var(--spacing-4);
+  }
+
+  .review-card,
+  .review-guide,
+  .review-preview {
+    padding: var(--spacing-6);
+  }
+
+  .preview-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .review-card__input-section {
+    flex-direction: column;
+  }
 }

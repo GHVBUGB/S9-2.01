@@ -1,20 +1,24 @@
 /* ================================
-   AI Context - AI 个性化语境闭环（增值服务 - L2 蓝色系）
-   【负责人：同事】
+   AI Context - AI 个性化语境闭环（增值服务）
+   采用 Jarvis 卡片式设计
    ================================ */
 
 .ai-context {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: #f8fafc;
   padding: var(--spacing-6);
 }
 
 .ai-context__header {
   max-width: 1200px;
-  margin: 0 auto var(--spacing-8);
+  margin: 0 auto var(--spacing-6);
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
+  background: white;
+  padding: var(--spacing-4);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .ai-context__back-btn {
@@ -24,25 +28,27 @@
 .ai-context__header-info {
   display: flex;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: var(--spacing-3);
+  flex: 1;
 }
 
 .ai-context__icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(33, 150, 243, 0.2);
-  border-radius: var(--radius-lg);
-  color: #2196F3;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 12px;
+  color: white;
+  flex-shrink: 0;
 }
 
 .ai-context__title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  color: #fff;
-  margin: 0 0 var(--spacing-2) 0;
+  color: #1e293b;
+  margin: 0 0 var(--spacing-1) 0;
 }
 
 .ai-context__container {
@@ -50,13 +56,16 @@
   margin: 0 auto;
 }
 
-/* Placeholder Content */
+/* ========== Placeholder / 功能卡片 ========== */
 .ai-context__placeholder {
+  background: white;
+  border-radius: 16px;
+  padding: var(--spacing-8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: var(--spacing-10) var(--spacing-6);
 }
 
 .ai-context__placeholder-icon {
@@ -65,22 +74,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(251, 191, 36, 0.1);
-  border-radius: 50%;
-  color: var(--color-yellow);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+  border-radius: 24px;
+  color: #d97706;
   margin-bottom: var(--spacing-6);
 }
 
 .ai-context__placeholder-title {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  color: #fff;
+  color: #1e293b;
   margin: 0 0 var(--spacing-4) 0;
 }
 
 .ai-context__placeholder-desc {
   font-size: var(--font-size-lg);
-  color: rgba(255, 255, 255, 0.7);
+  color: #64748b;
   margin: 0 0 var(--spacing-6) 0;
 }
 
@@ -91,28 +100,61 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-  align-items: flex-start;
+  align-items: stretch;
   text-align: left;
+  width: 100%;
+  max-width: 600px;
 }
 
 .ai-context__feature-list li {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   font-size: var(--font-size-base);
-  color: rgba(255, 255, 255, 0.8);
+  color: #334155;
+  transition: all 0.2s;
+}
+
+.ai-context__feature-list li:hover {
+  background: #fef3c7;
+  border-color: #fde047;
+  transform: translateX(4px);
 }
 
 .ai-context__feature-list svg {
   flex-shrink: 0;
-  color: var(--color-yellow);
+  color: #f59e0b;
 }
 
 .ai-context__placeholder-hint {
   padding: var(--spacing-4) var(--spacing-6);
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: var(--radius-md);
-  color: #FCD34D;
+  background: #fef3c7;
+  border: 1px solid #fde047;
+  border-radius: 12px;
+  color: #92400e;
   font-size: var(--font-size-sm);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .ai-context {
+    padding: var(--spacing-4);
+  }
+
+  .ai-context__placeholder {
+    padding: var(--spacing-6);
+  }
+
+  .ai-context__placeholder-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ai-context__feature-list {
+    max-width: 100%;
+  }
 }
