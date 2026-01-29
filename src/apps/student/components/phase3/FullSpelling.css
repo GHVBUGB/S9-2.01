@@ -37,54 +37,105 @@
   display: inline;
 }
 
-/* 内嵌输入框 */
-.full-spelling__inline-input {
-  display: inline-block;
-  padding: 0;
-  margin: 0 4px;
-  border: none;
+/* 字母格子容器 */
+.full-spelling__letter-slots {
+  display: inline-flex;
+  gap: 8px;
+  margin: 0 12px;
+  vertical-align: baseline;
+  position: relative;
+  cursor: text;
+}
+
+/* 单个字母格子 */
+.full-spelling__letter-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2em;
+  height: 1.4em;
   border-bottom: 3px solid #cbd5e1;
-  background: transparent;
   font-size: 42px;
   font-weight: 600;
   font-family: var(--font-family-en);
-  color: #0063F2;
-  text-align: center;
-  text-transform: lowercase;
-  outline: none;
-  box-shadow: none;
-  caret-color: #0063F2;
   transition: all 0.3s ease;
-  letter-spacing: -0.02em;
-  line-height: 1.4;
-  min-width: 2em;
-  vertical-align: baseline;
+  position: relative;
 }
 
-.full-spelling__inline-input:focus {
+/* 字母显示 */
+.full-spelling__letter {
+  color: #0063F2;
+  text-transform: lowercase;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 聚焦状态 */
+.full-spelling__letter-slots:focus-within .full-spelling__letter-slot {
   border-bottom-color: #0063F2;
   border-bottom-width: 4px;
-  outline: none;
-  box-shadow: none;
 }
 
-.full-spelling__inline-input.is-correct {
-  color: #22c55e;
+/* 正确状态 */
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot {
   border-bottom-color: #22c55e;
   border-bottom-width: 4px;
 }
 
-.full-spelling__inline-input.is-wrong {
-  color: #ef4444;
+.full-spelling__letter-slots.is-correct .full-spelling__letter {
+  color: #22c55e;
+  animation: letterBounce 0.6s ease;
+  animation-fill-mode: both;
+}
+
+/* 波浪跳动 - 每个字母延迟 */
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(1) .full-spelling__letter { animation-delay: 0s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(2) .full-spelling__letter { animation-delay: 0.06s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(3) .full-spelling__letter { animation-delay: 0.12s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(4) .full-spelling__letter { animation-delay: 0.18s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(5) .full-spelling__letter { animation-delay: 0.24s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(6) .full-spelling__letter { animation-delay: 0.30s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(7) .full-spelling__letter { animation-delay: 0.36s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(8) .full-spelling__letter { animation-delay: 0.42s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(9) .full-spelling__letter { animation-delay: 0.48s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(10) .full-spelling__letter { animation-delay: 0.54s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(11) .full-spelling__letter { animation-delay: 0.60s; }
+.full-spelling__letter-slots.is-correct .full-spelling__letter-slot:nth-child(12) .full-spelling__letter { animation-delay: 0.66s; }
+
+@keyframes letterBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-16px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+  70% {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+/* 错误状态 */
+.full-spelling__letter-slots.is-wrong .full-spelling__letter-slot {
   border-bottom-color: #ef4444;
   border-bottom-width: 4px;
   animation: wrongShake 0.5s ease;
 }
 
-.full-spelling__inline-input.is-readonly {
-  cursor: default;
-  color: #0ea5e9;
-  border-bottom-color: #0ea5e9;
+.full-spelling__letter-slots.is-wrong .full-spelling__letter {
+  color: #ef4444;
+}
+
+/* 隐藏的输入框 */
+.full-spelling__hidden-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
 }
 
 /* ========================================

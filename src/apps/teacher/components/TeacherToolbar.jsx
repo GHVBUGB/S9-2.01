@@ -73,8 +73,8 @@ const TeacherToolbar = () => {
     setShowConfirm(false);
   };
 
-  // RedBox 阶段不显示此工具栏（有专属控制面板）
-  if (currentPhase === 'RedBox') {
+  // Warmup 和 RedBox 阶段不显示此工具栏
+  if (currentPhase === 'Warmup' || currentPhase === 'RedBox') {
     return null;
   }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import WarmupStage from '../components/WarmupStage';
 import ContextProbe from '../components/ContextProbe';
 import P2Container from '../components/phase2/P2Container';
 import P3Container from '../components/phase3/P3Container';
@@ -26,11 +27,13 @@ const Classroom = ({ readonly = false }) => {
     currentWordIndex,
     sessionStatus,
     redBoxCompleted,
+    wordFlow,
     initClassroom,
     getCurrentWord,
     studentSubmitAnswer,
     nextWord,
     setPhase,
+    finalizeP1,
     getP2Words,
     getWordStats,
     getRedBoxProgress,
@@ -57,21 +60,25 @@ const Classroom = ({ readonly = false }) => {
         nextWord();
       }, 1500);
     } else {
+      // P1 所有词完成，进行分流
       setTimeout(() => {
-        setPhase('P2');
+        finalizeP1(false); // 正常完成，不强制标记未测试的词
       }, 2000);
     }
   };
 
   const allPhases = useMemo(() => {
     if (classroomMode === 'B') {
-      return ['RedBox', 'P1', 'P2', 'P3'];
+      return ['Warmup', 'RedBox', 'P1', 'P2', 'P3'];
     }
-    return ['P1', 'P2', 'P3'];
+    return ['Warmup', 'P1', 'P2', 'P3'];
   }, [classroomMode]);
 
   const renderPhaseContent = () => {
     switch (currentPhase) {
+      case 'Warmup':
+        return <WarmupStage readonly={readonly} />;
+      
       case 'RedBox':
         return <RedBoxContainer readonly={readonly} />;
       

@@ -5,15 +5,13 @@ import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import './P3Container.css';
 
 /**
- * Phase 3 容器组件
+ * Phase 3 容器组件（新流程）
  * 门神验收：统一交付标准
  * 
- * 来源：
- * - P1 跳级生 (疑似熟词)
- * - P2 训练生
- * 
- * 验收通过 → Yellow
- * 验收失败 → Pending，打回 P2
+ * 新流程：
+ * - 错词批次：验收当前组的错词（P3 失败也不退回 P2，直接继续）
+ * - 对词批次：验收所有 P1 对词
+ * - 完成后调用 advanceToNextGroup 推进到下一组/批次
  * 
  * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
@@ -21,47 +19,42 @@ const P3Container = ({ readonly = false }) => {
   const {
     wordList,
     wordResults,
+    wordFlow,
     studentState,
     setPhase,
     nextP3Word,
     setP3Completed,
-    setP3RetryWords,
-    clearP3RetryWords,
+    getCurrentGroupWords,
+    getCurrentGroupInfo,
+    advanceToNextGroup,
   } = useClassroomStore();
 
   // 从 store 获取 P3 状态
   const currentP3Index = studentState.p3WordIndex;
   const isCompleted = studentState.p3Completed;
-  const p3RetryWords = studentState.p3RetryWords || [];
+  
+  // 获取当前组信息
+  const groupInfo = getCurrentGroupInfo();
   
   // P3 结果仍然用本地状态（因为这是派生数据，可以从 wordResults 重建）
   const [p3Results, setP3Results] = useState({});
 
-  // 获取需要 P3 验收的单词
-  // 如果有 p3RetryWords，只验收这些词（从 P2 返回的情况）
+  // 获取当前组需要验收的单词
   const p3Words = useMemo(() => {
-    // 决定要验收的单词范围
-    let wordsToVerify = wordList;
+    const groupWords = getCurrentGroupWords();
     
-    if (p3RetryWords.length > 0) {
-      // 只验收从 P3 失败返回后需要重新验收的词
-      // 注意：确保类型匹配（p3RetryWords 可能是字符串或数字）
-      wordsToVerify = wordList.filter(w => 
-        p3RetryWords.some(retryId => Number(retryId) === w.id)
-      );
-      console.log(`📍 [P3] 只验收返回的 ${wordsToVerify.length} 个词, p3RetryWords:`, p3RetryWords);
-    }
-    
-    return wordsToVerify.map(word => {
+    return groupWords.map(word => {
       const result = wordResults[word.id] || {};
       
       // 判断单词来源
       let source = 'p2_trained'; // 默认为训练生
-      if (result.p1Result === true && !result.p3FailedToP2) {
-        // P1 答对且没有被 P3 打回过的是跳级生
+      
+      // 根据当前批次判断来源
+      if (wordFlow.currentBatch === 'correct') {
+        // 对词批次：都是跳级生（P1 对词直接过 P3）
         source = 'p1_skip';
-      } else if (result.needP2 || result.p3FailedToP2) {
-        // P1 答错或被 P3 打回过的是训练生
+      } else if (wordFlow.currentBatch === 'wrong') {
+        // 错词批次：都是训练生（经过 P2 的）
         source = 'p2_trained';
       }
       
@@ -70,7 +63,7 @@ const P3Container = ({ readonly = false }) => {
         source,
       };
     });
-  }, [wordList, wordResults, p3RetryWords]);
+  }, [wordList, wordResults, wordFlow.currentBatch, wordFlow.currentGroupIndex]);
 
   // 当前验收的单词
   const currentWord = p3Words[currentP3Index];
@@ -137,13 +130,9 @@ const P3Container = ({ readonly = false }) => {
       if (currentP3Index < p3Words.length - 1) {
         nextP3Word(); // 使用 store action
       } else {
-        // P3 全部完成
-        setP3Completed(true); // 使用 store action
-        // 如果是重新验收模式，清空列表
-        if (p3RetryWords.length > 0) {
-          clearP3RetryWords();
-        }
-        console.log('🎉 [P3] 门神验收全部完成！');
+        // 当前组 P3 全部完成，推进到下一组/批次
+        console.log('🎉 [P3] 当前组门神验收完成！');
+        advanceToNextGroup();
       }
     }, 2000);
   };
@@ -162,36 +151,6 @@ const P3Container = ({ readonly = false }) => {
       .filter(([_, result]) => !result.passed)
       .map(([id, _]) => Number(id));
   }, [p3Results]);
-  
-  // 返回 P2 重练失败的词
-  const handleReturnToP2 = () => {
-    console.log(`🔄 [P3] 返回 P2 重练，失败单词: ${failedWordIds.length} 个`);
-    
-    // 设置这些词为需要重新验收
-    setP3RetryWords(failedWordIds);
-    
-    // 标记这些词需要 P2 训练
-    failedWordIds.forEach(wordId => {
-      useClassroomStore.getState().updateWordResults({
-        [wordId]: {
-          ...wordResults[wordId],
-          needP2: true,
-          p3FailedToP2: true,
-        }
-      });
-    });
-    
-    // 切换到 P2
-    setPhase('P2');
-  };
-  
-  // 完成本节课
-  const handleComplete = () => {
-    console.log('🎉 [P3] 本节课完成！');
-    // 清空重新验收列表
-    clearP3RetryWords();
-    // TODO: 跳转到总结页面或结束
-  };
 
   // 如果没有需要验收的单词
   if (p3Words.length === 0) {
@@ -210,7 +169,7 @@ const P3Container = ({ readonly = false }) => {
     );
   }
 
-  // P3 完成界面 - 极简风格
+  // P3 完成界面（备用，正常情况下 advanceToNextGroup 会自动处理）
   if (isCompleted) {
     const passRate = p3Words.length > 0 
       ? Math.round((stats.passed / p3Words.length) * 100) 
@@ -229,24 +188,16 @@ const P3Container = ({ readonly = false }) => {
           <p className="p3-complete__stats">
             {stats.passed} 通过
             {stats.failed > 0 && <span className="p3-complete__stats-sep">·</span>}
-            {stats.failed > 0 && <span className="p3-complete__stats-failed">{stats.failed} 待重练</span>}
+            {stats.failed > 0 && <span className="p3-complete__stats-failed">{stats.failed} 未通过</span>}
           </p>
 
           {/* 操作按钮 */}
           <div className="p3-complete__actions">
-            {stats.failed > 0 && (
-              <button
-                className="p3-complete__btn p3-complete__btn--outline"
-                onClick={() => handleReturnToP2()}
-              >
-                重练 ({stats.failed})
-              </button>
-            )}
             <button
               className="p3-complete__btn p3-complete__btn--primary"
-              onClick={() => handleComplete()}
+              onClick={() => advanceToNextGroup()}
             >
-              完成本节课
+              继续
             </button>
           </div>
         </div>
@@ -259,6 +210,16 @@ const P3Container = ({ readonly = false }) => {
       {/* 进度药丸 - 统一格式 */}
       <div className="p3-container__progress-wrapper">
         <div className="p3-container__progress-pill">
+          {groupInfo && groupInfo.batch === 'wrong' && (
+            <span className="p3-container__group-badge">
+              生词第{groupInfo.groupIndex + 1}组
+            </span>
+          )}
+          {groupInfo && groupInfo.batch === 'correct' && (
+            <span className="p3-container__batch-badge">
+              熟词验收
+            </span>
+          )}
           单词进度: {currentP3Index + 1} / {p3Words.length}
         </div>
       </div>

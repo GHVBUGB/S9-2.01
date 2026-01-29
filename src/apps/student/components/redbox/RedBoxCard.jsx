@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
-import { Volume2, CheckCircle2, XCircle, Heart, Layers, Wand2, Lightbulb, Brain } from 'lucide-react';
+import { Volume2, CheckCircle2, XCircle, Heart, Layers, Wand2, Lightbulb, Brain, Image } from 'lucide-react';
 import './RedBoxCard.css';
 
 /**
@@ -173,6 +173,7 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
     context: <Wand2 size={20} />,
     visual: <Lightbulb size={20} />,
     compare: <Brain size={20} />,
+    image: <Image size={20} />,
   };
 
   if (!word) return null;
@@ -256,6 +257,7 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
                     {redBoxUI.selectedWeapon === 'context' && '语境记忆'}
                     {redBoxUI.selectedWeapon === 'visual' && '记忆口诀'}
                     {redBoxUI.selectedWeapon === 'compare' && '形近对比'}
+                    {redBoxUI.selectedWeapon === 'image' && '图片助记'}
                   </span>
                 </div>
 
@@ -298,6 +300,27 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
                     ))}
                   </div>
                 )}
+
+                {/* 图片助记 */}
+                {redBoxUI.selectedWeapon === 'image' && (
+                  word.visual?.imageUrl ? (
+                    <div className="redbox-card__image-display">
+                      <img 
+                        src={word.visual.imageUrl} 
+                        alt={word.visual.imageDescription || word.word}
+                        className="redbox-card__image"
+                      />
+                      {word.visual.imageDescription && (
+                        <p className="redbox-card__image-desc">{word.visual.imageDescription}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="redbox-card__image-placeholder">
+                      <Image size={48} strokeWidth={1.5} />
+                      <p>暂未上传</p>
+                    </div>
+                  )
+                )}
               </div>
             ) : (
               <div className="redbox-card__waiting">
@@ -315,22 +338,39 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
               <span className="redbox-card__test-phrase-text">
                 {getBlankPhrase.before}
               </span>
-              <input
-                ref={inputRef}
-                type="text"
-                className={`redbox-card__inline-input ${
-                  submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
-                } ${readonly ? 'is-readonly' : ''}`}
-                value={inputValue}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                placeholder=""
-                disabled={submitted || readonly}
-                autoComplete="off"
-                autoCapitalize="off"
-                spellCheck="false"
-                size={Math.max(word.word?.length || 8, 8)}
-              />
+              
+              {/* 答对时显示波浪动画字母 */}
+              {submitted && isCorrect ? (
+                <span className="redbox-card__wave-letters">
+                  {word.word.split('').map((letter, index) => (
+                    <span 
+                      key={index} 
+                      className="redbox-card__wave-letter"
+                      style={{ animationDelay: `${index * 0.06}s` }}
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                </span>
+              ) : (
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className={`redbox-card__inline-input ${
+                    submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
+                  } ${readonly ? 'is-readonly' : ''}`}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  placeholder=""
+                  disabled={submitted || readonly}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  size={Math.max(word.word?.length || 8, 8)}
+                />
+              )}
+              
               <span className="redbox-card__test-phrase-text">
                 {getBlankPhrase.after}
               </span>

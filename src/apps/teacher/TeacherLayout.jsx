@@ -8,6 +8,8 @@ import TeacherVideoControls from './components/TeacherVideoControls';
 import TeacherToolbar from './components/TeacherToolbar';
 import JarvisAssistant from './components/JarvisAssistant';
 import useClassroomStore from '../../shared/store/useClassroomStore';
+import { getStep1Script, getStep2Script, getStep3Script } from '../../shared/data/mockJarvisScripts';
+import { getWeaponJarvisScript } from '../../shared/data/mockWeaponJarvisScripts';
 import './TeacherLayout.css';
 
 /**
@@ -23,10 +25,126 @@ const TeacherLayout = ({ model = 'A', standalone = false, children }) => {
   const { currentPhase, getActiveWord } = useClassroomStore();
   const currentWord = getActiveWord();
 
-  // 根据当前阶段和单词生成助教脚本（临时 mock）
+  // 根据当前阶段和单词生成助教脚本
   const getJarvisScript = () => {
-    const { studentState } = useClassroomStore.getState();
+    const { 
+      studentState, 
+      studentMood, 
+      redBoxStep, 
+      redBoxUI,
+      getCurrentRedWord,
+      weaponPopup 
+    } = useClassroomStore.getState();
     const p2Round = studentState?.p2Round || 1;
+
+    // 🛠️ 优先级最高：武器库打开时返回武器教学提示
+    if (weaponPopup?.isOpen && weaponPopup?.word) {
+      const wordKey = weaponPopup.word.word?.toLowerCase();
+      const weaponId = weaponPopup.weaponId;
+      const script = getWeaponJarvisScript(wordKey, weaponId);
+      return script;
+    }
+
+    // Warmup 阶段：根据学生状态给建议
+    if (currentPhase === 'Warmup') {
+      const moodAdvice = {
+        good: {
+          title: '学生状态良好',
+          content: '学生状态很好，可以按正常节奏进行教学。',
+          action: '点击"开始上课"进入学习阶段。'
+        },
+        normal: {
+          title: '学生状态一般',
+          content: '学生状态一般，建议适当增加互动，保持学生注意力。',
+          action: '适当放慢节奏，多鼓励学生。点击"开始上课"继续。'
+        },
+        tired: {
+          title: '学生有些疲惫',
+          content: '学生反馈有点累，建议放慢节奏，增加趣味性互动。',
+          action: '考虑简化部分练习，多给予正面反馈。点击"开始上课"继续。'
+        },
+        null: {
+          title: '等待学生反馈',
+          content: '等待学生选择今日状态，以便调整教学节奏。',
+          action: '提示学生选择今日状态后，点击"开始上课"。'
+        }
+      };
+      return moodAdvice[studentMood] || moodAdvice.null;
+    }
+
+    // RedBox 阶段：根据步骤和操作返回对应话术
+    if (currentPhase === 'RedBox') {
+      const redWord = getCurrentRedWord();
+      const wordKey = redWord?.word?.toLowerCase();
+      
+      if (!wordKey) {
+        return {
+          title: '红盒攻坚',
+          content: '准备开始红词攻坚训练。',
+          action: '选择对应的操作按钮开始教学。'
+        };
+      }
+
+      // Step 1: 定音定形
+      if (redBoxStep === 1) {
+        // 根据最近的操作返回话术
+        if (redBoxUI.showPhonetic) {
+          const script = getStep1Script(wordKey, 'showPhonetic');
+          if (script) return script;
+        }
+        if (redBoxUI.showSyllables) {
+          const script = getStep1Script(wordKey, 'showSyllables');
+          if (script) return script;
+        }
+        if (redBoxUI.audioPlayed) {
+          const script = getStep1Script(wordKey, 'playAudio');
+          if (script) return script;
+        }
+        // 默认提示
+        return {
+          title: '定音定形',
+          content: `当前单词：${redWord.word}，先让学生听发音，建立音形对应。`,
+          action: '点击"播放发音"开始教学。'
+        };
+      }
+
+      // Step 2: 精准助记
+      if (redBoxStep === 2) {
+        const selectedWeapon = redBoxUI.selectedWeapon;
+        if (selectedWeapon) {
+          const script = getStep2Script(wordKey, selectedWeapon);
+          if (script) return script;
+        }
+        // 默认提示
+        return {
+          title: '精准助记',
+          content: `选择一个武器来帮助学生记忆 ${redWord.word}。`,
+          action: '根据学生情况选择：语境、口诀、对比或图片武器。'
+        };
+      }
+
+      // Step 3: L4 验收
+      if (redBoxStep === 3) {
+        const { isSubmitted, isCorrect, attempts } = studentState;
+        if (isSubmitted) {
+          if (isCorrect) {
+            const script = getStep3Script(wordKey, 'correct');
+            if (script) return script;
+          } else {
+            // 根据尝试次数返回不同话术
+            const resultKey = attempts >= 2 ? 'wrong2' : 'wrong1';
+            const script = getStep3Script(wordKey, resultKey);
+            if (script) return script;
+          }
+        }
+        // 默认提示
+        return {
+          title: 'L4 验收',
+          content: `学生正在拼写 ${redWord.word}，观察输入情况。`,
+          action: '等待学生完成输入，如需提示可显示答案。'
+        };
+      }
+    }
 
     if (currentPhase === 'P1' && currentWord) {
       return {
@@ -70,11 +188,16 @@ const TeacherLayout = ({ model = 'A', standalone = false, children }) => {
     };
   };
 
-  // 视频区控制组件（包含控制面板 + 助教）
+  // 视频区控制组件（Jarvis 单独居中显示）
   const videoControlsWithJarvis = (
     <>
+      {/* Jarvis 徽章 - 居中显示 */}
+      <div className="teacher-layout__jarvis-wrapper">
+        <JarvisAssistant script={getJarvisScript()} />
+      </div>
+      
+      {/* 教师控制面板 */}
       <TeacherVideoControls />
-      <JarvisAssistant script={getJarvisScript()} />
     </>
   );
 

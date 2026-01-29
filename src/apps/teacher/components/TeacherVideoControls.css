@@ -312,6 +312,49 @@
 }
 
 /* ========================================
+   Warmup 热身阶段控制面板（极简版）
+   ======================================== */
+
+.teacher-video-controls--warmup {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 开始上课按钮 */
+.warmup-panel__start-btn {
+  width: 100%;
+  max-width: 200px;
+  padding: 16px 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 180, 238, 0.35);
+}
+
+.warmup-panel__start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 180, 238, 0.45);
+}
+
+.warmup-panel__start-btn:active {
+  transform: translateY(-1px);
+}
+
+/* ========================================
    RedBox 专属控制面板
    ======================================== */
 

@@ -112,11 +112,6 @@ const ContextProbe = ({ word, onComplete, readonly = false }) => {
 
   return (
     <div className="context-probe">
-      {/* 核心短语 - 视觉焦点 */}
-      <div className="context-probe__phrase">
-        {highlightedPhrase}
-      </div>
-
       {/* 音频播放按钮 - 纯图标 */}
       <button 
         className={`context-probe__audio ${isPlaying ? 'is-playing' : ''}`}
@@ -126,6 +121,11 @@ const ContextProbe = ({ word, onComplete, readonly = false }) => {
       >
         <Volume2 size={20} />
       </button>
+
+      {/* 核心短语 - 视觉焦点 */}
+      <div className="context-probe__phrase">
+        {highlightedPhrase}
+      </div>
 
       {/* 选项区 - 2x2 网格 */}
       <div className="context-probe__options">

@@ -38,7 +38,7 @@ export const mockRedWords = [
       confusables: ['adopt', 'adept', 'depth'],
     },
     visual: {
-      imageUrl: '/images/adapt.jpg',
+      imageUrl: '/picture/adapt.png',
       imageDescription: 'A chameleon changing color on a green leaf.',
     },
     phrase: {
@@ -75,7 +75,7 @@ export const mockRedWords = [
       confusables: ['government', 'requirement', 'retirement'],
     },
     visual: {
-      imageUrl: '/images/environment.jpg',
+      imageUrl: '/picture/environment.png',
       imageDescription: 'Hands holding a small green earth.',
     },
     phrase: {
@@ -112,7 +112,7 @@ export const mockRedWords = [
       confusables: ['change', 'channel', 'orange'],
     },
     visual: {
-      imageUrl: '/images/challenge.jpg',
+      imageUrl: '/picture/challenge.png',
       imageDescription: 'A climber reaching for a rock ledge.',
     },
     phrase: {

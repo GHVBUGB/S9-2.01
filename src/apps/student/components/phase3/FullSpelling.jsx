@@ -192,16 +192,32 @@ const FullSpelling = ({ word, wordSource, onComplete, readonly = false }) => {
         <Volume2 size={20} />
       </button>
 
-      {/* 短语 - 输入框嵌入其中 */}
+      {/* 短语 - 字母格子嵌入其中 */}
       <div className="full-spelling__phrase">
         <span className="full-spelling__phrase-text">
           {before}
+        </span>
+        
+        {/* 字母格子容器 */}
+        <div 
+          className={`full-spelling__letter-slots ${
+            submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
+          }`}
+          onClick={() => !readonly && !submitted && inputRef.current?.focus()}
+        >
+          {Array.from({ length: word.word.length }).map((_, index) => (
+            <div key={index} className="full-spelling__letter-slot">
+              <span className="full-spelling__letter">
+                {inputValue[index] || ''}
+              </span>
+            </div>
+          ))}
+          
+          {/* 隐藏的输入框用于捕获键盘输入 */}
           <input
             ref={inputRef}
             type="text"
-            className={`full-spelling__inline-input ${
-              submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
-            } ${readonly ? 'is-readonly' : ''}`}
+            className="full-spelling__hidden-input"
             value={inputValue}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
@@ -210,10 +226,11 @@ const FullSpelling = ({ word, wordSource, onComplete, readonly = false }) => {
             autoComplete="off"
             autoCapitalize="off"
             spellCheck="false"
-            style={{
-              width: inputValue ? `${Math.max(inputValue.length * 0.6, 1.2)}em` : '2em'
-            }}
+            maxLength={word.word.length}
           />
+        </div>
+        
+        <span className="full-spelling__phrase-text">
           {after}
         </span>
       </div>

@@ -28,6 +28,9 @@ const TeacherVideoControls = () => {
     wordList,
     currentWordIndex,
     studentState,
+    studentMood,
+    classroomMode,
+    setPhase,
     // RedBox 专属
     redWords,
     redBoxStep,
@@ -47,11 +50,19 @@ const TeacherVideoControls = () => {
 
   // 阶段名称
   const phaseNames = {
+    Warmup: '热身',
     RedBox: 'Red Box',
     P1: '精准筛查',
     P2: '集中训练',
     P3: '门神验收',
     Summary: '课堂总结',
+  };
+
+  // 学生状态标签
+  const moodLabels = {
+    good: { label: '很好', color: '#10b981' },
+    normal: { label: '一般', color: '#f59e0b' },
+    tired: { label: '有点累', color: '#94a3b8' },
   };
 
   // RedBox 步骤名称
@@ -70,6 +81,7 @@ const TeacherVideoControls = () => {
     { id: 'context', name: '语境', icon: <Wand2 size={16} /> },
     { id: 'visual', name: '口诀', icon: <Lightbulb size={16} /> },
     { id: 'compare', name: '对比', icon: <Brain size={16} /> },
+    { id: 'image', name: '图片', icon: <Image size={16} /> },
   ];
 
   // 检查资源是否可用
@@ -148,6 +160,13 @@ const TeacherVideoControls = () => {
     updateRedBoxUI({ showAnswer: false });
     teacherSendCommand('repeat');
   };
+
+  // ========================================
+  // Warmup 阶段不显示右侧控制面板（按钮在内容区）
+  // ========================================
+  if (currentPhase === 'Warmup') {
+    return null;
+  }
 
   // ========================================
   // RedBox 阶段专属控制面板

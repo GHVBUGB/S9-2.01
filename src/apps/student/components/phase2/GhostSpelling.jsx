@@ -203,12 +203,6 @@ const GhostSpelling = ({ word, onComplete, readonly = false }) => {
   
   return (
     <div className="ghost-spelling">
-      {/* 中文翻译 + 词性 */}
-      <p className="ghost-spelling__meaning">
-        {word.meaning?.chinese || word.meaning}
-        <span className="ghost-spelling__pos">{word.core?.partOfSpeech}</span>
-      </p>
-      
       {/* 单词骨架 - 超大字体，居中显示 */}
       <div className="ghost-spelling__skeleton">
         {wordStructure.map((item, index) => {
@@ -220,6 +214,7 @@ const GhostSpelling = ({ word, onComplete, readonly = false }) => {
                 className={`ghost-spelling__char ghost-spelling__char--fixed ${
                   submitted ? (isCorrect ? 'is-correct' : 'is-wrong') : ''
                 }`}
+                style={submitted && isCorrect ? { animationDelay: `${index * 0.06}s` } : undefined}
               >
                 {item.char}
               </span>
@@ -248,6 +243,7 @@ const GhostSpelling = ({ word, onComplete, readonly = false }) => {
                   autoCapitalize="off"
                   spellCheck="false"
                   readOnly={readonly}
+                  style={isInputCorrect ? { animationDelay: `${index * 0.06}s` } : undefined}
                 />
                 <span className={`ghost-spelling__underline ${isInputWrong ? 'is-wrong' : ''}`} />
               </span>
@@ -255,6 +251,12 @@ const GhostSpelling = ({ word, onComplete, readonly = false }) => {
           }
         })}
       </div>
+
+      {/* 中文翻译 + 词性 */}
+      <p className="ghost-spelling__meaning">
+        {word.meaning?.chinese || word.meaning}
+        <span className="ghost-spelling__pos">{word.core?.partOfSpeech}</span>
+      </p>
 
       {/* 反馈图标 */}
       {submitted && (

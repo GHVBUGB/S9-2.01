@@ -6,31 +6,35 @@ import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import './P2Container.css';
 
 /**
- * Phase 2 容器组件
+ * Phase 2 容器组件（新流程）
+ * 
  * 三轮训练模式：
  * - 第一轮：所有单词的听音辨形
  * - 第二轮：所有单词的闪视辨析
  * - 第三轮：所有单词的幽灵拼写
  * 
- * 每轮逻辑：
- * 1. 首轮：遍历所有 P2 单词，记录错题
- * 2. 错题轮：只做错的单词，做对的移除
- * 3. 全部正确后进入下一轮
+ * 新流程：
+ * - 只处理当前组的错词（由 getCurrentGroupWords 返回）
+ * - P2 完成后进入当前组的 P3
+ * - 不再有全局的 P2 单词列表
  * 
  * @param {boolean} readonly - 是否只读模式（教师端使用）
  */
 const P2Container = ({ readonly = false }) => {
   const {
     studentState,
-    getP2Words,
-    setPhase,
+    wordFlow,
+    getCurrentGroupWords,
+    getCurrentGroupInfo,
+    currentGroupP2Complete,
     nextP2Round,
     nextP2Word,
     resetP2WrongWords,
   } = useClassroomStore();
 
-  // 获取需要 P2 训练的单词（全部）
-  const allP2Words = getP2Words();
+  // 获取当前组需要训练的单词
+  const groupWords = getCurrentGroupWords();
+  const groupInfo = getCurrentGroupInfo();
   
   // 从 store 获取当前轮次和单词索引
   const currentRound = studentState.p2Round;
@@ -49,15 +53,15 @@ const P2Container = ({ readonly = false }) => {
     // 直接从 store 获取最新的数据（避免闭包问题）
     const latestState = useClassroomStore.getState();
     const latestWrongWords = latestState.studentState.p2WrongWords;
-    const latestP2Words = latestState.getP2Words();
+    const latestGroupWords = latestState.getCurrentGroupWords();
     
     let wordsForThisRound;
     if (isRetryRound && latestWrongWords.length > 0) {
-      // 错题轮：使用 store 中的错题列表
-      wordsForThisRound = latestP2Words.filter(w => latestWrongWords.includes(w.id));
+      // 错题轮：使用 store 中的错题列表（限定在当前组内）
+      wordsForThisRound = latestGroupWords.filter(w => latestWrongWords.includes(w.id));
     } else {
-      // 首轮：使用全部 P2 单词
-      wordsForThisRound = latestP2Words;
+      // 首轮：使用当前组的全部单词
+      wordsForThisRound = latestGroupWords;
     }
     setRoundWords(wordsForThisRound);
     // 重置本轮错题收集
@@ -122,32 +126,26 @@ const P2Container = ({ readonly = false }) => {
           console.log(`🔄 [P2] 还有 ${newWrongWords.length} 个错题，开始重做`);
           useClassroomStore.getState().startP2RetryRound();
         } else {
-          // 全部正确，进入下一轮或下一阶段
+          // 全部正确，进入下一轮或当前组的 P3
           if (currentRound < 3) {
             console.log(`✅ [P2] 第${currentRound}轮全部正确！进入下一轮`);
             nextP2Round();
           } else {
-            console.log('✅ [P2] 全部训练完成！进入 Phase 3');
-            setPhase('P3');
+            console.log('✅ [P2] 当前组训练完成！进入当前组的 P3');
+            currentGroupP2Complete();
           }
         }
       }, 2000);
     }
   };
 
-  // 如果没有需要训练的单词，直接进入 P3
-  if (allP2Words.length === 0) {
+  // 如果没有需要训练的单词（不应该发生在新流程中）
+  if (groupWords.length === 0) {
     return (
       <div className="p2-container p2-container--empty">
-        <div className="p2-container__icon">🎉</div>
-        <h2>太棒了！</h2>
-        <p>所有单词在 P1 都答对了，无需训练</p>
-        <button 
-          className="p2-container__skip-btn"
-          onClick={() => setPhase('P3')}
-        >
-          直接进入 Phase 3 门神验收
-        </button>
+        <div className="p2-container__icon">✓</div>
+        <h2>当前组训练完成</h2>
+        <p>正在进入门神验收...</p>
       </div>
     );
   }
@@ -193,6 +191,11 @@ const P2Container = ({ readonly = false }) => {
       {/* 进度药丸 - 统一格式 */}
       <div className="p2-container__progress-wrapper">
         <div className="p2-container__progress-pill">
+          {groupInfo && groupInfo.batch === 'wrong' && (
+            <span className="p2-container__group-badge">
+              生词第{groupInfo.groupIndex + 1}组
+            </span>
+          )}
           单词进度: {currentWordIndex + 1} / {roundWords.length}
         </div>
       </div>
