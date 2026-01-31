@@ -1,0 +1,142 @@
+/* ExamComplete 组件样式 */
+.complete-card {
+  max-width: 480px !important;
+  margin: 2rem auto !important;
+  background: white !important;
+  border-radius: 1.5rem !important;
+  padding: 2.5rem 2rem !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+  width: auto !important;
+  text-align: left !important;
+}
+
+.complete-icon {
+  width: 4rem !important;
+  height: 4rem !important;
+  border-radius: 1rem !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  margin: 0 !important;
+}
+
+.trophy-icon {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+
+.complete-title {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin: 0 !important;
+  letter-spacing: normal !important;
+  font-style: normal !important;
+}
+
+.complete-subtitle {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 0.9375rem !important;
+  color: #64748b !important;
+  margin: 0 !important;
+  font-weight: normal !important;
+}
+
+.complete-results {
+  display: flex !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  justify-content: center !important;
+  margin: 0.5rem 0 !important;
+  grid-template-columns: none !important;
+}
+
+.result-box {
+  flex: 1 !important;
+  max-width: 100px !important;
+  padding: 1.25rem 0.75rem !important;
+  border-radius: 0.75rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+}
+
+.result-box.green {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.result-box.yellow {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.result-box.red {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+.result-number {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin-top: 0 !important;
+}
+
+.result-label {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin-top: 0 !important;
+}
+
+.complete-btn {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  padding: 0.875rem 1.5rem !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin-top: 0.5rem !important;
+  width: auto !important;
+  box-shadow: none !important;
+}
+
+.complete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 768px) {
+  .complete-card {
+    padding: 2rem 1.5rem;
+    margin: 1.5rem 1rem;
+  }
+  
+  .complete-results {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .result-box {
+    max-width: none;
+  }
+}

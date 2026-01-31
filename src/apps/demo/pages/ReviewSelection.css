@@ -1,0 +1,667 @@
+/* 复习选择页面 - LexiconMatrix */
+
+.review-selection-page {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg, 
+    rgba(0, 180, 238, 0.08) 0%,
+    rgba(0, 180, 238, 0.12) 40%,
+    rgba(253, 231, 0, 0.1) 70%,
+    rgba(253, 231, 0, 0.15) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* 渐变光晕背景 */
+.selection-bg-glow {
+  position: absolute;
+  top: 10%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: rgba(199, 210, 254, 0.3);
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: pulse 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 卡片网格 */
+.selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 3rem;
+  position: relative;
+  z-index: 10;
+}
+
+.selection-grid.three-columns {
+  grid-template-columns: repeat(3, 1fr) !important;
+  max-width: 1200px;
+  gap: 1rem;
+}
+
+/* 选择卡片 */
+.selection-card {
+  position: relative;
+  height: 480px;
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 2px solid #f8fafc;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* 三列布局时卡片稍微紧凑 */
+.selection-grid.three-columns .selection-card {
+  height: 440px;
+  padding: 1.2rem;
+  max-width: 100%;
+}
+
+.selection-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
+}
+
+/* 背景圆形装饰 */
+.card-bg-circle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin-right: -3.5rem;
+  margin-top: -3.5rem;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+.card-bg-circle.indigo {
+  background: #eef2ff;
+}
+
+.card-bg-circle.gray {
+  background: #f8fafc;
+}
+
+.card-bg-circle.blue {
+  background: #dbeafe;
+}
+
+.card-bg-circle.yellow {
+  background: #fef3c7;
+}
+
+.card-bg-circle.green {
+  background: #d1fae5;
+}
+
+.card-bg-circle.purple {
+  background: #e9d5ff;
+}
+
+.selection-card:hover .card-bg-circle {
+  transform: scale(1.15) rotate(90deg);
+  opacity: 0.8;
+}
+
+/* 卡片内容 */
+.card-content {
+  position: relative;
+  z-index: 10;
+}
+
+.card-icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-icon-box.indigo {
+  background: #6366f1;
+}
+
+.card-icon-box.gray {
+  background: #f1f5f9;
+}
+
+.card-icon-box.blue {
+  background: #3b82f6;
+}
+
+.card-icon-box.yellow {
+  background: #fbbf24;
+}
+
+.card-icon-box.green {
+  background: #10b981;
+}
+
+.card-icon-box.purple {
+  background: #a855f7;
+}
+
+.selection-card:hover .card-icon-box {
+  transform: translateY(-3px) rotate(5deg) scale(1.05);
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 4px 6px -2px rgba(0, 0, 0, 0.08);
+}
+
+.card-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.selection-card:hover .card-icon {
+  transform: scale(1.1);
+}
+
+.card-icon-box.indigo .card-icon {
+  color: white;
+}
+
+.card-icon-box.gray .card-icon {
+  color: #1e293b;
+}
+
+.card-icon-box.blue .card-icon,
+.card-icon-box.yellow .card-icon,
+.card-icon-box.green .card-icon,
+.card-icon-box.purple .card-icon {
+  color: white;
+}
+
+.card-label {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  color: #6366f1;
+  transition: all 0.3s ease;
+}
+
+.selection-card:hover .card-label {
+  letter-spacing: 0.12em;
+}
+
+.card-label.gray {
+  color: #94a3b8;
+}
+
+.card-label.yellow {
+  color: #f59e0b;
+}
+
+.card-label.green {
+  color: #10b981;
+}
+
+.card-label.purple {
+  color: #a855f7;
+}
+
+.card-title {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: all 0.3s ease;
+}
+
+.selection-card:hover .card-title {
+  transform: translateX(4px);
+}
+
+.card-description {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #94a3b8;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.selection-card:hover .card-description {
+  color: #64748b;
+}
+
+.highlight {
+  font-weight: 900;
+}
+
+.highlight.indigo {
+  color: #6366f1;
+}
+
+.highlight.gray {
+  color: #0f172a;
+}
+
+.highlight.green {
+  color: #10b981;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.highlight.yellow-text {
+  color: #f59e0b;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* 操作按钮 */
+.card-action-btn {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.85rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: none;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.card-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.card-action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.card-action-btn.primary {
+  background: #0f172a;
+  color: white;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.card-action-btn.primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.4);
+}
+
+.card-action-btn.primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.card-action-btn.secondary {
+  background: white;
+  color: #0f172a;
+  border: 3px solid #0f172a;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.1);
+}
+
+.card-action-btn.secondary::before {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+.card-action-btn.secondary:hover {
+  background: #0f172a;
+  color: white;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.card-action-btn.secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.card-action-btn.primary.yellow {
+  background: #f59e0b;
+  box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.3);
+}
+
+.card-action-btn.primary.yellow:hover {
+  background: #d97706;
+  box-shadow: 0 24px 48px -12px rgba(245, 158, 11, 0.4);
+}
+
+.card-action-btn.primary.green {
+  background: #10b981;
+  box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.3);
+}
+
+.card-action-btn.primary.green:hover {
+  background: #059669;
+  box-shadow: 0 24px 48px -12px rgba(16, 185, 129, 0.4);
+}
+
+.card-action-btn.primary.purple {
+  background: #a855f7;
+  box-shadow: 0 20px 40px -10px rgba(168, 85, 247, 0.3);
+}
+
+.card-action-btn.primary.purple:hover {
+  background: #9333ea;
+  box-shadow: 0 24px 48px -12px rgba(168, 85, 247, 0.4);
+}
+
+/* Track Features */
+.track-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.feature-item {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 11px;
+  color: #64748b;
+  padding: 0.3rem 0;
+  border-left: 2px solid #e2e8f0;
+  padding-left: 0.5rem;
+}
+
+.track-spec {
+  font-size: 11px;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+/* Stats Grid for Achievement Card */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.stat-item {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.3rem;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item.green {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #d1fae5 0%, #ffffff 100%);
+}
+
+.stat-item.yellow {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
+}
+
+.stat-item.red {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fee2e2 0%, #ffffff 100%);
+}
+
+.stat-number {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 0.15rem;
+  background: linear-gradient(135deg, #0f172a 0%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-item.green .stat-number {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-item.yellow .stat-number {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-item.red .stat-number {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #64748b;
+}
+
+/* 单词库美化样式 */
+.highlight-number {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0 0.25rem;
+}
+
+.highlight-number.total {
+  background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 进度条区域 */
+.progress-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-fill.green {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.progress-fill.yellow {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* 统计芯片行 */
+.stats-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.stat-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-chip.green {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+}
+
+.stat-chip.yellow {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.stat-chip.red {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+}
+
+.stat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stat-dot.green {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.stat-dot.yellow {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.stat-dot.red {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.stat-text {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 响应式 */
+@media (max-width: 1300px) {
+  .selection-grid.three-columns {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .selection-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 600px;
+  }
+  
+  .selection-card {
+    height: auto;
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .review-selection-page {
+    padding: 2rem;
+  }
+  
+  .selection-back-btn {
+    top: 2rem;
+    left: 2rem;
+  }
+  
+  .selection-card {
+    padding: 2.5rem;
+    border-radius: 2.5rem;
+  }
+  
+  .card-title {
+    font-size: 2rem;
+  }
+  
+  .card-description {
+    font-size: 1rem;
+  }
+  
+  .card-action-btn {
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+}

@@ -5,6 +5,8 @@ import DemoView from './apps/demo/DemoView';
 import StudentApp from './apps/student/StudentApp';
 import TeacherApp from './apps/teacher/TeacherApp';
 import SmartReview from './apps/demo/pages/SmartReview';
+import ReviewSelection from './apps/demo/pages/ReviewSelection';
+import WordLibrary from './apps/demo/pages/WordLibrary';
 import AIContext from './apps/demo/pages/AIContext';
 import MilestoneExam from './apps/demo/pages/MilestoneExam';
 
@@ -27,7 +29,9 @@ const App = () => {
       <Route path="/teacher" element={<TeacherApp />} />
       
       {/* 额外功能模块 */}
+      <Route path="/review-selection" element={<ReviewSelection />} />
       <Route path="/smart-review" element={<SmartReview />} />
+      <Route path="/word-library" element={<WordLibrary />} />
       <Route path="/ai-context" element={<AIContext />} />
       <Route path="/milestone" element={<MilestoneExam />} />
       

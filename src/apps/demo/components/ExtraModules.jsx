@@ -1,17 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Badge from '../../../shared/components/ui/Badge';
-import { RotateCcw, Sparkles, Trophy } from 'lucide-react';
+import { BookOpen, Sparkles, Trophy, ArrowRight } from 'lucide-react';
 import './ExtraModules.css';
 
 /**
- * 额外功能模块卡片
- * 【负责人：同事】- 只有同事需要修改这个文件
- * 
- * 包含三个模块：
- * 1. 智能复习与容错 (Phase 4)
- * 2. AI 个性化语境闭环 (增值服务)
- * 3. 里程碑大考 (Phase 6)
+ * 额外功能模块卡片 - 全新设计
+ * 三模块三足鼎立布局
  */
 const ExtraModules = () => {
   const navigate = useNavigate();
@@ -20,75 +14,93 @@ const ExtraModules = () => {
   const modules = [
     {
       id: 'smart-review',
-      title: '智能复习与容错',
-      subtitle: 'Phase 4',
-      description: '基于艾宾浩斯曲线的智能复习系统',
-      icon: <RotateCcw size={20} />,
-      iconColor: '#3B82F6', // blue
-      route: '/smart-review',
-      badge: { variant: 'blue', text: '已上线' },
+      title: '智能\n复习',
+      label: '模块 01',
+      description: '核心词法矩阵。包含',
+      highlights: ['复习入口', '数据全库'],
+      highlightColors: ['#6366f1', '#0f172a'],
+      description2: '的双向链接。',
+      icon: <BookOpen className="module-icon" />,
+      iconBg: '#6366f1',
+      bgColor: '#eef2ff',
+      route: '/review-selection',
+      actionText: '进入矩阵',
+      actionColor: '#6366f1',
     },
     {
       id: 'ai-context',
-      title: 'AI 个性化语境闭环',
-      subtitle: '增值服务',
-      description: 'AI 生成个性化学习场景',
-      icon: <Sparkles size={20} />,
-      iconColor: '#FBBF24', // yellow
+      title: '语境\n闭环',
+      label: '模块 02',
+      description: 'AI 语境闭环训练。通过',
+      highlights: ['故事阅读', '仿真练习'],
+      highlightColors: ['#f59e0b', '#0f172a'],
+      description2: '深层记忆。',
+      icon: <Sparkles className="module-icon" />,
+      iconBg: '#f59e0b',
+      bgColor: '#fffbeb',
       route: '/ai-context',
-      badge: { variant: 'yellow', text: '已上线' },
+      actionText: '开启训练',
+      actionColor: '#f59e0b',
     },
     {
       id: 'milestone',
-      title: '里程碑大考',
-      subtitle: 'Phase 6',
-      description: '阶段性学习成果验收',
-      icon: <Trophy size={20} />,
-      iconColor: '#10B981', // green
+      title: '里程碑\n大考',
+      label: '模块 03',
+      description: '里程碑大考。检验',
+      highlights: ['晋升绿灯'],
+      highlightColors: ['#10b981'],
+      description2: '的资格，一次定胜负的权威考核。',
+      icon: <Trophy className="module-icon" />,
+      iconBg: '#10b981',
+      bgColor: '#ecfdf5',
       route: '/milestone',
-      badge: { variant: 'green', text: '已上线' },
+      actionText: '进入考场',
+      actionColor: '#10b981',
     },
   ];
-
-  // 点击模块卡片
-  const handleModuleClick = (route) => {
-    // TODO: 同事在这里实现路由跳转逻辑
-    navigate(route);
-  };
 
   return (
     <section className="extra-modules">
       <h3 className="extra-modules__title">更多功能</h3>
       <div className="extra-modules__grid">
         {modules.map((module) => (
-          <div
+          <button
             key={module.id}
-            className="extra-module-card"
-            onClick={() => handleModuleClick(module.route)}
-            role="button"
-            tabIndex={0}
-            aria-label={`进入${module.title}`}
+            className="module-card"
+            onClick={() => navigate(module.route)}
           >
-            <div className="extra-module-card__content">
-              {/* 图标 */}
-              <div
-                className="extra-module-card__icon"
-                style={{ color: module.iconColor }}
-              >
+            <div className="module-card__bg" style={{ backgroundColor: module.bgColor }}>
+              <div className="module-card__bg-circle"></div>
+            </div>
+            
+            <div className="module-card__content">
+              <div className="module-card__icon" style={{ backgroundColor: module.iconBg }}>
                 {module.icon}
               </div>
-
-              {/* 文字信息 */}
-              <div className="extra-module-card__info">
-                <h4 className="extra-module-card__title">
-                  {module.title} <span className="extra-module-card__subtitle">({module.subtitle})</span>
-                </h4>
-                <Badge variant={module.badge.variant} size="sm">
-                  {module.badge.text}
-                </Badge>
-              </div>
+              
+              <h3 className="module-card__label">{module.label}</h3>
+              <h2 className="module-card__title">{module.title}</h2>
+              
+              <p className="module-card__description">
+                {module.description}
+                {module.highlights.map((highlight, idx) => (
+                  <span 
+                    key={idx}
+                    className="module-card__highlight" 
+                    style={{ color: module.highlightColors[idx] }}
+                  >
+                    {highlight}
+                  </span>
+                ))}
+                {module.description2}
+              </p>
             </div>
-          </div>
+            
+            <div className="module-card__action" style={{ color: module.actionColor }}>
+              <span>{module.actionText}</span>
+              <ArrowRight className="action-arrow" />
+            </div>
+          </button>
         ))}
       </div>
     </section>

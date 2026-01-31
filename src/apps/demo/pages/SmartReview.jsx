@@ -1,33 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../../../shared/components/ui/Button';
-import Badge from '../../../shared/components/ui/Badge';
-import { ArrowLeft, RotateCcw, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, CheckCircle, Volume2 } from 'lucide-react';
 import useWordStore from '../../../shared/store/useWordStore';
 import { getWordById } from '../../../shared/data/mockWords';
+import SimpleHeader from '../components/SimpleHeader';
 import './SmartReview.css';
+
+const ConfettiCelebration = () => {
+  const colors = ['#34d399', '#60a5fa', '#fbbf24', '#f472b6', '#818cf8'];
+  return (
+    <div className="confetti-container">
+      <div className="confetti-glow" />
+      {[...Array(20)].map((_, i) => {
+        const color = colors[i % colors.length];
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const velocity = 100 + Math.random() * 150;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        const rotate = Math.random() * 720;
+        return (
+          <div
+            key={i}
+            className="confetti-piece"
+            style={{
+              backgroundColor: color,
+              animation: `confetti-fall-${i} 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards`,
+              '--tx': `${tx}px`,
+              '--ty': `${ty}px`,
+              '--rotate': `${rotate}deg`
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 const SmartReview = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // 接收路由参数，设置默认值
+  const { track = 'standard', level = 'L4' } = location.state || {};
   
   const { 
     initialized, 
     initializeFromMockData,
-    yellowWords, 
-    reviewSuccess,
-    reviewSuccessWithReset,
-    reviewFailToRed
+    yellowWords
   } = useWordStore();
   
-  const [reviewState, setReviewState] = useState('preview');
+  const [queue, setQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [reviewWords, setReviewWords] = useState([]);
-  const [userInput, setUserInput] = useState('');
-  const [errorLevel, setErrorLevel] = useState(0);
-  const [showSkeleton, setShowSkeleton] = useState(false);
-  const [feedback, setFeedback] = useState(null);
-  const [stats, setStats] = useState({ total: 0, passed: 0, reset: 0, failed: 0 });
-  const [completedCount, setCompletedCount] = useState(0);
+  const [sessionAppearance, setSessionAppearance] = useState({});
+  const [inputValue, setInputValue] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [feedback, setFeedback] = useState({ type: 'none', message: '' });
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  const inputRef = useRef(null);
   
   useEffect(() => {
     if (!initialized) {
@@ -37,311 +68,240 @@ const SmartReview = () => {
   
   useEffect(() => {
     if (initialized && yellowWords.length > 0) {
-      const words = yellowWords.slice(0, 10).map(state => ({
-        wordId: state.wordId,
-        reviewCount: state.reviewCount,
-        track: state.reviewCount === 0 ? 'fast' : 'standard'
-      }));
-      setReviewWords(words);
-      setStats({ ...stats, total: words.length });
+      const words = yellowWords.slice(0, 3).map(state => getWordById(state.wordId)).filter(Boolean);
+      setQueue(words);
     }
   }, [initialized, yellowWords]);
   
-  const currentWord = reviewWords[currentIndex] ? getWordById(reviewWords[currentIndex].wordId) : null;
+  const currentWord = queue[currentIndex];
+  const appearanceCount = currentWord ? (sessionAppearance[currentWord.id] || 0) : 0;
   
-  const generateBlankSentence = (sentence, word) => {
-    if (!sentence || !word) return '';
-    return sentence.replace(new RegExp(`\\b${word}\\b`, 'gi'), '___________');
+  // 根据车道和出现次数决定题型
+  const getCurrentLevel = () => {
+    if (appearanceCount > 0) {
+      // 第二次出现降级为 L4
+      return 'L4';
+    }
+    // 首次出现使用车道指定的等级
+    return level;
   };
   
-  const renderSkeleton = (word) => {
-    if (!word) return null;
-    const chars = word.split('');
-    return (
-      <div className="skeleton-hint">
-        {chars.map((char, i) => (
-          <span key={i} className={i === 0 || i === chars.length - 1 || i % 2 === 0 ? 'shown' : 'hidden'}>
-            {i === 0 || i === chars.length - 1 || i % 2 === 0 ? char : '_'}
-          </span>
-        ))}
-      </div>
-    );
+  const currentLevel = getCurrentLevel();
+
+  useEffect(() => {
+    if (currentWord) {
+      focusInput();
+      playAudio(currentWord.word);
+    }
+  }, [currentIndex, currentWord]);
+
+  const focusInput = () => inputRef.current?.focus();
+
+  const playAudio = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.85;
+      utterance.onstart = () => setIsPlaying(true);
+      utterance.onend = () => setIsPlaying(false);
+      window.speechSynthesis.speak(utterance);
+    }
   };
-  
-  const handleSubmit = () => {
-    if (!userInput.trim() || !currentWord) return;
+
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (!inputValue.trim()) return;
     
-    const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase();
+    const isCorrect = inputValue.toLowerCase().trim() === currentWord.word.toLowerCase();
     
     if (isCorrect) {
-      if (errorLevel === 0) {
-        setFeedback({ type: 'perfect', message: '✓ 正确！完美保黄' });
-        reviewSuccess(currentWord.id);
-        setStats({ ...stats, passed: stats.passed + 1 });
-      } else if (errorLevel === 2) {
-        setFeedback({ type: 'reset', message: '✓ 正确，勉强保黄（复习周期重置为 Day 1）' });
-        reviewSuccessWithReset(currentWord.id);
-        setStats({ ...stats, reset: stats.reset + 1 });
-      }
-      setCompletedCount(completedCount + 1);
-      setTimeout(() => moveToNext(), 2000);
+      setFeedback({ type: 'success', message: 'Perfect' });
+      playAudio(currentWord.word);
+      setTimeout(() => handleNext(true), 2500);
     } else {
-      if (errorLevel === 0) {
-        setErrorLevel(1);
-        setFeedback({ type: 'level1', message: '可能点错了，再试一次～（不判错）' });
-        setUserInput('');
-      } else if (errorLevel === 1) {
-        setErrorLevel(2);
-        setShowSkeleton(true);
-        setFeedback({ type: 'level2', message: '看看骨架提示，能想起来吗？' });
-        setUserInput('');
-      } else if (errorLevel === 2) {
-        setErrorLevel(3);
-        setFeedback({ type: 'level3', message: '❌ 熔断锁定 - 变红灯，需要老师修复' });
-        reviewFailToRed(currentWord.id, []);
-        setStats({ ...stats, failed: stats.failed + 1 });
-        setCompletedCount(completedCount + 1);
+      const nextAttempt = attempts + 1;
+      setAttempts(nextAttempt);
+      if (nextAttempt === 1) {
+        setFeedback({ type: 'warning', message: '拼写有误，请再试' });
+        setInputValue('');
+        focusInput();
+      } else if (nextAttempt === 2) {
+        setFeedback({ type: 'hint', message: '已激活拼写引导' });
+        setInputValue('');
+        focusInput();
+      } else {
+        setFeedback({ type: 'wrong', message: '记忆失效' });
       }
     }
   };
-  
-  const moveToNext = () => {
-    if (currentIndex < reviewWords.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      resetWordState();
+
+  const handleNext = (isSuccess) => {
+    // 测试模式：不重新加入队列，答错也继续下一题
+    // if (!isSuccess) {
+    //   const wordId = currentWord.id;
+    //   setSessionAppearance(prev => ({ ...prev, [wordId]: (prev[wordId] || 0) + 1 }));
+    //   setQueue(prev => [...prev, currentWord]);
+    // }
+    if (currentIndex < 2) { // 只有3题，索引0,1,2
+      setCurrentIndex(prev => prev + 1);
+      setInputValue('');
+      setAttempts(0);
+      setFeedback({ type: 'none', message: '' });
     } else {
-      setReviewState('completed');
+      setIsCompleted(true);
     }
   };
-  
-  const resetWordState = () => {
-    setUserInput('');
-    setErrorLevel(0);
-    setShowSkeleton(false);
-    setFeedback(null);
-  };
-  
-  // 预览界面
-  if (reviewState === 'preview') {
-    if (!initialized || reviewWords.length === 0) {
-      return (
-        <div className="smart-review-page">
-          <div className="review-header">
-            <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft size={20} />
-              返回首页
-            </Button>
-            <div className="header-title">
-              <div className="title-icon">
-                <RotateCcw size={24} />
-              </div>
-              <div>
-                <h1>智能复习与容错</h1>
-                <Badge variant="blue">Phase 4</Badge>
-              </div>
-            </div>
-          </div>
-          
-          <div className="review-content">
-            <h2 className="section-title">今日计划</h2>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <p className="stat-label">已复习</p>
-                <div className="stat-value">
-                  <span className="current">0</span>
-                  <span className="divider">/</span>
-                  <span className="total">0</span>
-                </div>
-                <Button size="lg" onClick={() => navigate('/')}>返回首页</Button>
-              </div>
-            </div>
-          </div>
+
+  const renderWordInputs = () => {
+    if (!currentWord) return null;
+    const wordLength = currentWord.word.length;
+    const chars = inputValue.split('');
+    const slots = [];
+    
+    for (let i = 0; i < wordLength; i++) {
+      const char = chars[i] || '';
+      const isActive = i === chars.length && feedback.type !== 'success' && feedback.type !== 'wrong';
+      const isFilled = i < chars.length;
+      let hintChar = attempts >= 2 && !isFilled && (i === 0 || i === wordLength - 1) ? currentWord.word[i].toLowerCase() : '';
+      
+      slots.push(
+        <div key={i} className={`word-slot ${isActive ? 'active' : ''} ${isFilled ? 'filled' : ''}`}>
+          <span className={`slot-char ${isFilled ? 'filled' : hintChar ? 'hint' : ''}`}>
+            {isFilled ? char.toLowerCase() : hintChar}
+          </span>
+          {isActive && <div className="slot-indicator"></div>}
         </div>
       );
     }
-    
+    return slots;
+  };
+
+  if (isCompleted || !currentWord) {
     return (
-      <div className="smart-review-page">
-        <div className="review-header">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            <ArrowLeft size={20} />
-            返回首页
-          </Button>
-          <div className="header-title">
-            <div className="title-icon">
-              <RotateCcw size={24} />
-            </div>
-            <div>
-              <h1>智能复习与容错</h1>
-              <Badge variant="blue">Phase 4</Badge>
-            </div>
+      <div className="review-page completed">
+        <div className="completion-card">
+          <div className="completion-badge">
+            <CheckCircle className="completion-icon" />
           </div>
-        </div>
-        
-        <div className="review-content">
-          <h2 className="section-title">今日计划</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <p className="stat-label">已复习</p>
-              <div className="stat-value">
-                <span className="current">0</span>
-                <span className="divider">/</span>
-                <span className="total">{reviewWords.length}</span>
-              </div>
-              <Button size="lg" className="action-btn" onClick={() => setReviewState('reviewing')}>
-                复习
-              </Button>
-            </div>
-          </div>
+          <h2 className="completion-title">PHASE COMPLETE</h2>
+          <button onClick={() => navigate('/')} className="completion-button">
+            返回矩阵中心
+          </button>
         </div>
       </div>
     );
   }
+
+  // L4模式使用短语，L5模式使用长句子
+  const sentence = currentLevel === 'L4' 
+    ? (currentWord.context?.[0]?.phrase || currentWord.phrase || currentWord.context?.[0]?.sentence || '')
+    : (currentWord.context?.[0]?.sentence || currentWord.phrase || '');
   
-  // 复习中
-  if (reviewState === 'reviewing') {
-    if (!currentWord) return <div className="smart-review-page">加载中...</div>;
-    
-    return (
-      <div className="smart-review-page">
-        <div className="review-header">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            <ArrowLeft size={20} />
-            返回首页
-          </Button>
-          <div className="header-title">
-            <div className="title-icon">
-              <RotateCcw size={24} />
+  // 确保正确替换单词，使用单词边界匹配
+  const wordPattern = new RegExp(`\\b${currentWord.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+  const displaySentence = sentence.replace(wordPattern, '____');
+
+  return (
+    <div className={`review-page ${feedback.type === 'success' ? 'success-bg' : ''}`}>
+      <SimpleHeader 
+        mode={currentLevel}
+        progress={`${currentIndex + 1} / ${queue.length}`}
+        track={track}
+        showBadges={true}
+      />
+
+      <main className="review-main">
+        <div className={`sentence-display ${feedback.type === 'success' ? 'faded' : ''}`}>
+          <div className="sentence-text sentence" lang="en">
+            {displaySentence.includes('____') ? (
+              displaySentence.split('____').map((part, i, arr) => (
+                <React.Fragment key={i}>
+                  {part}
+                  {i < arr.length - 1 && (
+                    <span className="blank-dots" aria-hidden="true">
+                      {Array.from({ length: currentWord.word.length }).map((_, idx) => (
+                        <span key={idx} className="dot" />
+                      ))}
+                    </span>
+                  )}
+                </React.Fragment>
+              ))
+            ) : (
+              displaySentence
+            )}
+          </div>
+          <div className="word-meaning-row">
+            <div className="meaning-card">
+              {currentWord.core?.partOfSpeech && (
+                <span className="meaning-card__pos">{currentWord.core.partOfSpeech}</span>
+              )}
+              <span className="meaning-card__text">{currentWord.meaning?.definitionCn || currentWord.meaning?.chinese}</span>
             </div>
-            <div>
-              <h1>智能复习与容错</h1>
-              <Badge variant="blue">Phase 4</Badge>
-            </div>
+            <button 
+              onClick={() => playAudio(currentWord.word)} 
+              className={`audio-button ${isPlaying ? 'playing' : ''}`}
+              aria-label="Play audio"
+              type="button"
+            >
+              <Volume2 className={`audio-icon ${isPlaying ? 'pulse' : ''}`} />
+            </button>
           </div>
         </div>
-        
-        <div className="review-content">
-          <h2 className="section-title">今日计划</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <p className="stat-label">已复习</p>
-              <div className="stat-value">
-                <span className="current">{completedCount}</span>
-                <span className="divider">/</span>
-                <span className="total">{reviewWords.length}</span>
-              </div>
+
+        <div className="input-area">
+          <form onSubmit={handleSubmit} className="input-form">
+            <input 
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                if (val.length <= currentWord.word.length) setInputValue(val);
+              }}
+              autoFocus
+              className="hidden-input"
+              disabled={feedback.type === 'success' || feedback.type === 'wrong'}
+            />
+            <div onClick={focusInput} className="word-slots">
+              {renderWordInputs()}
             </div>
-          </div>
+            {(feedback.type === 'none' || feedback.type === 'hint' || feedback.type === 'warning') && 
+             inputValue.length === currentWord.word.length && (
+              <button type="submit" className="submit-button">
+                确认拼写
+              </button>
+            )}
+          </form>
           
-          <div className="word-practice">
-            <div className="word-display">
-              <div className="sentence-blank">
-                {currentWord.context?.[0]?.sentence ? 
-                  generateBlankSentence(currentWord.context[0].sentence, currentWord.word) : 
-                  '请拼写单词：___________'
-                }
-              </div>
-              <div className="word-meaning">{currentWord.meaning?.definitionCn || currentWord.meaning?.chinese}</div>
-            </div>
-            
-            {showSkeleton && errorLevel === 2 && (
-              <div className="skeleton-display">
-                <p className="skeleton-title">💡 骨架提示</p>
-                {renderSkeleton(currentWord.word)}
+          <div className="feedback-area">
+            {feedback.type === 'warning' && (
+              <div className="feedback-message warning">
+                <span className="feedback-icon">⚠️</span>
+                <span className="feedback-text">{feedback.message}</span>
               </div>
             )}
-            
-            <div className="answer-section">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                placeholder="请输入单词拼写..."
-                disabled={errorLevel === 3}
-                autoFocus
-              />
-              <Button size="lg" onClick={handleSubmit} disabled={!userInput.trim() || errorLevel === 3}>
-                提交
-              </Button>
-            </div>
-            
-            {feedback && (
-              <div className={`feedback-box ${feedback.type}`}>
-                {feedback.message}
-                {feedback.type === 'level3' && (
-                  <div className="failed-info">
-                    <p><strong>正确答案：</strong>{currentWord.word}</p>
-                    <Button onClick={moveToNext}>下一个</Button>
-                  </div>
-                )}
+            {feedback.type === 'wrong' && (
+              <div className="feedback-wrong">
+                <div className="wrong-answer">{currentWord.word}</div>
+                <button onClick={() => handleNext(false)} className="next-button">
+                  <span>移入强化矩阵 · 下一题</span>
+                  <ArrowLeft className="next-icon" />
+                </button>
+              </div>
+            )}
+            {feedback.type === 'success' && (
+              <div className="feedback-success">
+                <ConfettiCelebration />
+                <div className="success-word">{currentWord.word}</div>
+                <span className="success-label">Matrix Synced</span>
               </div>
             )}
           </div>
         </div>
-      </div>
-    );
-  }
-  
-  // 完成界面
-  if (reviewState === 'completed') {
-    return (
-      <div className="smart-review-page">
-        <div className="review-header">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            <ArrowLeft size={20} />
-            返回首页
-          </Button>
-          <div className="header-title">
-            <div className="title-icon">
-              <RotateCcw size={24} />
-            </div>
-            <div>
-              <h1>智能复习与容错</h1>
-              <Badge variant="blue">Phase 4</Badge>
-            </div>
-          </div>
-        </div>
-        
-        <div className="review-content">
-          <h2 className="section-title">今日计划</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <p className="stat-label">已复习</p>
-              <div className="stat-value completed">
-                <span className="current">{reviewWords.length}</span>
-                <span className="divider">/</span>
-                <span className="total">{reviewWords.length}</span>
-              </div>
-              <div className="complete-message">
-                <CheckCircle size={24} />
-                <span>今日复习完成！</span>
-              </div>
-              <div className="result-summary">
-                <div className="result-item">
-                  <span className="result-label">完美保黄</span>
-                  <span className="result-num">{stats.passed}</span>
-                </div>
-                <div className="result-item">
-                  <span className="result-label">勉强保黄</span>
-                  <span className="result-num">{stats.reset}</span>
-                </div>
-                <div className="result-item">
-                  <span className="result-label">变红灯</span>
-                  <span className="result-num">{stats.failed}</span>
-                </div>
-              </div>
-              <Button size="lg" className="action-btn" onClick={() => navigate('/')}>
-                返回首页
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  return null;
+      </main>
+    </div>
+  );
 };
 
 export default SmartReview;

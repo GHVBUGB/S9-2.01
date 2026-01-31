@@ -1,290 +1,507 @@
-/* 里程碑大考 - 首页样式 */
+/* 里程碑大考 - 全新设计 */
 
-.milestone-exam-page {
+.exam-page {
   min-height: 100vh;
-  background: #F8FAFB;
-  padding: 20px;
+  width: 100vw;
+  background: linear-gradient(
+    135deg, 
+    rgba(0, 180, 238, 0.08) 0%,
+    rgba(0, 180, 238, 0.12) 40%,
+    rgba(253, 231, 0, 0.1) 70%,
+    rgba(253, 231, 0, 0.15) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 }
 
-/* 头部 */
-.exam-header {
+/* 预览页面 */
+.exam-page.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 64px;
+}
+
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto 30px;
+  margin: auto;
+  padding: 3rem;
+  position: relative;
+  z-index: 10;
+}
+
+.preview-container .preview-card {
+  max-width: 380px;
+  width: 100%;
+}
+
+.exam-page.preview .simple-header {
+  width: 100vw !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+.preview-bg-decoration {
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: rgba(236, 253, 245, 0.5);
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: pulse 3s infinite;
+}
+
+.preview-back-btn {
+  position: absolute;
+  top: 3rem;
+  left: 3rem;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 0.75rem;
+  color: #94a3b8;
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  transition: color 0.3s;
+}
+
+.preview-back-btn:hover {
+  color: #0f172a;
+}
+
+.back-btn-icon {
+  padding: 0.75rem;
   background: white;
-  padding: 16px 20px;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.header-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.title-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.5s;
+}
+
+.preview-back-btn:hover .back-btn-icon {
+  background: #0f172a;
   color: white;
 }
 
-.title-icon.green {
-  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+.back-btn-icon .icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
-.header-title h1 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 4px 0;
-}
+/* Preview card 样式移到 ExamPreview.css */
 
-/* 内容区 */
-.exam-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.section-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 32px 0;
-}
-
-/* 统计卡片网格 */
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  margin-bottom: 40px;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 24px;
-  padding: 48px 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 24px;
-  font-weight: 500;
-  color: #64748b;
-  margin: 0 0 24px 0;
-}
-
-.stat-value {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
-.stat-value .current {
-  font-size: 160px;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1;
-}
-
-.stat-value .divider {
-  font-size: 80px;
-  font-weight: 400;
-  color: #cbd5e1;
-}
-
-.stat-value .total {
-  font-size: 80px;
-  font-weight: 400;
-  color: #94a3b8;
-}
-
-.stat-value.completed .current {
-  color: #22C55E;
-}
-
-.action-btn {
-  min-width: 240px;
-  background: #22C55E !important;
-  color: white !important;
-  font-size: 24px !important;
-  padding: 20px 60px !important;
-  border-radius: 16px !important;
-}
-
-.action-btn:hover {
-  background: #16A34A !important;
-}
-
-/* 完成信息 */
-.complete-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 32px;
-  color: #22C55E;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.result-summary {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-bottom: 40px;
-  padding: 32px;
-  background: #F8FAFC;
-  border-radius: 16px;
-}
-
-.result-item {
+/* 完成页面 */
+.exam-page.completed {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  text-align: center;
-}
-
-.result-label {
-  font-size: 16px;
-  color: #64748b;
-}
-
-.result-num {
-  font-size: 36px;
-  font-weight: 700;
-  color: #22C55E;
-}
-
-/* 单词练习区 */
-.word-practice {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.word-display {
-  background: white;
-  border-radius: 24px;
-  padding: 48px 40px;
-  margin-bottom: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  text-align: center;
-}
-
-.sentence-blank {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1e293b;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.exam-hint {
-  font-size: 16px;
-  color: #F59E0B;
-  margin: 0;
-}
-
-/* 答题区 */
-.answer-section {
-  display: flex;
-  gap: 16px;
-  max-width: 700px;
-  margin: 0 auto 24px;
-}
-
-.answer-section input {
-  flex: 1;
-  padding: 20px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  text-align: center;
-  background: white;
-  border: 2px solid #E2E8F0;
-  border-radius: 12px;
-  color: #1e293b;
-  transition: all 0.2s;
-}
-
-.answer-section input:focus {
-  outline: none;
-  border-color: #22C55E;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
-}
-
-.answer-section input::placeholder {
-  color: #CBD5E1;
-}
-
-/* 结果反馈 */
-.result-box {
-  padding: 32px;
-  border-radius: 16px;
-  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  max-width: 700px;
+  width: 100vw;
+}
+
+.exam-page.completed .simple-header {
+  width: 100vw !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* ExamComplete 组件样式已移至 ExamComplete.css */
+
+/* 考试中 - 参考复习模块设计 */
+.exam-page.testing {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100vw;
+}
+
+.exam-page.testing .simple-header {
+  width: 100vw !important;
+}
+
+.exam-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 2.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  min-height: calc(100vh - 64px);
 }
 
-.result-box.correct {
-  background: #DCFCE7;
-  color: #166534;
+/* 句子区域 - 参考 SmartReview */
+.exam-sentence {
+  text-align: center !important;
+  margin-bottom: 0 !important;
+  margin-top: 6.5rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transition: opacity 0.7s !important;
+  padding: 0 2rem !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  font-family: 'Merriweather', 'Georgia', serif !important;
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.4 !important;
+  font-style: italic !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  display: block !important;
+  hyphens: none !important;
 }
 
-.result-box.incorrect {
-  background: #FEE2E2;
-  color: #991B1B;
+.exam-sentence .blank-dots {
+  display: inline-flex !important;
+  gap: 0.4rem !important;
+  margin: 0 0.5rem !important;
+  align-items: center !important;
+  transform: translateY(8px) !important;
+  vertical-align: middle !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-.result-box h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+.exam-sentence .dot {
+  width: 1.2rem !important;
+  height: 0.4rem !important;
+  background: #fef08a !important;
+  border-radius: 9999px !important;
+  opacity: 0.8 !important;
+  box-shadow: 0 0 6px rgba(254, 240, 138, 0.5) !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  flex-shrink: 0 !important;
 }
 
-.result-box p {
-  font-size: 16px;
-  margin: 0;
+.exam-sentence .sentence-text {
+  display: inline !important;
+  width: auto !important;
+  font-family: 'Merriweather', 'Georgia', serif !important;
+  font-size: 2.25rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.4 !important;
+  font-style: italic !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
 }
 
-.word-def {
-  color: #64748b;
-  margin-top: 4px !important;
+/* 警告提示已移除 */
+
+/* 输入区域 - 动态灰色底线 */
+.exam-form {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin-top: 7rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.input-wrapper {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  position: relative !important;
+}
+
+.exam-input {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  text-align: center !important;
+  font-family: 'Merriweather', 'Georgia', serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  padding: 1rem 0.5rem !important;
+  outline: none !important;
+  color: #0f172a !important;
+  letter-spacing: 0.02em !important;
+  position: relative !important;
+  z-index: 2 !important;
+  width: auto !important;
+  min-width: 200px !important;
+  transition: all 0.3s ease !important;
+}
+
+.exam-input::placeholder {
+  color: #cbd5e1 !important;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+}
+
+.input-line {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  height: 2px !important;
+  background: #94a3b8 !important;
+  transform: translateX(-50%) !important;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  z-index: 3 !important;
+  width: calc(var(--input-length) * 1.5rem + 2rem) !important;
+  max-width: 400px !important;
+}
+
+.exam-input:focus ~ .input-line {
+  background: #64748b !important;
+}
+
+.exam-input:not(:placeholder-shown) ~ .input-line {
+  background: #64748b !important;
+}
+
+.exam-input:placeholder-shown ~ .input-line {
+  width: 200px !important;
+  background: #e2e8f0 !important;
+}
+
+/* 反馈区域 - 添加动效 */
+.exam-feedback-area {
+  min-height: 8rem !important;
+  margin-top: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.exam-feedback {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.exam-feedback.success {
+  animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.exam-feedback.success .feedback-message {
+  background: #10b981 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.exam-feedback.success .feedback-detail {
+  color: #10b981 !important;
+}
+
+.exam-feedback.error {
+  color: #ef4444 !important;
+  animation: errorShake 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.feedback-message {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 2rem !important;
+  background: white !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 2px solid currentColor !important;
+}
+
+.feedback-detail {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  opacity: 0.7 !important;
+}
+
+.feedback-detail-wrong {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.correct-answer {
+  font-family: 'Merriweather', 'Georgia', serif !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  padding: 0.5rem 1.5rem !important;
+  background: white !important;
+  border-radius: 0.75rem !important;
+  border: 2px solid currentColor !important;
+  animation: highlightPulse 0.8s ease-in-out !important;
+}
+
+.word-meaning {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  opacity: 0.7 !important;
+}
+
+@keyframes successPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  50% {
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes errorShake {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-10px);
+  }
+  30% {
+    transform: translateX(10px);
+  }
+  45% {
+    transform: translateX(-10px);
+  }
+  60% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  90% {
+    transform: translateX(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+.exam-submit-btn {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  padding: 0.875rem 2.5rem !important;
+  background: #0f172a !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  font-weight: 700 !important;
+  font-size: 0.9375rem !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.exam-submit-btn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.exam-submit-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.exam-next-btn {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  padding: 0.875rem 2.5rem !important;
+  background: #0f172a !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  font-weight: 700 !important;
+  font-size: 0.9375rem !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.exam-next-btn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.exam-next-btn:active {
+  transform: translateY(0) scale(0.98) !important;
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
-  .stat-value .current {
-    font-size: 100px;
+  .exam-main {
+    padding: 0 1.5rem;
   }
   
-  .stat-value .divider,
-  .stat-value .total {
-    font-size: 50px;
+  .exam-sentence {
+    font-size: 2rem !important;
+    margin-top: 3rem !important;
   }
   
-  .sentence-blank {
-    font-size: 20px;
+  .exam-warning {
+    font-size: 0.625rem !important;
+    margin-top: 5rem !important;
   }
   
-  .answer-section {
-    flex-direction: column;
+  .exam-input {
+    font-size: 1.25rem !important;
+    padding: 0.875rem 1rem !important;
   }
   
-  .result-summary {
+  .exam-submit-btn {
+    padding: 0.75rem 2rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .complete-results {
     grid-template-columns: 1fr;
   }
 }
