@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import useClassroomStore from '../../store/useClassroomStore';
-import { Volume2, X, Scissors, Lightbulb, Image, Sprout } from 'lucide-react';
+import { Volume2, X, Scissors, Lightbulb, Image as ImageIcon, Sprout } from 'lucide-react';
 import './WeaponPopup.css';
 
 /**
- * 学生端武器库弹窗卡片
+ * 武器库内嵌面板
  * 
  * 功能：
- * - 教师触发后弹出
+ * - 教师触发后在内容区下方展开
+ * - 内容区向上挤压（动画）
  * - 显示当前单词的详细信息
  * - 根据武器类型展示对应内容
+ * 
+ * @param {boolean} isTeacher - 是否为教师端（用于调整位置避开工具栏）
  */
-const WeaponPopup = () => {
+const WeaponPopup = ({ isTeacher = false }) => {
   const { weaponPopup, closeWeaponPopup } = useClassroomStore();
   const { isOpen, weaponId, word } = weaponPopup;
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [voicesReady, setVoicesReady] = useState(false);
+
+  // 预加载语音
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) setVoicesReady(true);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   // 关闭时重置
   useEffect(() => {
@@ -25,23 +39,47 @@ const WeaponPopup = () => {
     }
   }, [isOpen]);
 
-  // 播放发音
+  // 播放发音（优化版本）
   const handlePlayAudio = () => {
-    if (!word?.word) return;
+    if (!word?.word || isPlaying) return;
     setIsPlaying(true);
-    const utterance = new SpeechSynthesisUtterance(word.word);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    utterance.onend = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.cancel();
+    
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(word.word);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoices = ['Google US English', 'Microsoft Zira', 'Samantha', 'Alex'];
+      for (const voiceName of preferredVoices) {
+        const voice = voices.find(v => v.name.includes(voiceName));
+        if (voice) {
+          utterance.voice = voice;
+          break;
+        }
+      }
+      
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setIsPlaying(false);
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    if (!voicesReady) {
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
   // 武器图标
   const weaponIcons = {
-    syllables: <Scissors size={20} />,
-    mnemonic: <Lightbulb size={20} />,
-    image: <Image size={20} />,
-    etymology: <Sprout size={20} />,
+    syllables: <Scissors size={18} />,
+    mnemonic: <Lightbulb size={18} />,
+    image: <ImageIcon size={18} />,
+    etymology: <Sprout size={18} />,
   };
 
   // 武器标题
@@ -51,8 +89,6 @@ const WeaponPopup = () => {
     image: '看图片',
     etymology: '讲词根',
   };
-
-  if (!isOpen || !word) return null;
 
   // 渲染音节内容
   const renderSyllables = () => {
@@ -125,13 +161,13 @@ const WeaponPopup = () => {
                   }}
                 />
                 <div className="weapon-popup__image-placeholder" style={{ display: 'none' }}>
-                  <Image size={48} />
+                  <ImageIcon size={48} />
                   <span>图片加载失败</span>
                 </div>
               </div>
             ) : (
               <div className="weapon-popup__image-placeholder">
-                <Image size={48} />
+                <ImageIcon size={48} />
                 <span>暂无图片</span>
               </div>
             )}
@@ -161,57 +197,61 @@ const WeaponPopup = () => {
     }
   };
 
-  // 使用 Portal 渲染到 body，避免被父容器的 overflow:hidden 裁剪
-  return createPortal(
-    <div className="weapon-popup-overlay" onClick={closeWeaponPopup}>
-      <div className="weapon-popup" onClick={(e) => e.stopPropagation()}>
-        {/* 头部 */}
-        <div className="weapon-popup__header">
-          <div className="weapon-popup__header-left">
-            <span className="weapon-popup__weapon-icon">
-              {weaponIcons[weaponId]}
-            </span>
-            <span className="weapon-popup__weapon-title">
-              {weaponTitles[weaponId]}
-            </span>
+  const showPanel = isOpen && word;
+
+  // 内嵌式面板渲染
+  return (
+    <div className={`weapon-panel ${showPanel ? 'weapon-panel--open' : ''} ${isTeacher ? 'weapon-panel--teacher' : ''}`}>
+      {showPanel && (
+        <div className="weapon-panel__inner">
+          {/* 标题栏 */}
+          <div className="weapon-panel__header">
+            <div className="weapon-panel__title-group">
+              <span className="weapon-panel__icon">{weaponIcons[weaponId]}</span>
+              <span className="weapon-panel__title">{weaponTitles[weaponId]}</span>
+            </div>
+            <button className="weapon-panel__close" onClick={closeWeaponPopup}>
+              <X size={18} />
+            </button>
           </div>
-          <button className="weapon-popup__close" onClick={closeWeaponPopup}>
-            <X size={20} />
-          </button>
-        </div>
 
-        {/* 单词展示 */}
-        <div className="weapon-popup__word-section">
-          <span className="weapon-popup__word">{word.word}</span>
-          <button 
-            className={`weapon-popup__audio-btn ${isPlaying ? 'weapon-popup__audio-btn--playing' : ''}`}
-            onClick={handlePlayAudio}
-            disabled={isPlaying}
-          >
-            <Volume2 size={24} />
-          </button>
-        </div>
+          {/* 主内容区 - 横向排列 */}
+          <div className="weapon-panel__body">
+            {/* 左侧：单词信息 */}
+            <div className="weapon-panel__word-info">
+              <div className="weapon-panel__word-row">
+                <span className="weapon-panel__word">{word.word}</span>
+                <button 
+                  className={`weapon-panel__audio ${isPlaying ? 'weapon-panel__audio--playing' : ''}`}
+                  onClick={handlePlayAudio}
+                >
+                  <Volume2 size={20} />
+                </button>
+              </div>
+              <div className="weapon-panel__meaning">
+                <span className="weapon-panel__pos">{word.meaning?.partOfSpeech}</span>
+                <span className="weapon-panel__def">{word.meaning?.definitionCn}</span>
+              </div>
+              {/* 例句 */}
+              {word.context?.[0] && (
+                <div className="weapon-panel__example">
+                  <p className="weapon-panel__example-en">{word.context[0].sentence}</p>
+                  <p className="weapon-panel__example-cn">{word.context[0].sentenceCn}</p>
+                </div>
+              )}
+            </div>
 
-        {/* 释义 */}
-        <div className="weapon-popup__meaning">
-          <span className="weapon-popup__pos">{word.meaning?.partOfSpeech}</span>
-          <span className="weapon-popup__def">{word.meaning?.definitionCn}</span>
-        </div>
+            {/* 分隔线 */}
+            <div className="weapon-panel__divider"></div>
 
-        {/* 内容区 */}
-        {renderContent()}
-
-        {/* 语境例句 */}
-        {word.context?.[0] && (
-          <div className="weapon-popup__context">
-            <p className="weapon-popup__context-label">📖 例句：</p>
-            <p className="weapon-popup__context-en">{word.context[0].sentence}</p>
-            <p className="weapon-popup__context-cn">{word.context[0].sentenceCn}</p>
+            {/* 右侧：武器内容 */}
+            <div className="weapon-panel__weapon-content">
+              {renderContent()}
+            </div>
           </div>
-        )}
-      </div>
-    </div>,
-    document.body
+        </div>
+      )}
+    </div>
   );
 };
 

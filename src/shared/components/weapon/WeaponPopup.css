@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* 武器库弹窗 - 学生端 */
 .weapon-popup-overlay {
   position: fixed;
@@ -321,3 +322,404 @@
   color: #94a3b8;
   margin: 0;
 }
+=======
+/* 武器库内嵌面板 - 从下方展开 */
+.weapon-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  margin-top: auto; /* 推到容器底部 */
+  margin-bottom: 40px; /* 统一底部间距 */
+}
+
+.weapon-panel--open {
+  max-height: 280px;
+}
+
+/* 教师端特殊样式 - 避开底部工具栏 */
+.weapon-panel--teacher {
+  margin-bottom: 120px; /* 40px基础 + 80px工具栏空间 */
+  z-index: 150; /* 高于 TeacherToolbar 的 100 */
+  position: relative;
+}
+
+.weapon-panel--teacher.weapon-panel--open {
+  max-height: 350px; /* 教师端需要更多空间显示完整内容 */
+  overflow-y: auto; /* 如果内容过多允许滚动 */
+}
+
+/* 滚动条优化 */
+.weapon-panel--teacher.weapon-panel--open::-webkit-scrollbar {
+  width: 6px;
+}
+
+.weapon-panel--teacher.weapon-panel--open::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.weapon-panel--teacher.weapon-panel--open::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.weapon-panel--teacher.weapon-panel--open::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.weapon-panel__inner {
+  padding: 20px 24px;
+  animation: panelSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes panelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题栏 */
+.weapon-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.weapon-panel__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weapon-panel__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.weapon-panel__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.weapon-panel__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.weapon-panel__close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+/* 主内容区 - 横向布局 */
+.weapon-panel__body {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* 左侧：单词信息 */
+.weapon-panel__word-info {
+  flex: 0 0 280px;
+  min-width: 0;
+}
+
+.weapon-panel__word-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.weapon-panel__word {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: var(--font-family-en);
+}
+
+.weapon-panel__audio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.weapon-panel__audio:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+}
+
+.weapon-panel__audio--playing {
+  background: #3b82f6;
+  color: white;
+  animation: audioPulse 1s ease infinite;
+}
+
+@keyframes audioPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.weapon-panel__meaning {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.weapon-panel__pos {
+  font-size: 13px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.weapon-panel__def {
+  font-size: 15px;
+  color: #475569;
+}
+
+.weapon-panel__example {
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid rgba(59, 130, 246, 0.3);
+}
+
+.weapon-panel__example-en {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0 0 4px 0;
+}
+
+.weapon-panel__example-cn {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* 分隔线 */
+.weapon-panel__divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(59, 130, 246, 0.2) 20%,
+    rgba(59, 130, 246, 0.2) 80%,
+    transparent
+  );
+}
+
+/* 右侧：武器内容 */
+.weapon-panel__weapon-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 内容区通用样式 - 简化无卡片 */
+.weapon-popup__content {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.weapon-popup__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin: 0 0 10px 0;
+}
+
+.weapon-popup__tip {
+  font-size: 12px;
+  color: #64748b;
+  margin: 12px 0 0 0;
+  padding: 8px 10px;
+  background: rgba(253, 224, 71, 0.2);
+  border-radius: 6px;
+}
+
+/* 音节内容 */
+.weapon-popup__syllables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.weapon-popup__syllable {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ef4444;
+  font-family: var(--font-family-en);
+}
+
+.weapon-popup__syllable-dot {
+  color: #94a3b8;
+  margin: 0 3px;
+}
+
+.weapon-popup__phonetic {
+  font-size: 16px;
+  color: #64748b;
+  font-family: monospace;
+  margin: 0;
+}
+
+/* 口诀内容 */
+.weapon-popup__mnemonic-box {
+  padding: 12px 14px;
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+}
+
+.weapon-popup__mnemonic-text {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.weapon-popup__confusables {
+  margin-top: 10px;
+}
+
+.weapon-popup__confusables-label {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 0 0 6px 0;
+}
+
+.weapon-popup__confusables-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.weapon-popup__confusable {
+  padding: 3px 10px;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #dc2626;
+  font-family: var(--font-family-en);
+}
+
+/* 图片内容 */
+.weapon-popup__content--image {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weapon-popup__image-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.weapon-popup__image {
+  max-width: 160px;
+  max-height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.weapon-popup__image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 160px;
+  height: 100px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.weapon-popup__image-desc {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* 词源内容 */
+.weapon-popup__etymology-box {
+  padding: 12px 14px;
+  background: rgba(34, 197, 94, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #22c55e;
+}
+
+.weapon-popup__etymology-text {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 响应式：小屏幕改为纵向布局 */
+@media (max-width: 768px) {
+  .weapon-panel--open {
+    max-height: 400px;
+  }
+  
+  .weapon-panel__body {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .weapon-panel__word-info {
+    flex: none;
+    width: 100%;
+  }
+  
+  .weapon-panel__divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(59, 130, 246, 0.2) 20%,
+      rgba(59, 130, 246, 0.2) 80%,
+      transparent
+    );
+  }
+}
+>>>>>>> origin/feature/phase1-3-updates

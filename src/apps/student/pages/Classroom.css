@@ -85,11 +85,39 @@
   min-height: 0; /* 关键：允许 flex 子元素正确计算高度 */
   display: flex;
   flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 武器面板打开时的挤压效果 */
+.classroom__main-container--squeezed {
+  /* 内容区高度自动调整 */
+}
+
+/* 内容包装器 - 主学习内容 */
+.classroom__content-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 武器面板打开时，内容向上挤压 */
+.classroom__main-container--squeezed .classroom__content-wrapper {
+  flex: 0 1 auto;
+  max-height: calc(100% - 280px); /* 为武器面板留出空间 */
+  overflow: hidden;
+}
+
+/* 教师端武器面板打开时，需要更多空间 */
+.classroom__main-container--teacher.classroom__main-container--squeezed .classroom__content-wrapper {
+  max-height: calc(100% - 430px); /* 350px面板 + 80px工具栏空间 */
 }
 
 /* Phase 内容包装器 */
 .classroom__phase-content {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -97,7 +125,11 @@
 
 /* 进度药丸 - 紧凑化 */
 .classroom__progress-wrapper {
-  margin-bottom: 16px; /* 减小底部间距 */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  margin-bottom: 16px;
 }
 
 .classroom__progress-pill {

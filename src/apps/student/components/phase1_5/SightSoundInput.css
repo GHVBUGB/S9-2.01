@@ -1,0 +1,285 @@
+/* ========================================
+   SightSoundInput - 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
+   与 ContextProbe 保持一致的设计语言
+   ======================================== */
+
+.sight-sound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ========================================
+   进度药丸 - 与 P2 保持一致（固定在顶部）
+   ======================================== */
+
+.sight-sound__progress-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16px 24px;
+  margin-bottom: 0;
+}
+
+.sight-sound__progress-pill {
+  background: rgba(0, 99, 242, 0.1);
+  color: #0063f2;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: inset 0 1px 3px rgba(0, 99, 242, 0.1);
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 组徽章 */
+.sight-sound__group-badge {
+  background: #0063f2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ========================================
+   主内容区域 - 垂直居中
+   ======================================== */
+
+.sight-sound__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 24px;
+}
+
+/* ========================================
+   核心单词 - 大字号视觉焦点
+   ======================================== */
+
+.sight-sound__word {
+  font-size: 64px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: var(--font-family-en);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.sight-sound__word.is-playing {
+  color: #0063F2;
+  animation: wordPulse 1s ease infinite;
+}
+
+@keyframes wordPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* ========================================
+   音标
+   ======================================== */
+
+.sight-sound__phonetic {
+  font-size: 20px;
+  color: #64748b;
+  font-family: 'Times New Roman', serif;
+  margin-bottom: 16px;
+}
+
+/* ========================================
+   中文释义
+   ======================================== */
+
+.sight-sound__meaning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  margin-bottom: 32px;
+}
+
+.sight-sound__pos {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.sight-sound__chinese {
+  color: #475569;
+  font-weight: 500;
+}
+
+/* ========================================
+   交互区域
+   ======================================== */
+
+.sight-sound__action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100px;
+  margin-top: 24px;
+}
+
+/* 播放中指示 */
+.sight-sound__playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #0063F2;
+}
+
+.sight-sound__volume-icon {
+  animation: volumePulse 1s ease infinite;
+}
+
+@keyframes volumePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+.sight-sound__hint {
+  font-size: 16px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* ========================================
+   教师端控制
+   ======================================== */
+
+.sight-sound__teacher-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.sight-sound__teacher-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sight-sound__teacher-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 99, 242, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.12);
+}
+
+.sight-sound__teacher-btn--primary {
+  background: linear-gradient(135deg, #0063f2 0%, #2563eb 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.sight-sound__teacher-btn--primary:hover {
+  background: linear-gradient(135deg, #0052cc 0%, #1d4ed8 100%);
+  border-color: transparent;
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.3);
+}
+
+.sight-sound__teacher-btn--skip {
+  color: #64748b;
+}
+
+.sight-sound__teacher-btn--skip:hover {
+  border-color: rgba(100, 116, 139, 0.3);
+  box-shadow: 0 8px 24px rgba(100, 116, 139, 0.12);
+}
+
+/* ========================================
+   空状态（无错词）
+   ======================================== */
+
+.sight-sound__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #22c55e;
+  padding: 40px 24px;
+}
+
+.sight-sound__empty h2 {
+  margin: 20px 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.sight-sound__empty p {
+  font-size: 16px;
+  color: #64748b;
+}
+
+/* ========================================
+   动画
+   ======================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+  .sight-sound__progress-wrapper {
+    padding: 12px 16px;
+  }
+
+  .sight-sound__content {
+    padding: 24px 16px;
+  }
+
+  .sight-sound__word {
+    font-size: 42px;
+  }
+
+  .sight-sound__phonetic {
+    font-size: 18px;
+  }
+
+  .sight-sound__meaning {
+    font-size: 18px;
+  }
+
+  .sight-sound__hint {
+    font-size: 14px;
+  }
+
+  .sight-sound__teacher-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

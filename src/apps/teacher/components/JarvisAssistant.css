@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ========================================
    Jarvis 助教组件 - 智能教学引导卡片
    ======================================== */
@@ -158,3 +159,294 @@
     font-size: 11px;
   }
 }
+=======
+/* ========================================
+   Jarvis 徽章模式 - 圆角矩形 + 内部光照
+   ======================================== */
+
+.jarvis-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 徽章主体 - 圆角矩形 */
+.jarvis-badge__body {
+  position: relative;
+  padding: 16px 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 光束滑过效果 */
+.jarvis-badge__body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: lightSweep 3s ease-in-out infinite;
+}
+
+@keyframes lightSweep {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* 悬停效果 */
+.jarvis-badge:hover .jarvis-badge__body {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 180, 238, 0.3);
+}
+
+/* 徽章文字 */
+.jarvis-badge__text {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   Jarvis 完整面板模式
+   ======================================== */
+
+.jarvis-assistant {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(0, 180, 238, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: expandPanel 0.4s ease-out;
+}
+
+@keyframes expandPanel {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ========================================
+   标题区域
+   ======================================== */
+
+.jarvis-assistant__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.jarvis-assistant__close {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.jarvis-assistant__close:hover {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.jarvis-assistant__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  color: white;
+  flex-shrink: 0;
+}
+
+.jarvis-assistant__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.jarvis-assistant__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.jarvis-assistant__subtitle {
+  font-size: 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* ========================================
+   指引内容区域
+   ======================================== */
+
+.jarvis-assistant__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.jarvis-assistant__section {
+  margin-bottom: 14px;
+}
+
+/* 状态标题 */
+.jarvis-assistant__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.jarvis-assistant__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00B4EE;
+  flex-shrink: 0;
+}
+
+.jarvis-assistant__status-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00B4EE;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 内容描述 */
+.jarvis-assistant__description {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+  margin: 0;
+  min-height: 1.6em; /* 防止文字未出现时高度塌陷 */
+}
+
+/* 流式输出闪烁光标 */
+.jarvis-assistant__cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: #00B4EE;
+  animation: cursorBlink 1s steps(2, start) infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   建议行动区域
+   ======================================== */
+
+.jarvis-assistant__action {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.jarvis-assistant__action-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: #00B4EE;
+}
+
+.jarvis-assistant__action-header span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jarvis-assistant__action-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #475569;
+  margin: 0;
+  min-height: 1.5em; /* 防止文字未出现时高度塌陷 */
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+  .jarvis-assistant {
+    padding: 14px;
+  }
+
+  .jarvis-assistant__description {
+    font-size: 12px;
+  }
+
+  .jarvis-assistant__action-text {
+    font-size: 11px;
+  }
+}
+>>>>>>> origin/feature/phase1-3-updates

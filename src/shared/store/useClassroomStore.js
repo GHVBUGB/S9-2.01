@@ -16,6 +16,12 @@ const useClassroomStore = create((set, get) => ({
   /** 课堂模式: 'A' (标准新授) | 'B' (攻坚复习) */
   classroomMode: 'A',
   
+  /** 词包类型: 'core' (核心词) | 'non-core' (非核心词) */
+  wordType: 'core',
+  
+  /** 非核心词 P3 是否等待重试 */
+  p3WaitingForRetry: false,
+  
   /** 课堂状态: 'waiting' | 'active' | 'paused' | 'ended' */
   sessionStatus: 'waiting',
   
@@ -25,8 +31,8 @@ const useClassroomStore = create((set, get) => ({
   /** 红词列表（Model B 专用） */
   redWords: [],
   
-  /** 当前学习阶段: 'P1' | 'P2' | 'P3' | 'RedBox' | 'Summary' */
-  currentPhase: 'P1',
+  /** 当前学习阶段: 'Warmup' | 'RedBox' | 'P1' | 'P2' | 'P3' | 'Summary' */
+  currentPhase: 'Warmup',
   
   /** 已完成的阶段 */
   completedPhases: [],
@@ -59,6 +65,58 @@ const useClassroomStore = create((set, get) => ({
     selectedWeapon: null,
     /** Step 3: 是否显示答案 */
     showAnswer: false,
+  },
+  
+  // ========================================
+  // 热身阶段状态
+  // ========================================
+  
+  /** 学生课前状态选择: 'good' | 'normal' | 'tired' | null */
+  studentMood: null,
+  
+  // ========================================
+  // P1.5 认读跟读状态
+  // ========================================
+  
+  sightSound: {
+    /** 当前跟读单词索引 */
+    currentIndex: 0,
+    
+    /** 已完成跟读的单词 ID 列表 */
+    completedWords: [],
+    
+    /** P1.5 是否已完成 */
+    completed: false,
+  },
+  
+  // ========================================
+  // 单词流转状态（新流程）
+  // ========================================
+  
+  wordFlow: {
+    /** P1 错词 ID 列表 */
+    p1WrongWordIds: [],
+    
+    /** P1 对词 ID 列表 */
+    p1CorrectWordIds: [],
+    
+    /** 当前处理批次: 'wrong' | 'correct' | null */
+    currentBatch: null,
+    
+    /** 当前组索引（从0开始） */
+    currentGroupIndex: 0,
+    
+    /** 每组大小 */
+    groupSize: 5,
+    
+    /** P1 是否已完成分流 */
+    p1Finalized: false,
+    
+    /** 当前组在 P2/P3 中的单词索引 */
+    currentWordInGroupIndex: 0,
+    
+    /** 当前组 P2 的轮次: 1(听音) | 2(闪视) | 3(幽灵拼写) */
+    currentGroupP2Round: 1,
   },
   
   // ========================================
@@ -169,10 +227,12 @@ const useClassroomStore = create((set, get) => ({
     
     set({
       classroomMode: mode,
+      wordType: 'core', // 默认核心词
       sessionStatus: 'active',
       wordList: words,
       redWords: redWordsList,
-      currentPhase: mode === 'B' ? 'RedBox' : 'P1', // Model B 从 Red Box 开始
+      currentPhase: 'Warmup', // 所有模式都从热身开始
+      studentMood: null, // 重置学生状态
       completedPhases: [],
       currentWordIndex: 0,
       redBoxStep: 1,
@@ -192,6 +252,23 @@ const useClassroomStore = create((set, get) => ({
         isOpen: false,
         weaponId: null,
         word: null,
+      },
+      // 重置 P1.5 认读跟读状态
+      sightSound: {
+        currentIndex: 0,
+        completedWords: [],
+        completed: false,
+      },
+      // 重置单词流转状态
+      wordFlow: {
+        p1WrongWordIds: [],
+        p1CorrectWordIds: [],
+        currentBatch: null,
+        currentGroupIndex: 0,
+        groupSize: 5,
+        p1Finalized: false,
+        currentWordInGroupIndex: 0,
+        currentGroupP2Round: 1,
       },
       studentState: {
         isOnline: true,
@@ -387,14 +464,40 @@ const useClassroomStore = create((set, get) => ({
   /**
    * 教师强制进入下一阶段
    * - 立即结束当前阶段
-   * - 下一阶段的数据以当前已完成的数据为准
-   * - 未测试的单词不会进入后续阶段
+   * - P1 阶段：未测试的单词标记为【正确】，然后调用 finalizeP1 分流
    */
   forceNextPhase: () => {
-    const { currentPhase, wordList, wordResults, currentWordIndex, redWords, currentRedWordIndex } = get();
+    const { currentPhase, wordList, wordResults, currentWordIndex, redWords, currentRedWordIndex, finalizeP1 } = get();
     
-    // 确定下一阶段
-    const phaseOrder = ['RedBox', 'P1', 'P2', 'P3', 'Summary'];
+    // P1 阶段特殊处理：使用新的分流逻辑
+    if (currentPhase === 'P1') {
+      const testedCount = currentWordIndex + (get().studentState.isSubmitted ? 1 : 0);
+      console.log(`🎯 [Store] P1 筛查强制结束，已测试 ${testedCount}/${wordList.length} 个单词`);
+      console.log(`📝 [Store] 未测试的 ${wordList.length - testedCount} 个单词将标记为正确`);
+      
+      // 调用 finalizeP1，传入 true 表示将未测试的词标记为正确
+      finalizeP1(true);
+      
+      return { 
+        success: true, 
+        message: `P1 筛查强制结束，未测试的词已标记为正确`,
+        nextPhase: get().currentPhase // finalizeP1 会设置正确的下一阶段
+      };
+    }
+    
+    // P1.5 阶段特殊处理：跳过跟读，直接进入 P2
+    if (currentPhase === 'P1.5') {
+      console.log(`⏭️ [Store] P1.5 跟读强制跳过，进入 P2`);
+      get().skipSightSound();
+      return { 
+        success: true, 
+        message: `跟读环节已跳过`,
+        nextPhase: 'P2'
+      };
+    }
+    
+    // 其他阶段保持原有逻辑
+    const phaseOrder = ['RedBox', 'P1', 'P1.5', 'P2', 'P3', 'Summary'];
     const currentIndex = phaseOrder.indexOf(currentPhase);
     
     if (currentIndex === -1 || currentIndex >= phaseOrder.length - 1) {
@@ -408,69 +511,28 @@ const useClassroomStore = create((set, get) => ({
     let truncatedData = {};
     let message = '';
     
-    if (currentPhase === 'P1') {
-      // P1 -> P2: 只保留已测试的单词结果
-      // 已测试的单词数 = currentWordIndex（如果当前单词已提交则 +1）
-      const testedCount = currentWordIndex + (get().studentState.isSubmitted ? 1 : 0);
-      const testedWords = wordList.slice(0, testedCount);
+    if (currentPhase === 'P2') {
       
-      // 标记未测试的单词为"跳过"
-      const updatedResults = { ...wordResults };
-      wordList.forEach((word, idx) => {
-        if (idx >= testedCount) {
-          // 未测试的单词标记为跳过（不需要 P2 训练，直接进入 P3）
-          updatedResults[word.id] = {
-            ...updatedResults[word.id],
-            p1Result: null, // 未测试
-            p1Skipped: true, // 被教师跳过
-            needP2: false, // 不需要 P2
-          };
-        }
-      });
-      
-      truncatedData = { wordResults: updatedResults };
-      message = `P1 筛查强制结束，已测试 ${testedCount}/${wordList.length} 个单词`;
-      console.log(`🎯 [Store] ${message}`);
-      
-    } else if (currentPhase === 'P2') {
-      // P2 -> P3: 当前已训练的单词保持状态，未训练的标记为已完成（跳过）
-      const p2Words = wordList.filter(w => wordResults[w.id]?.needP2);
+    } else     if (currentPhase === 'P2') {
+      // P2 -> P3: 当前组 P2 强制完成，进入当前组 P3
       const { p2Round, p2WordIndex } = get().studentState;
       
-      // 标记 P2 为强制完成
-      const updatedResults = { ...wordResults };
-      p2Words.forEach((word, idx) => {
-        if (!updatedResults[word.id]?.p2Completed) {
-          updatedResults[word.id] = {
-            ...updatedResults[word.id],
-            p2Completed: true,
-            p2ForcedComplete: true, // 标记为教师强制完成
-          };
-        }
-      });
+      // 调用 currentGroupP2Complete 进入当前组的 P3
+      get().currentGroupP2Complete();
       
-      truncatedData = { wordResults: updatedResults };
-      message = `P2 训练强制结束，当前进度: 第${p2Round}轮 第${p2WordIndex + 1}词`;
+      message = `P2 训练强制结束，进入当前组 P3`;
       console.log(`🎯 [Store] ${message}`);
+      
+      return { success: true, message, nextPhase: 'P3' };
       
     } else if (currentPhase === 'P3') {
-      // P3 -> Summary: 当前已验收的保持状态，未验收的标记为跳过
-      const updatedResults = { ...wordResults };
-      wordList.forEach(word => {
-        if (updatedResults[word.id]?.p3Passed === undefined) {
-          updatedResults[word.id] = {
-            ...updatedResults[word.id],
-            p3Passed: null,
-            p3Skipped: true, // 被教师跳过
-            status: updatedResults[word.id]?.needP2 ? 'pending' : 'yellow', // 保持原状态
-          };
-        }
-      });
+      // P3 -> 下一组或 Summary: 调用 advanceToNextGroup
+      get().advanceToNextGroup();
       
-      truncatedData = { wordResults: updatedResults };
-      const testedCount = wordList.filter(w => wordResults[w.id]?.p3Passed !== undefined).length;
-      message = `P3 验收强制结束，已验收 ${testedCount}/${wordList.length} 个单词`;
+      message = `P3 验收强制结束，进入下一组/阶段`;
       console.log(`🎯 [Store] ${message}`);
+      
+      return { success: true, message, nextPhase: get().currentPhase };
       
     } else if (currentPhase === 'RedBox') {
       // RedBox -> P1: 标记未完成的红词
@@ -529,7 +591,9 @@ const useClassroomStore = create((set, get) => ({
   /** 获取下一阶段信息（用于 UI 显示） */
   getNextPhaseInfo: () => {
     const { currentPhase, classroomMode } = get();
-    const phaseOrder = classroomMode === 'B' ? ['RedBox', 'P1', 'P2', 'P3', 'Summary'] : ['P1', 'P2', 'P3', 'Summary'];
+    const phaseOrder = classroomMode === 'B' 
+      ? ['Warmup', 'RedBox', 'P1', 'P1.5', 'P2', 'P3', 'Summary'] 
+      : ['Warmup', 'P1', 'P1.5', 'P2', 'P3', 'Summary'];
     const currentIndex = phaseOrder.indexOf(currentPhase);
     
     if (currentIndex === -1 || currentIndex >= phaseOrder.length - 1) {
@@ -538,8 +602,10 @@ const useClassroomStore = create((set, get) => ({
     
     const nextPhase = phaseOrder[currentIndex + 1];
     const phaseNames = {
-      RedBox: 'Red Box 攻坚',
+      Warmup: '热身',
+      RedBox: '红盒攻坚',
       P1: '精准筛查',
+      'P1.5': '认读跟读',
       P2: '集中训练',
       P3: '门神验收',
       Summary: '课堂总结',
@@ -549,6 +615,43 @@ const useClassroomStore = create((set, get) => ({
       id: nextPhase,
       name: phaseNames[nextPhase],
     };
+  },
+  
+  /** 设置学生课前状态 */
+  setStudentMood: (mood) => {
+    set({ studentMood: mood });
+    console.log(`😊 [Store] 学生状态: ${mood}`);
+  },
+  
+  /** 设置词包类型 */
+  setWordType: (type) => {
+    set({ wordType: type });
+    console.log(`📚 [Store] 词包类型: ${type === 'core' ? '核心词' : '非核心词'}`);
+  },
+  
+  /** 设置非核心词 P3 等待重试状态 */
+  setP3WaitingForRetry: (waiting) => {
+    set({ p3WaitingForRetry: waiting });
+    console.log(`⏸️ [Store] P3 等待重试: ${waiting}`);
+  },
+  
+  /** 教师触发 P3 重试（非核心词） */
+  triggerP3Retry: () => {
+    set((state) => ({
+      p3WaitingForRetry: false,
+      teacherState: {
+        ...state.teacherState,
+        command: 'retryP3NonCore',
+      },
+    }));
+    console.log('🔄 [Store] 教师触发 P3 重试');
+    
+    // 清除命令
+    setTimeout(() => {
+      set((state) => ({
+        teacherState: { ...state.teacherState, command: null },
+      }));
+    }, 500);
   },
   
   /** Phase 2: 更新轮次和单词索引 */
@@ -719,6 +822,362 @@ const useClassroomStore = create((set, get) => ({
       studentState: {
         ...state.studentState,
         p3RetryWords: [],
+      },
+    }));
+  },
+  
+  // ========================================
+  // Actions: P1.5 认读跟读
+  // ========================================
+  
+  /**
+   * 获取 P1.5 需要跟读的单词列表（只跟读 P1 错词）
+   */
+  getCurrentSightSoundWords: () => {
+    const { wordList, wordResults } = get();
+    // 只返回 P1 阶段做错的单词
+    return wordList.filter(word => wordResults[word.id]?.p1Result === false);
+  },
+  
+  /**
+   * P1.5: 进入下一个跟读单词
+   */
+  nextSightSoundWord: () => {
+    const state = get();
+    const wordsToRead = get().getCurrentSightSoundWords();
+    const currentWord = wordsToRead[state.sightSound.currentIndex];
+    
+    set((state) => ({
+      sightSound: {
+        ...state.sightSound,
+        currentIndex: state.sightSound.currentIndex + 1,
+        completedWords: currentWord 
+          ? [...state.sightSound.completedWords, currentWord.id]
+          : state.sightSound.completedWords,
+      },
+    }));
+    
+    console.log(`🎤 [P1.5] 跟读下一词，索引: ${state.sightSound.currentIndex + 1}`);
+  },
+  
+  /**
+   * P1.5: 完成跟读环节，进入 P2
+   */
+  completeSightSound: () => {
+    const { wordFlow } = get();
+    
+    console.log(`✅ [P1.5] 跟读环节完成，进入 P2`);
+    
+    set((state) => ({
+      sightSound: {
+        ...state.sightSound,
+        completed: true,
+      },
+      currentPhase: 'P2',
+      completedPhases: [...state.completedPhases.filter(p => p !== 'P1.5'), 'P1.5'],
+      studentState: {
+        ...state.studentState,
+        selectedOption: null,
+        isSubmitted: false,
+        isCorrect: null,
+        inputText: '',
+        p2Round: 1,
+        p2WordIndex: 0,
+        attempts: 0,
+      },
+    }));
+  },
+  
+  /**
+   * P1.5: 教师跳过跟读环节，直接进入 P2
+   */
+  skipSightSound: () => {
+    console.log(`⏭️ [P1.5] 教师跳过跟读环节，直接进入 P2`);
+    
+    set((state) => ({
+      sightSound: {
+        ...state.sightSound,
+        completed: true,
+      },
+      currentPhase: 'P2',
+      completedPhases: [...state.completedPhases.filter(p => p !== 'P1.5'), 'P1.5'],
+      studentState: {
+        ...state.studentState,
+        selectedOption: null,
+        isSubmitted: false,
+        isCorrect: null,
+        inputText: '',
+        p2Round: 1,
+        p2WordIndex: 0,
+        attempts: 0,
+      },
+    }));
+  },
+  
+  // ========================================
+  // Actions: 单词流转（新流程）
+  // ========================================
+  
+  /**
+   * 完成 P1 分流
+   * 收集错词和对词，设置当前批次
+   * @param {boolean} forceCorrectUntested - 是否将未测试的词标记为正确（教师跳过时为 true）
+   */
+  finalizeP1: (forceCorrectUntested = false) => {
+    const { wordList, wordResults } = get();
+    
+    // 如果教师跳过，未测试的词标记为正确
+    let updatedResults = { ...wordResults };
+    if (forceCorrectUntested) {
+      wordList.forEach(word => {
+        if (updatedResults[word.id]?.p1Result === undefined) {
+          updatedResults[word.id] = {
+            ...updatedResults[word.id],
+            p1Result: true,
+            p1Skipped: true,
+          };
+        }
+      });
+    }
+    
+    // 收集错词和对词
+    const wrongIds = wordList
+      .filter(w => updatedResults[w.id]?.p1Result === false)
+      .map(w => w.id);
+      
+    const correctIds = wordList
+      .filter(w => updatedResults[w.id]?.p1Result === true || 
+                   updatedResults[w.id]?.p1Result === undefined)
+      .map(w => w.id);
+    
+    console.log(`📊 [Store] P1 分流完成 - 错词: ${wrongIds.length}, 对词: ${correctIds.length}`);
+    
+    // 更新状态
+    const nextBatch = wrongIds.length > 0 ? 'wrong' : 'correct';
+    
+    // 如果有错词，先进入 P1.5 跟读环节；否则直接进入 P3（对词直接验收）
+    const nextPhase = wrongIds.length > 0 ? 'P1.5' : 'P3';
+    
+    set((state) => ({
+      wordResults: updatedResults,
+      wordFlow: {
+        ...state.wordFlow,
+        p1WrongWordIds: wrongIds,
+        p1CorrectWordIds: correctIds,
+        currentBatch: nextBatch,
+        currentGroupIndex: 0,
+        p1Finalized: true,
+        currentWordInGroupIndex: 0,
+        currentGroupP2Round: 1,
+      },
+      // 重置 P1.5 状态
+      sightSound: {
+        currentIndex: 0,
+        completedWords: [],
+        completed: false,
+      },
+      currentPhase: nextPhase,
+      completedPhases: [...state.completedPhases.filter(p => p !== 'P1'), 'P1'],
+      studentState: {
+        ...state.studentState,
+        selectedOption: null,
+        isSubmitted: false,
+        isCorrect: null,
+        inputText: '',
+        p2Round: 1,
+        p2WordIndex: 0,
+        p3WordIndex: 0,
+        attempts: 0,
+      },
+    }));
+    
+    console.log(`🎯 [Store] 进入 ${nextPhase}，处理批次: ${nextBatch}`);
+  },
+  
+  /**
+   * 获取当前组需要处理的单词列表
+   */
+  getCurrentGroupWords: () => {
+    const { wordFlow, wordList } = get();
+    const { currentBatch, currentGroupIndex, groupSize, p1WrongWordIds, p1CorrectWordIds } = wordFlow;
+    
+    if (!currentBatch) return [];
+    
+    // 获取当前批次的所有词 ID
+    const batchIds = currentBatch === 'wrong' ? p1WrongWordIds : p1CorrectWordIds;
+    
+    // 对于错词批次，分组处理
+    if (currentBatch === 'wrong') {
+      const startIdx = currentGroupIndex * groupSize;
+      const endIdx = startIdx + groupSize;
+      const groupIds = batchIds.slice(startIdx, endIdx);
+      return wordList.filter(w => groupIds.includes(w.id));
+    }
+    
+    // 对于对词批次，全部一起过 P3
+    return wordList.filter(w => batchIds.includes(w.id));
+  },
+  
+  /**
+   * 获取当前组信息
+   */
+  getCurrentGroupInfo: () => {
+    const { wordFlow } = get();
+    const { currentBatch, currentGroupIndex, groupSize, p1WrongWordIds, p1CorrectWordIds } = wordFlow;
+    
+    if (currentBatch === 'wrong') {
+      const totalGroups = Math.ceil(p1WrongWordIds.length / groupSize);
+      const startIdx = currentGroupIndex * groupSize;
+      const endIdx = Math.min(startIdx + groupSize, p1WrongWordIds.length);
+      const groupSize_actual = endIdx - startIdx;
+      
+      return {
+        batch: 'wrong',
+        groupIndex: currentGroupIndex,
+        totalGroups,
+        groupSize: groupSize_actual,
+        totalWords: p1WrongWordIds.length,
+        isLastGroup: currentGroupIndex >= totalGroups - 1,
+      };
+    } else if (currentBatch === 'correct') {
+      return {
+        batch: 'correct',
+        groupIndex: 0,
+        totalGroups: 1,
+        groupSize: p1CorrectWordIds.length,
+        totalWords: p1CorrectWordIds.length,
+        isLastGroup: true,
+      };
+    }
+    
+    return null;
+  },
+  
+  /**
+   * 当前组 P3 完成后，推进到下一组或下一批次
+   */
+  advanceToNextGroup: () => {
+    const { wordFlow } = get();
+    const { currentBatch, currentGroupIndex, groupSize, p1WrongWordIds, p1CorrectWordIds } = wordFlow;
+    
+    console.log(`🔄 [Store] advanceToNextGroup - 当前批次: ${currentBatch}, 组索引: ${currentGroupIndex}`);
+    
+    if (currentBatch === 'wrong') {
+      const totalGroups = Math.ceil(p1WrongWordIds.length / groupSize);
+      
+      if (currentGroupIndex + 1 < totalGroups) {
+        // 还有下一组错词，从 P1.5 跟读开始
+        console.log(`📦 [Store] 进入错词组 ${currentGroupIndex + 2}/${totalGroups}，从 P1.5 跟读开始`);
+        set((state) => ({
+          wordFlow: { 
+            ...state.wordFlow, 
+            currentGroupIndex: currentGroupIndex + 1,
+            currentWordInGroupIndex: 0,
+            currentGroupP2Round: 1,
+          },
+          currentPhase: 'P1.5',
+          sightSound: {
+            currentIndex: 0,
+            completedWords: [],
+            completed: false,
+          },
+          studentState: {
+            ...state.studentState,
+            selectedOption: null,
+            isSubmitted: false,
+            isCorrect: null,
+            inputText: '',
+            p2Round: 1,
+            p2WordIndex: 0,
+            p3WordIndex: 0,
+            attempts: 0,
+          },
+        }));
+      } else {
+        // 所有错词组处理完，切换到对词批次
+        if (p1CorrectWordIds.length > 0) {
+          console.log(`✅ [Store] 错词组全部完成，进入对词 P3`);
+          set((state) => ({
+            wordFlow: { 
+              ...state.wordFlow, 
+              currentBatch: 'correct', 
+              currentGroupIndex: 0,
+              currentWordInGroupIndex: 0,
+            },
+            currentPhase: 'P3',
+            studentState: {
+              ...state.studentState,
+              selectedOption: null,
+              isSubmitted: false,
+              isCorrect: null,
+              inputText: '',
+              p3WordIndex: 0,
+              attempts: 0,
+            },
+          }));
+        } else {
+          // 没有对词，直接结束
+          console.log(`🏁 [Store] 所有单词处理完成，进入 Summary`);
+          set((state) => ({
+            currentPhase: 'Summary',
+            completedPhases: [...state.completedPhases.filter(p => p !== 'P3'), 'P3'],
+          }));
+        }
+      }
+    } else if (currentBatch === 'correct') {
+      // 对词批次 P3 完成，结束
+      console.log(`🏁 [Store] 对词 P3 完成，进入 Summary`);
+      set((state) => ({
+        currentPhase: 'Summary',
+        completedPhases: [...state.completedPhases.filter(p => p !== 'P3'), 'P3'],
+      }));
+    }
+  },
+  
+  /**
+   * 当前组 P2 完成后，进入当前组的 P3
+   */
+  currentGroupP2Complete: () => {
+    console.log(`✅ [Store] 当前组 P2 完成，进入 P3`);
+    set((state) => ({
+      currentPhase: 'P3',
+      wordFlow: {
+        ...state.wordFlow,
+        currentWordInGroupIndex: 0,
+      },
+      studentState: {
+        ...state.studentState,
+        selectedOption: null,
+        isSubmitted: false,
+        isCorrect: null,
+        inputText: '',
+        p3WordIndex: 0,
+        attempts: 0,
+      },
+    }));
+  },
+  
+  /**
+   * 更新当前组内的单词索引
+   */
+  setCurrentWordInGroupIndex: (index) => {
+    set((state) => ({
+      wordFlow: {
+        ...state.wordFlow,
+        currentWordInGroupIndex: index,
+      },
+    }));
+  },
+  
+  /**
+   * 更新当前组 P2 的轮次
+   */
+  setCurrentGroupP2Round: (round) => {
+    set((state) => ({
+      wordFlow: {
+        ...state.wordFlow,
+        currentGroupP2Round: round,
+        currentWordInGroupIndex: 0,
       },
     }));
   },

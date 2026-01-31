@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ========================================
    ContextProbe - 极简重构版
    设计原则：无卡片、大留白、视觉聚焦、高级感
@@ -308,3 +309,330 @@
     font-size: 15px;
   }
 }
+=======
+/* ========================================
+   ContextProbe - 极简重构版
+   设计原则：无卡片、大留白、视觉聚焦、高级感
+   ======================================== */
+
+.context-probe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  padding: 0 24px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ========================================
+   核心短语 - 视觉焦点（放大）
+   ======================================== */
+
+.context-probe__phrase {
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e293b;
+  font-family: var(--font-family-en);
+  text-align: center;
+  margin-bottom: 28px;
+  max-width: 800px;
+  letter-spacing: -0.02em;
+}
+
+/* 高亮目标单词 */
+.context-probe__highlight {
+  color: #0063F2;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(255, 190, 27, 0.4) 60%
+  );
+  padding: 0 4px;
+  font-weight: 700;
+  border-radius: 2px;
+}
+
+/* ========================================
+   音频播放按钮 - 纯图标
+   ======================================== */
+
+.context-probe__audio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.context-probe__audio:hover:not(:disabled) {
+  color: #0063F2;
+  background: rgba(0, 99, 242, 0.08);
+}
+
+.context-probe__audio:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.context-probe__audio.is-playing {
+  color: #0063F2;
+}
+
+.context-probe__audio.is-playing svg {
+  animation: audioWave 0.8s ease-in-out infinite;
+}
+
+@keyframes audioWave {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* ========================================
+   极简提示
+   ======================================== */
+
+.context-probe__hint {
+  font-size: 15px;
+  color: #94a3b8;
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+
+.context-probe__target-word {
+  color: #0063F2;
+  font-family: var(--font-family-en);
+  font-weight: 700;
+}
+
+/* ========================================
+   选项区 - 2x2 网格
+   ======================================== */
+
+.context-probe__options {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+  justify-content: center;
+}
+
+.context-probe__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 32px;
+  min-height: 52px;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px; /* 胶囊形 */
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.context-probe__option:hover:not(:disabled):not(.is-readonly) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 99, 242, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 99, 242, 0.12);
+}
+
+.context-probe__option:active:not(:disabled):not(.is-readonly) {
+  transform: translateY(0);
+}
+
+.context-probe__option-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  transition: color 0.2s;
+}
+
+.context-probe__option-icon {
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------
+   选项状态
+   ---------------------------------------- */
+
+/* 选中态 */
+.context-probe__option.is-selected {
+  background: rgba(0, 99, 242, 0.08);
+  border-color: #0063F2;
+}
+
+.context-probe__option.is-selected .context-probe__option-text {
+  color: #0063F2;
+}
+
+/* 正确态 */
+.context-probe__option.is-correct {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  animation: correctPulse 0.4s ease-out;
+}
+
+.context-probe__option.is-correct .context-probe__option-text {
+  color: #16a34a;
+}
+
+.context-probe__option.is-correct .context-probe__option-icon {
+  color: #22c55e;
+}
+
+/* 错误态 */
+.context-probe__option.is-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  animation: wrongShake 0.4s ease-out;
+}
+
+.context-probe__option.is-wrong .context-probe__option-text {
+  color: #dc2626;
+}
+
+.context-probe__option.is-wrong .context-probe__option-icon {
+  color: #ef4444;
+}
+
+/* 暗淡态（其他选项） */
+.context-probe__option.is-dimmed {
+  opacity: 0.4;
+}
+
+/* 只读态 */
+.context-probe__option.is-readonly {
+  cursor: default;
+}
+
+.context-probe__option.is-readonly:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ========================================
+   等待老师指导提示（非核心词 P3）
+   ======================================== */
+
+.context-probe__waiting-hint {
+  margin-top: 24px;
+  font-size: 15px;
+  color: #f59e0b;
+  font-weight: 600;
+  animation: waitingPulse 1.5s ease infinite;
+}
+
+@keyframes waitingPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ========================================
+   只读模式提示
+   ======================================== */
+
+.context-probe__readonly {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ========================================
+   动画
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes correctPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wrongShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+  .context-probe {
+    padding: 24px 16px;
+  }
+
+  .context-probe__phrase {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+
+  .context-probe__audio {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 20px;
+  }
+
+  .context-probe__hint {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .context-probe__options {
+    flex-direction: column;
+    max-width: 280px;
+  }
+
+  .context-probe__option {
+    padding: 14px 24px;
+    min-height: 48px;
+    min-width: 100%;
+  }
+
+  .context-probe__option-text {
+    font-size: 15px;
+  }
+}
+>>>>>>> origin/feature/phase1-3-updates

@@ -1,12 +1,20 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import WarmupStage from '../components/WarmupStage';
 import ContextProbe from '../components/ContextProbe';
+import { SightSoundInput } from '../components/phase1_5';
 import P2Container from '../components/phase2/P2Container';
 import P3Container from '../components/phase3/P3Container';
 import { RedBoxContainer } from '../components/redbox';
 import { WeaponPopup } from '../../../shared/components/weapon';
 import useClassroomStore from '../../../shared/store/useClassroomStore';
 import './Classroom.css';
+
+// 检测武器面板是否打开
+const useWeaponPanelOpen = () => {
+  const { weaponPopup } = useClassroomStore();
+  return weaponPopup?.isOpen && weaponPopup?.word;
+};
 
 /**
  * 课堂页面（学生端 + 教师端共用）
@@ -26,11 +34,13 @@ const Classroom = ({ readonly = false }) => {
     currentWordIndex,
     sessionStatus,
     redBoxCompleted,
+    wordFlow,
     initClassroom,
     getCurrentWord,
     studentSubmitAnswer,
     nextWord,
     setPhase,
+    finalizeP1,
     getP2Words,
     getWordStats,
     getRedBoxProgress,
@@ -57,21 +67,25 @@ const Classroom = ({ readonly = false }) => {
         nextWord();
       }, 1500);
     } else {
+      // P1 所有词完成，进行分流
       setTimeout(() => {
-        setPhase('P2');
+        finalizeP1(false); // 正常完成，不强制标记未测试的词
       }, 2000);
     }
   };
 
   const allPhases = useMemo(() => {
     if (classroomMode === 'B') {
-      return ['RedBox', 'P1', 'P2', 'P3'];
+      return ['Warmup', 'RedBox', 'P1', 'P1.5', 'P2', 'P3'];
     }
-    return ['P1', 'P2', 'P3'];
+    return ['Warmup', 'P1', 'P1.5', 'P2', 'P3'];
   }, [classroomMode]);
 
   const renderPhaseContent = () => {
     switch (currentPhase) {
+      case 'Warmup':
+        return <WarmupStage readonly={readonly} />;
+      
       case 'RedBox':
         return <RedBoxContainer readonly={readonly} />;
       
@@ -94,6 +108,13 @@ const Classroom = ({ readonly = false }) => {
           </div>
         );
       
+      case 'P1.5':
+        return (
+          <div className="classroom__phase-content">
+            <SightSoundInput readonly={readonly} />
+          </div>
+        );
+      
       case 'P2':
         return <P2Container readonly={readonly} />;
       
@@ -105,13 +126,18 @@ const Classroom = ({ readonly = false }) => {
     }
   };
 
+  const isWeaponOpen = useWeaponPanelOpen();
+
   return (
     <div className="classroom">
-      <WeaponPopup />
-      
       {/* 学习内容区域 - 导航栏已移至全局 GlobalHeader */}
-      <div className="classroom__main-container">
-        {renderPhaseContent()}
+      <div className={`classroom__main-container ${isWeaponOpen ? 'classroom__main-container--squeezed' : ''} ${readonly ? 'classroom__main-container--teacher' : ''}`}>
+        <div className="classroom__content-wrapper">
+          {renderPhaseContent()}
+        </div>
+        
+        {/* 武器面板 - 内嵌在内容区底部 */}
+        <WeaponPopup isTeacher={readonly} />
       </div>
     </div>
   );

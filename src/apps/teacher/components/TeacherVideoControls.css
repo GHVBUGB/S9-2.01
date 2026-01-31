@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ========================================
    教师端视频区控制面板
    ======================================== */
@@ -561,3 +562,611 @@
   background: rgba(0, 0, 0, 0.05);
   color: #64748b;
 }
+=======
+/* ========================================
+   教师端视频区控制面板
+   ======================================== */
+
+.teacher-video-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative; /* 让弹出面板相对于此定位 */
+}
+
+/* 简化版（只显示状态栏） */
+.teacher-video-controls--simple {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 0;
+}
+
+/* 状态信息栏 */
+.teacher-video-controls__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.teacher-video-controls__phase {
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.teacher-video-controls__progress {
+  color: #64748b;
+}
+
+.teacher-video-controls__word {
+  margin-left: auto;
+  font-family: var(--font-family-en, 'Inter', sans-serif);
+  font-weight: 600;
+  color: #0063F2;
+}
+
+/* 控制按钮区 */
+.teacher-video-controls__buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.teacher-video-controls__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 武器库按钮 */
+.teacher-video-controls__btn--weapon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.teacher-video-controls__btn--weapon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.teacher-video-controls__btn--weapon.is-active {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* 下一阶段按钮 */
+.teacher-video-controls__btn--next {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.teacher-video-controls__btn--next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* 武器库弹出面板 */
+.teacher-video-controls__weapon-wrapper {
+  flex: 1;
+  position: static; /* 不用 relative，让弹出面板相对于更上层定位 */
+}
+
+.teacher-video-controls__weapon-popup {
+  position: absolute;
+  top: 100%;
+  left: 12px;
+  right: 12px;
+  margin-top: 12px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  z-index: 100;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teacher-video-controls__weapon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.teacher-video-controls__weapon-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.teacher-video-controls__weapon-header button:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.teacher-video-controls__weapon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.teacher-video-controls__weapon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.teacher-video-controls__weapon-btn:hover:not(.is-disabled) {
+  border-color: #10b981;
+  background: #f0fdf4;
+  color: #059669;
+}
+
+.teacher-video-controls__weapon-btn.is-active {
+  border-color: #10b981;
+  background: #10b981;
+  color: white;
+}
+
+.teacher-video-controls__weapon-btn.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.teacher-video-controls__close-popup {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.teacher-video-controls__close-popup:hover {
+  background: #fee2e2;
+}
+
+/* 确认弹窗 */
+.teacher-video-controls__confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.teacher-video-controls__confirm {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  width: 320px;
+  max-width: 90%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.teacher-video-controls__confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+.teacher-video-controls__confirm-body {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.teacher-video-controls__confirm-body p {
+  margin: 0 0 8px 0;
+}
+
+.teacher-video-controls__confirm-body strong {
+  color: #111827;
+}
+
+.teacher-video-controls__confirm-warning {
+  color: #dc2626 !important;
+  font-weight: 500;
+}
+
+.teacher-video-controls__confirm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.teacher-video-controls__confirm-actions button {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.teacher-video-controls__confirm-actions button:first-child {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.teacher-video-controls__confirm-actions button:first-child:hover {
+  background: #e5e7eb;
+}
+
+.teacher-video-controls__confirm-actions button.is-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.teacher-video-controls__confirm-actions button.is-danger:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ========================================
+   Warmup 热身阶段控制面板（极简版）
+   ======================================== */
+
+.teacher-video-controls--warmup {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 开始上课按钮 */
+.warmup-panel__start-btn {
+  width: 100%;
+  max-width: 200px;
+  padding: 16px 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 180, 238, 0.35);
+}
+
+.warmup-panel__start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 180, 238, 0.45);
+}
+
+.warmup-panel__start-btn:active {
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   RedBox 专属控制面板
+   ======================================== */
+
+.teacher-video-controls--redbox {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* 标题栏 */
+.redbox-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.redbox-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.redbox-panel__progress {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* 步骤指示器 */
+.redbox-panel__steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.redbox-panel__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.redbox-panel__step.is-active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.redbox-panel__step.is-done {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.redbox-panel__step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.redbox-panel__step.is-active .redbox-panel__step-num {
+  background: #3b82f6;
+  color: white;
+}
+
+.redbox-panel__step.is-done .redbox-panel__step-num {
+  background: #22c55e;
+  color: white;
+}
+
+.redbox-panel__step-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+}
+
+.redbox-panel__step.is-active .redbox-panel__step-name {
+  color: #3b82f6;
+}
+
+.redbox-panel__step.is-done .redbox-panel__step-name {
+  color: #16a34a;
+}
+
+/* 操作区 */
+.redbox-panel__actions {
+  margin-bottom: 12px;
+}
+
+.redbox-panel__action-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.redbox-panel__action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.redbox-panel__action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.redbox-panel__action-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.redbox-panel__action-btn.is-done {
+  border-color: #22c55e;
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+/* 武器选择 */
+.redbox-panel__weapon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.redbox-panel__weapon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 6px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.redbox-panel__weapon-btn:hover {
+  border-color: #8b5cf6;
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.redbox-panel__weapon-btn.is-active {
+  border-color: #8b5cf6;
+  background: #8b5cf6;
+  color: white;
+}
+
+/* 学生状态 */
+.redbox-panel__student-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.redbox-panel__student-input {
+  flex: 1;
+  font-family: var(--font-family-mono, monospace);
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 下一步按钮 */
+.redbox-panel__next-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.redbox-panel__next-btn:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  transform: translateY(-1px);
+}
+
+/* 跳过按钮 */
+.redbox-panel__skip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.redbox-panel__skip-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #64748b;
+}
+>>>>>>> origin/feature/phase1-3-updates

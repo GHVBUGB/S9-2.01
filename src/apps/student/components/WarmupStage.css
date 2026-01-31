@@ -1,0 +1,362 @@
+/* ========================================
+   热身阶段 - 融合参考设计
+   ======================================== */
+
+.warmup-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  overflow-y: auto;
+}
+
+.warmup-stage__container {
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+/* ========================================
+   挑战天数徽章
+   ======================================== */
+
+.warmup-stage__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 180, 238, 0.1);
+  border: 1px solid rgba(0, 180, 238, 0.2);
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #00B4EE;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.warmup-stage__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00B4EE;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ========================================
+   欢迎标题
+   ======================================== */
+
+.warmup-stage__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.warmup-stage__title {
+  font-size: 38px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.warmup-stage__name {
+  font-size: 38px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #00B4EE, #0088CC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========================================
+   词包类型选择（教师端）
+   ======================================== */
+
+.warmup-stage__word-type {
+  display: flex;
+  gap: 8px;
+}
+
+.warmup-stage__word-type-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.warmup-stage__word-type-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.warmup-stage__word-type-btn--active {
+  background: linear-gradient(135deg, rgba(0, 180, 238, 0.1) 0%, rgba(0, 99, 242, 0.1) 100%);
+  border-color: #00B4EE;
+  color: #0088CC;
+}
+
+.warmup-stage__word-type-btn--active svg {
+  color: #00B4EE;
+}
+
+/* ========================================
+   标签行（呼吸动效）
+   ======================================== */
+
+.warmup-stage__tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.warmup-stage__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(0, 180, 238, 0.1);
+  border: 1px solid rgba(0, 180, 238, 0.2);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00B4EE;
+}
+
+.warmup-stage__tag svg {
+  flex-shrink: 0;
+}
+
+.warmup-stage__tag--yellow {
+  background: rgba(253, 231, 0, 0.1);
+  border-color: rgba(253, 231, 0, 0.3);
+  color: #B39B00;
+}
+
+/* ========================================
+   信息卡片
+   ======================================== */
+
+.warmup-stage__info-row {
+  display: flex;
+  gap: 12px;
+}
+
+.warmup-stage__info-block {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 180, 238, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.warmup-stage__info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #808080;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.warmup-stage__info-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+/* ========================================
+   开始上课按钮（教师端）
+   ======================================== */
+
+.warmup-stage__start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00B4EE 0%, #0088CC 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 180, 238, 0.35);
+}
+
+.warmup-stage__start-btn:hover {
+  box-shadow: 0 6px 20px rgba(0, 180, 238, 0.45);
+}
+
+/* ========================================
+   状态选择（学生端）
+   ======================================== */
+
+.warmup-stage__mood-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.warmup-stage__mood-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #808080;
+}
+
+.warmup-stage__mood-options {
+  display: flex;
+  gap: 8px;
+}
+
+.warmup-stage__mood-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.warmup-stage__mood-btn:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.warmup-stage__mood-btn--selected {
+  border-color: var(--mood-color);
+  color: var(--mood-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   学生状态显示（教师端）
+   ======================================== */
+
+.warmup-stage__student-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid rgba(0, 180, 238, 0.25);
+  border-radius: 14px;
+}
+
+.warmup-stage__status-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #808080;
+}
+
+.warmup-stage__status-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mood-color, #64748b);
+}
+
+/* ========================================
+   等待提示
+   ======================================== */
+
+.warmup-stage__waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0, 180, 238, 0.06);
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.warmup-stage__waiting-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00B4EE;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 768px) {
+  .warmup-stage {
+    padding: 32px 20px;
+  }
+  
+  .warmup-stage__container {
+    gap: 24px;
+  }
+  
+  .warmup-stage__title,
+  .warmup-stage__name {
+    font-size: 30px;
+  }
+  
+  .warmup-stage__tags {
+    gap: 6px;
+  }
+  
+  .warmup-stage__tag {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .warmup-stage__info-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .warmup-stage__info-block {
+    width: 100%;
+    padding: 14px 16px;
+  }
+  
+  .warmup-stage__info-value {
+    font-size: 16px;
+  }
+  
+  .warmup-stage__mood-options {
+    flex-wrap: wrap;
+  }
+  
+  .warmup-stage__mood-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

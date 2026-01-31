@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Dumbbell, CheckCircle, RotateCcw, AlertCircle, Trophy, Flame } from 'lucide-react';
+import { Search, Dumbbell, CheckCircle, RotateCcw, AlertCircle, Trophy, Flame, Sparkles } from 'lucide-react';
 import './PhaseNavigator.css';
 
 /**
@@ -21,9 +21,15 @@ const PhaseNavigator = ({
   
   // 完整的阶段配置
   const allPhasesConfig = {
+    Warmup: {
+      id: 'Warmup',
+      name: '热身',
+      icon: Sparkles,
+      description: 'Warmup'
+    },
     RedBox: {
       id: 'RedBox',
-      name: 'Red Box',
+      name: '红盒攻坚',
       icon: Flame,
       description: 'Attack',
       color: '#ef4444'
@@ -68,8 +74,8 @@ const PhaseNavigator = ({
 
   // 根据 props 确定要显示的阶段
   const displayPhases = phases || (showRedBox 
-    ? ['RedBox', 'P1', 'P2', 'P3'] 
-    : ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+    ? ['Warmup', 'RedBox', 'P1', 'P2', 'P3'] 
+    : ['Warmup', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6']
   );
 
   // 获取要渲染的阶段配置
