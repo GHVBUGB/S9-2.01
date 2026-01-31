@@ -26,11 +26,23 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [attempts, setAttempts] = useState(2);
+  const [voicesReady, setVoicesReady] = useState(false);
   const inputRef = useRef(null);
 
   const inputValue = studentState.inputText || '';
   const submitted = studentState.isSubmitted;
   const isCorrect = studentState.isCorrect;
+  
+  // 预加载语音列表
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) setVoicesReady(true);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   // 重置状态（当单词变化时）
   useEffect(() => {
@@ -68,15 +80,40 @@ const RedBoxCard = ({ word, step, totalWords, currentIndex, readonly = false }) 
     }
   }, [teacherState.command]);
 
-  // 播放发音
+  // 播放发音（优化版本）
   const handlePlayAudio = () => {
     if (!word?.word || isPlaying) return;
     setIsPlaying(true);
-    const utterance = new SpeechSynthesisUtterance(word.word);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    utterance.onend = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
+    window.speechSynthesis.cancel();
+    
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(word.word);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoices = ['Google US English', 'Microsoft Zira', 'Samantha', 'Alex'];
+      for (const voiceName of preferredVoices) {
+        const voice = voices.find(v => v.name.includes(voiceName));
+        if (voice) {
+          utterance.voice = voice;
+          break;
+        }
+      }
+      
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setIsPlaying(false);
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    if (!voicesReady) {
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
   // 处理输入（仅学生端）

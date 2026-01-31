@@ -24,6 +24,7 @@ const P2Container = ({ readonly = false }) => {
   const {
     studentState,
     wordFlow,
+    wordType,
     getCurrentGroupWords,
     getCurrentGroupInfo,
     currentGroupP2Complete,
@@ -31,6 +32,11 @@ const P2Container = ({ readonly = false }) => {
     nextP2Word,
     resetP2WrongWords,
   } = useClassroomStore();
+  
+  // 根据词包类型确定总轮次
+  // 核心词：3轮（听音、闪视、幽灵拼写）
+  // 非核心词：2轮（听音、闪视）
+  const totalRounds = wordType === 'non-core' ? 2 : 3;
 
   // 获取当前组需要训练的单词
   const groupWords = getCurrentGroupWords();
@@ -127,7 +133,9 @@ const P2Container = ({ readonly = false }) => {
           useClassroomStore.getState().startP2RetryRound();
         } else {
           // 全部正确，进入下一轮或当前组的 P3
-          if (currentRound < 3) {
+          // 核心词：3轮，非核心词：2轮
+          const maxRounds = useClassroomStore.getState().wordType === 'non-core' ? 2 : 3;
+          if (currentRound < maxRounds) {
             console.log(`✅ [P2] 第${currentRound}轮全部正确！进入下一轮`);
             nextP2Round();
           } else {

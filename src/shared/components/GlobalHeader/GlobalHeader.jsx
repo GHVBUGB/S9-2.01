@@ -58,36 +58,41 @@ const GlobalHeader = ({ role = 'student' }) => {
   };
 
   // 阶段配置 - 使用 lucide-react 图标
+  // 注：P1.5 显示在"集中训练"中，因为它是 P2 的一部分（跟读环节）
   const phases = classroomMode === 'B' 
     ? [
         { id: 'RedBox', name: '红盒攻坚', icon: Target },
         { id: 'P1', name: '精准筛查', icon: Search },
-        { id: 'P2', name: '集中训练', icon: BookOpen },
+        { id: 'P2', name: '集中训练', icon: BookOpen, includesP15: true },
         { id: 'P3', name: '门神验收', icon: DoorOpen },
       ]
     : [
         { id: 'P1', name: '精准筛查', icon: Search },
-        { id: 'P2', name: '集中训练', icon: BookOpen },
+        { id: 'P2', name: '集中训练', icon: BookOpen, includesP15: true },
         { id: 'P3', name: '门神验收', icon: DoorOpen },
       ];
 
   // 获取当前阶段进度
-  const getProgress = () => {
-    if (currentPhase === 'P1') {
+  const getProgress = (phaseId) => {
+    if (phaseId === 'P1' && currentPhase === 'P1') {
       return `${currentWordIndex + 1}/${wordList.length}`;
     }
-    if (currentPhase === 'P2') {
+    // P1.5 显示在 P2 导航项中
+    if (phaseId === 'P2' && currentPhase === 'P1.5') {
+      return '跟读';
+    }
+    if (phaseId === 'P2' && currentPhase === 'P2') {
       const p2Round = studentState?.p2Round || 1;
       return `第${p2Round}轮`;
     }
     return null;
   };
 
-  const progress = getProgress();
-
   // 判断阶段状态
   const getPhaseStatus = (phaseId) => {
     if (completedPhases.includes(phaseId)) return 'completed';
+    // P1.5 属于 P2 大阶段，所以当 P1.5 激活时，P2 也显示为激活
+    if (phaseId === 'P2' && currentPhase === 'P1.5') return 'active';
     if (phaseId === currentPhase) return 'active';
     return 'pending';
   };
@@ -138,8 +143,8 @@ const GlobalHeader = ({ role = 'student' }) => {
                   <span className="global-header__phase-name">{phase.name}</span>
                   
                   {/* 当前阶段显示进度 */}
-                  {isActive && progress && (
-                    <span className="global-header__phase-progress">{progress}</span>
+                  {isActive && getProgress(phase.id) && (
+                    <span className="global-header__phase-progress">{getProgress(phase.id)}</span>
                   )}
                   
                   {/* 已完成显示勾 */}

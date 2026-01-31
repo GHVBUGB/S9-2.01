@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Scissors, Lightbulb, Image, Sprout, 
-  ChevronRight, AlertTriangle, X 
+  ChevronRight, AlertTriangle, X, RotateCcw 
 } from 'lucide-react';
 import useClassroomStore from '../../../shared/store/useClassroomStore';
 import './TeacherToolbar.css';
@@ -15,12 +15,15 @@ const TeacherToolbar = () => {
   
   const {
     currentPhase,
+    wordType,
+    p3WaitingForRetry,
     getActiveWord,
     weaponPopup,
     openWeaponPopup,
     closeWeaponPopup,
     forceNextPhase,
     getNextPhaseInfo,
+    triggerP3Retry,
   } = useClassroomStore();
 
   const currentWord = getActiveWord();
@@ -72,6 +75,14 @@ const TeacherToolbar = () => {
     forceNextPhase();
     setShowConfirm(false);
   };
+  
+  // 处理 P3 重试（非核心词）
+  const handleRetry = () => {
+    triggerP3Retry();
+  };
+  
+  // 判断是否显示重试按钮
+  const showRetryButton = currentPhase === 'P3' && wordType === 'non-core' && p3WaitingForRetry;
 
   // Warmup 和 RedBox 阶段不显示此工具栏
   if (currentPhase === 'Warmup' || currentPhase === 'RedBox') {
@@ -102,8 +113,20 @@ const TeacherToolbar = () => {
           })}
         </div>
 
+        {/* 再试一次按钮（非核心词 P3，学生第1次答错时显示） */}
+        {showRetryButton && (
+          <button
+            className="teacher-toolbar__retry"
+            onClick={handleRetry}
+            title="让学生再试一次"
+          >
+            <RotateCcw size={20} />
+            <span>再试一次</span>
+          </button>
+        )}
+
         {/* 下一阶段按钮 */}
-        {nextPhaseInfo && (
+        {nextPhaseInfo && !showRetryButton && (
           <button
             className="teacher-toolbar__next"
             onClick={() => setShowConfirm(true)}

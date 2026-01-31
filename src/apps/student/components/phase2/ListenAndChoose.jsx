@@ -29,18 +29,55 @@ const ListenAndChoose = ({ word, onComplete, readonly = false }) => {
   
   // 🔊 音频播放状态（本地状态）
   const [isPlaying, setIsPlaying] = useState(false);
+  const [voicesReady, setVoicesReady] = useState(false);
   const hasAutoPlayed = useRef(false);
+  
+  // 预加载语音列表
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) setVoicesReady(true);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   // 播放音频
   const playAudio = () => {
     setIsPlaying(true);
-    // TODO: 接入真实音频 API
-    console.log('🔊 播放音频:', word.sound?.ipa);
+    window.speechSynthesis.cancel();
     
-    // 模拟播放时间
-    setTimeout(() => {
-      setIsPlaying(false);
-    }, 1000);
+    console.log('🔊 播放音频:', word.word);
+    
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(word.word);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoices = ['Google US English', 'Microsoft Zira', 'Samantha', 'Alex'];
+      for (const voiceName of preferredVoices) {
+        const voice = voices.find(v => v.name.includes(voiceName));
+        if (voice) {
+          utterance.voice = voice;
+          break;
+        }
+      }
+      
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setTimeout(() => setIsPlaying(false), 1000);
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    if (!voicesReady) {
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
   // 重置状态（仅学生端）

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Button from '../../../../shared/components/ui/Button';
 import FullSpelling from './FullSpelling';
+import ContextProbe from '../ContextProbe';
 import useClassroomStore from '../../../../shared/store/useClassroomStore';
 import './P3Container.css';
 
@@ -20,6 +21,7 @@ const P3Container = ({ readonly = false }) => {
     wordList,
     wordResults,
     wordFlow,
+    wordType,
     studentState,
     setPhase,
     nextP3Word,
@@ -27,7 +29,11 @@ const P3Container = ({ readonly = false }) => {
     getCurrentGroupWords,
     getCurrentGroupInfo,
     advanceToNextGroup,
+    setP3WaitingForRetry,
   } = useClassroomStore();
+  
+  // 是否为非核心词（选择题验收）
+  const isNonCore = wordType === 'non-core';
 
   // 从 store 获取 P3 状态
   const currentP3Index = studentState.p3WordIndex;
@@ -38,6 +44,9 @@ const P3Container = ({ readonly = false }) => {
   
   // P3 结果仍然用本地状态（因为这是派生数据，可以从 wordResults 重建）
   const [p3Results, setP3Results] = useState({});
+  
+  // 非核心词 P3 重试状态
+  const [isWaitingForRetry, setIsWaitingForRetry] = useState(false);
 
   // 获取当前组需要验收的单词
   const p3Words = useMemo(() => {
@@ -85,6 +94,13 @@ const P3Container = ({ readonly = false }) => {
     console.log(`📍 [P3Container] 挂载，当前进度: 第${currentP3Index + 1}/${p3Words.length}词`);
   }, []);
 
+  // 处理非核心词需要重试的情况（第1次答错）
+  const handleRetryNeeded = () => {
+    console.log('⏸️ [P3] 非核心词第1次答错，等待老师指导');
+    setIsWaitingForRetry(true);
+    setP3WaitingForRetry(true); // 通知 Store，让教师端显示"再试一次"按钮
+  };
+  
   // 处理单词验收完成
   const handleWordComplete = (passed, finalStatus) => {
     if (!currentWord) return;
@@ -100,6 +116,10 @@ const P3Container = ({ readonly = false }) => {
       console.log(`🚨 [P3] 单词 "${currentWord.word}" 被武器库标记为红灯，即使答对也算失败`);
     }
     console.log(`📝 [P3] 单词 ${currentWord.word} 验收结果:`, finalPassed ? '✅ 通过' : '❌ 未通过');
+
+    // 重置等待状态
+    setIsWaitingForRetry(false);
+    setP3WaitingForRetry(false);
 
     // 记录本地结果（用于显示统计）
     setP3Results(prev => ({
@@ -226,12 +246,26 @@ const P3Container = ({ readonly = false }) => {
 
       {/* 验收内容（无卡片包裹，直接显示在背景上） */}
       {currentWord && (
-        <FullSpelling
-          word={currentWord}
-          wordSource={currentWord.source}
-          onComplete={handleWordComplete}
-          readonly={readonly}
-        />
+        <div className="p3-container__content">
+          {isNonCore ? (
+            // 非核心词：选择题验收（复用 ContextProbe，支持重试）
+            <ContextProbe
+              word={currentWord}
+              onComplete={(isCorrect) => handleWordComplete(isCorrect, isCorrect ? 'yellow' : 'pending')}
+              onRetryNeeded={handleRetryNeeded}
+              allowRetry={true}
+              readonly={readonly}
+            />
+          ) : (
+            // 核心词：拼写验收
+            <FullSpelling
+              word={currentWord}
+              wordSource={currentWord.source}
+              onComplete={handleWordComplete}
+              readonly={readonly}
+            />
+          )}
+        </div>
       )}
     </div>
   );

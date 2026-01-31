@@ -37,20 +37,60 @@ const FullSpelling = ({ word, wordSource, onComplete, readonly = false }) => {
 
   // 音频播放状态
   const [isPlaying, setIsPlaying] = useState(false);
+  const [voicesReady, setVoicesReady] = useState(false);
   const hasAutoPlayed = useRef(false);
 
   const inputRef = useRef(null);
+  
+  // 预加载语音列表
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) setVoicesReady(true);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
-  // 播放音频
+  // 播放音频 - 播放完整短语
   const playAudio = () => {
     if (!word?.word || isPlaying) return;
     setIsPlaying(true);
+    window.speechSynthesis.cancel();
     
-    const utterance = new SpeechSynthesisUtterance(word.word);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.8;
-    utterance.onend = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
+    const speak = () => {
+      // 播放完整短语（如果有），否则播放单词
+      const textToSpeak = word.context?.[0]?.phrase || word.word;
+      console.log('🔊 P3 播放:', textToSpeak);
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoices = ['Google US English', 'Microsoft Zira', 'Samantha', 'Alex'];
+      for (const voiceName of preferredVoices) {
+        const voice = voices.find(v => v.name.includes(voiceName));
+        if (voice) {
+          utterance.voice = voice;
+          break;
+        }
+      }
+      
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setIsPlaying(false);
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    if (!voicesReady) {
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
   // 重置状态 + 自动播放音频

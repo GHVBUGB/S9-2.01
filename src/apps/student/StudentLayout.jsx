@@ -2,7 +2,6 @@ import React from 'react';
 import MainLayout from '../../shared/components/layout/MainLayout';
 import GlobalHeader from '../../shared/components/GlobalHeader';
 import Classroom from './pages/Classroom';
-import WeaponPopup from '../../shared/components/weapon/WeaponPopup';
 import ViewSwitcher from '../../shared/components/ui/ViewSwitcher';
 import './StudentLayout.css';
 
@@ -25,8 +24,6 @@ const StudentLayout = ({ model = 'A', standalone = false, children }) => {
           </div>
         </MainLayout>
       </div>
-      
-      <WeaponPopup />
       
       {/* 视角切换按钮 - 左下角 */}
       {!standalone && <ViewSwitcher />}

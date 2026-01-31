@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Flame, Zap, TrendingUp, ChevronRight } from 'lucide-react';
+import { BookOpen, Flame, Zap, TrendingUp, ChevronRight, Star, Sparkles } from 'lucide-react';
 import useClassroomStore from '../../../shared/store/useClassroomStore';
 import './WarmupStage.css';
 
@@ -15,8 +15,10 @@ const WarmupStage = ({ readonly = false }) => {
     wordList, 
     redWords, 
     classroomMode,
+    wordType,
     studentMood,
     setStudentMood,
+    setWordType,
     setPhase
   } = useClassroomStore();
 
@@ -125,12 +127,37 @@ const WarmupStage = ({ readonly = false }) => {
           <h1 className="warmup-stage__name">{displayName}</h1>
         </motion.div>
         
+        {/* 词包类型选择（仅教师端显示） */}
+        {readonly && (
+          <motion.div 
+            className="warmup-stage__word-type"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <button
+              className={`warmup-stage__word-type-btn ${wordType === 'core' ? 'warmup-stage__word-type-btn--active' : ''}`}
+              onClick={() => setWordType('core')}
+            >
+              <Star size={16} />
+              <span>核心词</span>
+            </button>
+            <button
+              className={`warmup-stage__word-type-btn ${wordType === 'non-core' ? 'warmup-stage__word-type-btn--active' : ''}`}
+              onClick={() => setWordType('non-core')}
+            >
+              <Sparkles size={16} />
+              <span>非核心词</span>
+            </button>
+          </motion.div>
+        )}
+        
         {/* 标签行 - 呼吸动效 */}
         <motion.div 
           className="warmup-stage__tags"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
         >
           <motion.div 
             className="warmup-stage__tag"

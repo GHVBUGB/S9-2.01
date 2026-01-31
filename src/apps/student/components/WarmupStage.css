@@ -85,6 +85,45 @@
 }
 
 /* ========================================
+   词包类型选择（教师端）
+   ======================================== */
+
+.warmup-stage__word-type {
+  display: flex;
+  gap: 8px;
+}
+
+.warmup-stage__word-type-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.warmup-stage__word-type-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.warmup-stage__word-type-btn--active {
+  background: linear-gradient(135deg, rgba(0, 180, 238, 0.1) 0%, rgba(0, 99, 242, 0.1) 100%);
+  border-color: #00B4EE;
+  color: #0088CC;
+}
+
+.warmup-stage__word-type-btn--active svg {
+  color: #00B4EE;
+}
+
+/* ========================================
    标签行（呼吸动效）
    ======================================== */
 

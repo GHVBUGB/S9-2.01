@@ -3,7 +3,6 @@ import MainLayout from '../../shared/components/layout/MainLayout';
 import GlobalHeader from '../../shared/components/GlobalHeader';
 import Classroom from '../student/pages/Classroom';
 import ViewSwitcher from '../../shared/components/ui/ViewSwitcher';
-import WeaponPopup from '../../shared/components/weapon/WeaponPopup';
 import TeacherVideoControls from './components/TeacherVideoControls';
 import TeacherToolbar from './components/TeacherToolbar';
 import JarvisAssistant from './components/JarvisAssistant';
@@ -153,6 +152,28 @@ const TeacherLayout = ({ model = 'A', standalone = false, children }) => {
         action: `问学生："看到这个搭配，你觉得 ${currentWord.word} 是什么意思？"`
       };
     }
+    
+    // P1.5 认读跟读阶段
+    if (currentPhase === 'P1.5') {
+      const { sightSound, getCurrentSightSoundWords } = useClassroomStore.getState();
+      const wordsToRead = getCurrentSightSoundWords?.() || [];
+      const currentSightWord = wordsToRead[sightSound?.currentIndex || 0];
+      
+      if (currentSightWord) {
+        return {
+          title: '认读跟读',
+          content: `学生正在跟读 "${currentSightWord.word}"，这是建立"眼-耳-口"肌肉映射的关键环节。此环节以鼓励为主，不设严苛门槛。`,
+          action: `引导学生："Follow me! 张嘴跟读一遍！" 观察学生发音，给予正向反馈。`
+        };
+      }
+      
+      return {
+        title: '认读跟读',
+        content: '学生正在进行错词跟读训练，帮助建立正确的发音记忆。',
+        action: '观察学生跟读情况，必要时可示范发音或跳过此环节。'
+      };
+    }
+    
     if (currentPhase === 'P2') {
       // P2 各轮次差异化脚本
       const p2Scripts = {
@@ -220,9 +241,6 @@ const TeacherLayout = ({ model = 'A', standalone = false, children }) => {
           </div>
         </MainLayout>
       </div>
-      
-      {/* 武器库弹窗（学生端也会显示） */}
-      <WeaponPopup />
       
       {/* 视角切换按钮 - 左下角 */}
       {!standalone && <ViewSwitcher />}

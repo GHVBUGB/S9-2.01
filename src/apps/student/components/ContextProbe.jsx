@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { CheckCircle2, XCircle, Volume2 } from 'lucide-react';
+import useClassroomStore from '../../../shared/store/useClassroomStore';
 import './ContextProbe.css';
 
 /**
@@ -9,24 +10,70 @@ import './ContextProbe.css';
  * @param {Object} word - 当前单词数据
  * @param {Function} onComplete - 完成回调 (isCorrect) => void
  * @param {boolean} readonly - 是否只读模式（教师端使用）
+ * @param {boolean} allowRetry - 是否允许重试（非核心词 P3 时为 true）
+ * @param {Function} onRetryNeeded - 答错需要重试时的回调 (非核心词 P3 使用)
  */
-const ContextProbe = ({ word, onComplete, readonly = false }) => {
+const ContextProbe = ({ word, onComplete, readonly = false, allowRetry = false, onRetryNeeded = null }) => {
+  const { teacherState } = useClassroomStore();
+  
   const [selectedOption, setSelectedOption] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [waitingForTeacher, setWaitingForTeacher] = useState(false);
+  const [voicesReady, setVoicesReady] = useState(false);
   const hasAutoPlayed = useRef(false);
+  
+  // 预加载语音列表
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setVoicesReady(true);
+      }
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, []);
 
   // 播放音频
   const playAudio = () => {
     setIsPlaying(true);
-    // TODO: 接入真实音频 API
-    console.log('🔊 播放音频:', word.context?.[0]?.phrase || word.word);
+    window.speechSynthesis.cancel();
     
-    // 模拟播放时间
-    setTimeout(() => {
-      setIsPlaying(false);
-    }, 1500);
+    const textToSpeak = word.context?.[0]?.phrase || word.word;
+    console.log('🔊 播放音频:', textToSpeak);
+    
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoices = ['Google US English', 'Microsoft Zira', 'Samantha', 'Alex'];
+      for (const voiceName of preferredVoices) {
+        const voice = voices.find(v => v.name.includes(voiceName));
+        if (voice) {
+          utterance.voice = voice;
+          break;
+        }
+      }
+      
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setTimeout(() => setIsPlaying(false), 1500);
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    if (!voicesReady) {
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
   // 当单词变化时，重置所有状态 + 自动播放音频
@@ -34,8 +81,22 @@ const ContextProbe = ({ word, onComplete, readonly = false }) => {
     setSelectedOption(null);
     setSubmitted(false);
     setIsCorrect(false);
+    setAttemptCount(0);
+    setWaitingForTeacher(false);
     hasAutoPlayed.current = false;
   }, [word.id]);
+  
+  // 监听教师重试命令（非核心词 P3）
+  useEffect(() => {
+    if (allowRetry && waitingForTeacher && teacherState?.command === 'retryP3NonCore') {
+      // 重置状态让学生重试
+      setSelectedOption(null);
+      setSubmitted(false);
+      setIsCorrect(false);
+      setWaitingForTeacher(false);
+      console.log('🔄 [ContextProbe] 教师触发重试，题目重置');
+    }
+  }, [allowRetry, waitingForTeacher, teacherState?.command]);
 
   // 自动播放音频（仅首次）
   useEffect(() => {
@@ -103,8 +164,31 @@ const ContextProbe = ({ word, onComplete, readonly = false }) => {
     
     setIsCorrect(correct);
     setSubmitted(true);
+    setAttemptCount(prev => prev + 1);
     
-    // 短暂延迟后进入下一题
+    // 重试模式（非核心词 P3）
+    if (allowRetry && !correct) {
+      // 第1次答错：等待老师指导
+      if (attemptCount === 0) {
+        console.log('❌ [ContextProbe] 第1次答错，等待老师指导');
+        setWaitingForTeacher(true);
+        // 通知 P3Container 需要重试
+        if (onRetryNeeded) {
+          setTimeout(() => onRetryNeeded(), 500);
+        }
+        return;
+      }
+      // 第2次答错：直接进入下一题
+      else {
+        console.log('❌ [ContextProbe] 第2次答错，进入下一题');
+        setTimeout(() => {
+          onComplete(false);
+        }, 800);
+        return;
+      }
+    }
+    
+    // 正常模式或答对：短暂延迟后进入下一题
     setTimeout(() => {
       onComplete(correct);
     }, 800);
@@ -157,6 +241,13 @@ const ContextProbe = ({ word, onComplete, readonly = false }) => {
           );
         })}
       </div>
+
+      {/* 等待老师指导提示（非核心词 P3 第1次答错） */}
+      {waitingForTeacher && !readonly && (
+        <div className="context-probe__waiting-hint">
+          等待老师指导...
+        </div>
+      )}
 
       {/* 只读模式提示 */}
       {readonly && (

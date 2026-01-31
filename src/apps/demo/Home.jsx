@@ -5,7 +5,6 @@ import Badge from '../../shared/components/ui/Badge';
 import ModelCards from './components/ModelCards';
 import ExtraModules from './components/ExtraModules';
 import ViewSelector from './components/ViewSelector';
-import { Play } from 'lucide-react';
 import './Home.css';
 
 /**
@@ -85,7 +84,6 @@ const Home = () => {
             onClick={handleEnterClassroom}
             disabled={!selectedModel}
           >
-            <Play size={20} />
             {selectedModel 
               ? `进入 ${selectedModel === 'A' ? 'Model A (N)' : 'Model B (N+1)'} (${viewMode === 'demo' ? '双屏' : viewMode === 'student' ? '学生' : '教师'})`
               : '请先选择课程模式'
