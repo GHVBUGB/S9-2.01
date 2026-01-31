@@ -30,8 +30,8 @@ export const MOCK_STUDENTS = [
         wordId: 1,  // adapt
         status: 'yellow',
         reviewCount: 2,
-        lastReviewTime: '2026-01-26T10:00:00Z',
-        nextReviewTime: '2026-01-28T10:00:00Z',  // 今天到期
+        lastReviewTime: '2026-01-22T10:00:00Z',
+        nextReviewTime: '2026-01-25T10:00:00Z',  // 3天后复习
         errorCount: 0,
         errorPatterns: [],
         phase: 4,
@@ -46,8 +46,8 @@ export const MOCK_STUDENTS = [
         wordId: 2,  // brave
         status: 'yellow',
         reviewCount: 1,
-        lastReviewTime: '2026-01-27T14:00:00Z',
-        nextReviewTime: '2026-01-28T14:00:00Z',  // 今天到期
+        lastReviewTime: '2026-01-21T14:00:00Z',
+        nextReviewTime: '2026-01-24T14:00:00Z',
         errorCount: 0,
         errorPatterns: [],
         phase: 4,
@@ -62,8 +62,8 @@ export const MOCK_STUDENTS = [
         wordId: 5,  // energy
         status: 'yellow',
         reviewCount: 3,
-        lastReviewTime: '2026-01-25T09:00:00Z',
-        nextReviewTime: '2026-01-28T09:00:00Z',  // 今天到期
+        lastReviewTime: '2026-01-18T09:00:00Z',
+        nextReviewTime: '2026-01-25T09:00:00Z',  // 7天后复习
         errorCount: 0,
         errorPatterns: [],
         phase: 4,
