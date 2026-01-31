@@ -1,34 +1,3 @@
-<<<<<<< HEAD
-/* ========================================
-   教师端布局
-   ======================================== */
-
-.teacher-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* 主内容区域（导航栏下方） */
-.teacher-layout__content {
-  flex: 1;
-  overflow: hidden;
-}
-
-/* 确保 MainLayout 填满剩余空间 */
-.teacher-layout__content .main-layout {
-  height: 100%;
-}
-
-/* 内容区包装器 - 用于定位底部工具栏 */
-.teacher-layout__main-area {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-=======
 /* ========================================
    教师端布局
    ======================================== */
@@ -68,4 +37,3 @@
   padding: 16px 0;
   z-index: 10002; /* 高于武器库遮罩层，保持 Jarvis 可见 */
 }
->>>>>>> origin/feature/phase1-3-updates
