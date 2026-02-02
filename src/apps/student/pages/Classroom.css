@@ -158,3 +158,39 @@
   color: #64748b;
   font-size: 18px;
 }
+
+.classroom__error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  padding: 32px;
+  text-align: center;
+  color: #dc2626;
+  font-size: 16px;
+  gap: 16px;
+}
+
+.classroom__error p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.classroom__error button {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: #0063f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.classroom__error button:hover {
+  background: #0052cc;
+}

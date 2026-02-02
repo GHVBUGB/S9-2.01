@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import WarmupStage from '../components/WarmupStage';
 import ContextProbe from '../components/ContextProbe';
 import { SightSoundInput } from '../components/phase1_5';
@@ -8,6 +8,7 @@ import P3Container from '../components/phase3/P3Container';
 import { RedBoxContainer } from '../components/redbox';
 import { WeaponPopup } from '../../../shared/components/weapon';
 import useClassroomStore from '../../../shared/store/useClassroomStore';
+import { StudentReviewReport } from '../components/reviewReport/StudentReviewReport';
 import './Classroom.css';
 
 // 检测武器面板是否打开
@@ -24,7 +25,9 @@ const useWeaponPanelOpen = () => {
  */
 const Classroom = ({ readonly = false }) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const model = searchParams.get('model') || 'A';
+  const [showReport, setShowReport] = useState(false);
 
   const {
     classroomMode,
@@ -82,6 +85,21 @@ const Classroom = ({ readonly = false }) => {
   }, [classroomMode]);
 
   const renderPhaseContent = () => {
+    // 如果 currentPhase 为空或未定义，显示加载状态并尝试初始化
+    if (!currentPhase) {
+      console.warn('[Classroom] currentPhase is null/undefined:', {
+        currentPhase,
+        type: typeof currentPhase,
+        classroomMode,
+        wordListLength: wordList.length
+      });
+      // 如果还没有初始化，尝试初始化
+      if (wordList.length === 0) {
+        initClassroom(model, 30);
+      }
+      return <div className="classroom__loading">初始化中...</div>;
+    }
+
     switch (currentPhase) {
       case 'Warmup':
         return <WarmupStage readonly={readonly} />;
@@ -122,7 +140,26 @@ const Classroom = ({ readonly = false }) => {
         return <P3Container readonly={readonly} />;
       
       default:
-        return <div>未知阶段</div>;
+        // 未知阶段 - 显示复习报告（课程结束）
+        // 记录详细的调试信息
+        console.log('[Classroom] Unknown phase detected - showing report:', {
+          currentPhase,
+          type: typeof currentPhase,
+          classroomMode,
+          wordListLength: wordList.length,
+          currentWordIndex,
+          sessionStatus,
+          allPhases
+        });
+        
+        // 如果报告还未显示，则显示报告
+        if (!showReport) {
+          setTimeout(() => {
+            setShowReport(true);
+          }, 100);
+        }
+        
+        return null; // 不渲染任何内容，报告会以弹窗形式显示
     }
   };
 
@@ -139,6 +176,17 @@ const Classroom = ({ readonly = false }) => {
         {/* 武器面板 - 内嵌在内容区底部 */}
         <WeaponPopup isTeacher={readonly} />
       </div>
+      
+      {/* 课程结束报告弹窗 */}
+      {showReport && (
+        <StudentReviewReport 
+          onClose={() => {
+            setShowReport(false);
+            // 关闭报告后返回首页
+            navigate('/');
+          }} 
+        />
+      )}
     </div>
   );
 };
