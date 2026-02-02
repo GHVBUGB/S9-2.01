@@ -39,6 +39,14 @@ const WeaponPopup = ({ isTeacher = false }) => {
     }
   }, [isOpen]);
 
+  // 监听单词变化，确保内容更新
+  useEffect(() => {
+    if (word) {
+      setIsPlaying(false);
+      // 强制组件重新渲染以显示新单词的内容
+    }
+  }, [word?.id, word?.word]);
+
   // 播放发音（优化版本）
   const handlePlayAudio = () => {
     if (!word?.word || isPlaying) return;
