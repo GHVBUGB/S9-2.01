@@ -311,12 +311,36 @@ const useClassroomStore = create((set, get) => ({
     return redWords[currentRedWordIndex] || null;
   },
   
+  /** P1.5阶段当前单词（由SightSoundInput设置） */
+  p15CurrentWord: null,
+  
+  /** 设置P1.5当前单词 */
+  setP15CurrentWord: (word) => {
+    set({ p15CurrentWord: word });
+  },
+  
+  /** P2阶段当前单词（由P2Container设置） */
+  p2CurrentWord: null,
+  
+  /** 设置P2当前单词 */
+  setP2CurrentWord: (word) => {
+    set({ p2CurrentWord: word });
+  },
+  
+  /** P3阶段当前单词（由P3Container设置） */
+  p3CurrentWord: null,
+  
+  /** 设置P3当前单词 */
+  setP3CurrentWord: (word) => {
+    set({ p3CurrentWord: word });
+  },
+  
   /** 
    * 获取当前阶段正在学习的单词（武器库使用）
    * 根据不同阶段返回正确的单词
    */
   getActiveWord: () => {
-    const { currentPhase, wordList, redWords, currentWordIndex, currentRedWordIndex, studentState, wordResults } = get();
+    const { currentPhase, wordList, redWords, currentWordIndex, currentRedWordIndex, studentState, p15CurrentWord, p2CurrentWord, p3CurrentWord } = get();
     
     switch (currentPhase) {
       case 'RedBox':
@@ -325,15 +349,17 @@ const useClassroomStore = create((set, get) => ({
       case 'P1':
         return wordList[currentWordIndex] || null;
       
-      case 'P2': {
-        // P2 阶段：从需要训练的单词列表中获取
-        const p2Words = wordList.filter(word => wordResults[word.id]?.needP2);
-        return p2Words[studentState.p2WordIndex] || null;
-      }
+      case 'P1.5':
+        // P1.5 阶段：使用SightSoundInput设置的当前单词
+        return p15CurrentWord;
+      
+      case 'P2':
+        // P2 阶段：使用P2Container设置的当前单词
+        return p2CurrentWord;
       
       case 'P3':
-        // P3 阶段：所有单词都需要验收
-        return wordList[studentState.p3WordIndex] || null;
+        // P3 阶段：使用P3Container设置的当前单词
+        return p3CurrentWord;
       
       default:
         return wordList[currentWordIndex] || null;

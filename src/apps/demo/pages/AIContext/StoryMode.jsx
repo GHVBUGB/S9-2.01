@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Volume2, CheckCircle } from 'lucide-react';
 import WordTooltip from './WordTooltip';
+import { getWordById } from '../../../../shared/data/mockWords';
 import './StoryMode.css';
 
 /**
@@ -59,7 +60,8 @@ const StoryMode = ({ storyData, words, onFinish }) => {
       <article className="story-article">
         {story.content.map((part, i) => {
           if (typeof part === 'string') return <span key={i} className="story-text">{part}</span>;
-          const wordObj = words.find(w => w.id === part.wordId);
+          // 直接通过 getWordById 获取单词，不依赖 words prop
+          const wordObj = getWordById(part.wordId);
           return wordObj ? <WordTooltip key={i} word={wordObj}>{part.text}</WordTooltip> : <span key={i}>{part.text}</span>;
         })}
       </article>

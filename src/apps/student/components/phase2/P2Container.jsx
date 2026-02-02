@@ -31,6 +31,7 @@ const P2Container = ({ readonly = false }) => {
     nextP2Round,
     nextP2Word,
     resetP2WrongWords,
+    setP2CurrentWord,
   } = useClassroomStore();
   
   // 根据词包类型确定总轮次
@@ -77,6 +78,14 @@ const P2Container = ({ readonly = false }) => {
   
   // 当前训练的单词
   const currentWord = roundWords[currentWordIndex];
+  
+  // 同步当前单词到store（供武器库使用）
+  useEffect(() => {
+    if (currentWord) {
+      setP2CurrentWord(currentWord);
+      console.log(`🔄 [P2] 同步当前单词到store: ${currentWord.word}`);
+    }
+  }, [currentWord, setP2CurrentWord]);
   
   // 初始化 P2
   useEffect(() => {

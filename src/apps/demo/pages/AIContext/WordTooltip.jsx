@@ -20,9 +20,9 @@ const WordTooltip = ({ word, children }) => {
       {show && (
         <div className="word-tooltip-content">
           <div className="tooltip-inner">
-            <div className="tooltip-pos">{word.pos || 'v.'}</div>
-            <div className="tooltip-meaning">{word.meaning?.definitionCn || word.meaning?.chinese}</div>
-            <div className="tooltip-phrase">"{word.phrase || word.context?.[0]?.sentence}"</div>
+            <div className="tooltip-pos">{word.core?.partOfSpeech || word.meaning?.partOfSpeech || word.pos || 'v.'}</div>
+            <div className="tooltip-meaning">{word.meaning?.chinese || word.meaning?.definitionCn}</div>
+            <div className="tooltip-phrase">"{word.context?.[0]?.sentence || word.phrase}"</div>
             <div className="tooltip-arrow"></div>
           </div>
         </div>

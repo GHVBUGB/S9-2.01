@@ -30,6 +30,7 @@ const P3Container = ({ readonly = false }) => {
     getCurrentGroupInfo,
     advanceToNextGroup,
     setP3WaitingForRetry,
+    setP3CurrentWord,
   } = useClassroomStore();
   
   // 是否为非核心词（选择题验收）
@@ -93,6 +94,14 @@ const P3Container = ({ readonly = false }) => {
     setP3Results(rebuiltResults);
     console.log(`📍 [P3Container] 挂载，当前进度: 第${currentP3Index + 1}/${p3Words.length}词`);
   }, []);
+
+  // 同步当前单词到store（供武器库使用）
+  useEffect(() => {
+    if (currentWord) {
+      setP3CurrentWord(currentWord);
+      console.log(`🔄 [P3] 同步当前单词到store: ${currentWord.word}`);
+    }
+  }, [currentWord, setP3CurrentWord]);
 
   // 处理非核心词需要重试的情况（第1次答错）
   const handleRetryNeeded = () => {

@@ -30,6 +30,7 @@ const SightSoundInput = ({ readonly = false }) => {
     completeSightSound,
     skipSightSound,
     teacherState,
+    setP15CurrentWord,
   } = useClassroomStore();
 
   // P1.5 跟读使用当前组的单词（5个一组）
@@ -62,6 +63,14 @@ const SightSoundInput = ({ readonly = false }) => {
       window.speechSynthesis.onvoiceschanged = null;
     };
   }, []);
+
+  // 同步当前单词到store（供武器库使用）
+  useEffect(() => {
+    if (currentWord) {
+      setP15CurrentWord(currentWord);
+      console.log(`🔄 [P1.5] 同步当前单词到store: ${currentWord.word}`);
+    }
+  }, [currentWord, setP15CurrentWord]);
 
   // 重置状态
   useEffect(() => {

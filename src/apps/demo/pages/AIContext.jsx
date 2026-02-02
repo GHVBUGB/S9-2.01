@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import useWordStore from '../../../shared/store/useWordStore';
-import { getWordById } from '../../../shared/data/mockWords';
+import mockWords, { getWordById } from '../../../shared/data/mockWords';
 import SimpleHeader from '../components/SimpleHeader';
 import ModeSelection from './AIContext/ModeSelection';
 import StoryMode from './AIContext/StoryMode';
@@ -37,8 +37,23 @@ const AIContext = () => {
 
   useEffect(() => {
     if (initialized && yellowWords.length > 0) {
+      // 获取前5个黄词用于第一篇故事
       const wordList = yellowWords.slice(0, 5).map(state => getWordById(state.wordId)).filter(Boolean);
-      setWords(wordList);
+      
+      // 添加第二篇故事需要的额外单词（通过id直接获取）
+      const additionalWordIds = [3, 12, 29]; // nervous, challenge, trouble
+      const additionalWords = additionalWordIds.map(id => getWordById(id)).filter(Boolean);
+      
+      // 合并所有单词（去重）
+      const allWords = [...wordList];
+      additionalWords.forEach(word => {
+        if (!allWords.find(w => w.id === word.id)) {
+          allWords.push(word);
+        }
+      });
+      
+      console.log('All words for stories:', allWords.map(w => `${w.word} (id:${w.id})`));
+      setWords(allWords);
     }
   }, [initialized, yellowWords]);
 
@@ -96,21 +111,19 @@ const AIContext = () => {
       {
         group: "Group B: 自然探索 (Nature Exploration)",
         title: "The Changing Weather",
-        content: words.length >= 6 ? [
-          "The weather suddenly changed. It is hard for small plants to ",
-          { wordId: words[6]?.id, text: words[6]?.word || "survive" },
-          " in such a bad ",
-          { wordId: words[1]?.id, text: words[1]?.word || "environment" },
-          ". We saw some ",
-          { wordId: words[9]?.id, text: words[9]?.word || "damage" },
-          ". We must protect the animals from ",
-          { wordId: words[10]?.id, text: words[10]?.word || "danger" },
+        content: [
+          "The weather suddenly changed. It is a big ",
+          { wordId: 12, text: "challenge" },  // challenge id: 12
+          " for small plants in this bad ",
+          { wordId: 2, text: "environment" },  // environment id: 2
+          ". Many animals feel ",
+          { wordId: 3, text: "nervous" },  // nervous id: 3
+          ". We must help them avoid ",
+          { wordId: 29, text: "trouble" },  // trouble id: 29
           "."
-        ] : [
-          "The weather suddenly changed. It is hard for small plants to survive in such a bad environment. We saw some damage. We must protect the animals from danger."
         ],
-        question: "Is it hard for plants to survive there?",
-        options: ["A. Yes", "B. No"],
+        question: "How do the animals feel?",
+        options: ["A. Nervous", "B. Happy"],
         correctAnswer: 0
       }
     ]
