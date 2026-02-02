@@ -80,14 +80,14 @@ const AIContext = () => {
         title: "Tom's New School",
         content: words.length >= 3 ? [
           "Tom felt nervous. The ",
-          { wordId: words[0]?.id, text: words[0]?.word || "rules" },
+          { wordId: words[1]?.id, text: words[1]?.word || "environment" },
           " in his new school were very strict. He had to wear a blue uniform. It was hard to ",
-          { wordId: words[1]?.id, text: words[1]?.word || "adapt" },
+          { wordId: words[0]?.id, text: words[0]?.word || "adapt" },
           " at first. But after he passed the exam, he made a new friend, Jerry. Jerry was always ",
           { wordId: words[2]?.id, text: words[2]?.word || "shy" },
           " but very kind."
         ] : [
-          "Tom felt nervous. The rules in his new school were very strict. He had to wear a blue uniform. It was hard to adapt at first. But after he passed the exam, he made a new friend, Jerry."
+          "Tom felt nervous. The environment in his new school were very strict. He had to wear a blue uniform. It was hard to adapt at first. But after he passed the exam, he made a new friend, Jerry."
         ],
         question: "Who is Tom's new friend?",
         options: ["A. Jerry", "B. Bob"],
@@ -96,7 +96,17 @@ const AIContext = () => {
       {
         group: "Group B: 自然探索 (Nature Exploration)",
         title: "The Changing Weather",
-        content: [
+        content: words.length >= 6 ? [
+          "The weather suddenly changed. It is hard for small plants to ",
+          { wordId: words[6]?.id, text: words[6]?.word || "survive" },
+          " in such a bad ",
+          { wordId: words[1]?.id, text: words[1]?.word || "environment" },
+          ". We saw some ",
+          { wordId: words[9]?.id, text: words[9]?.word || "damage" },
+          ". We must protect the animals from ",
+          { wordId: words[10]?.id, text: words[10]?.word || "danger" },
+          "."
+        ] : [
           "The weather suddenly changed. It is hard for small plants to survive in such a bad environment. We saw some damage. We must protect the animals from danger."
         ],
         question: "Is it hard for plants to survive there?",

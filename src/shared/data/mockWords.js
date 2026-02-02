@@ -40,7 +40,7 @@ const mockWords = [
       memoryTips: ['adapt 有 a，像张开嘴适应', 'adopt 有 o，像圆圆的怀抱收养'],
     },
     visual: {
-      imageUrl: '/images/adapt.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&auto=format&fit=crop',
       description: 'A chameleon changing color on a green leaf.',
     },
     // Phase 2 训练专用数据
@@ -84,7 +84,7 @@ const mockWords = [
       memoryTips: ['environment 很长，就像环境包围着我们'],
     },
     visual: {
-      imageUrl: '/images/environment.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop',
       description: 'Hands holding a small green earth.',
     },
     training: {
@@ -127,7 +127,7 @@ const mockWords = [
       memoryTips: ['nervous 有 nerve（神经），神经紧张'],
     },
     visual: {
-      imageUrl: '/images/nervous.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&auto=format&fit=crop',
       description: 'A student sweating while looking at a clock.',
     },
     training: {
@@ -170,7 +170,7 @@ const mockWords = [
       memoryTips: ['introduce = intro(引入) + duce(导致)'],
     },
     visual: {
-      imageUrl: '/images/introduce.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?w=800&auto=format&fit=crop',
       description: 'Two students shaking hands with name tags.',
     },
     training: {
@@ -213,7 +213,7 @@ const mockWords = [
       memoryTips: ['shy 只有3个字母，像害羞的人说话很少'],
     },
     visual: {
-      imageUrl: '/images/shy.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop',
       description: 'A girl hiding her face behind a book.',
     },
     training: {
@@ -256,7 +256,7 @@ const mockWords = [
       memoryTips: ['active = act(行动) + ive，爱行动就活跃'],
     },
     visual: {
-      imageUrl: '/images/active.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=800&auto=format&fit=crop',
       description: 'Kids running and jumping in P.E. class.',
     },
     training: {
@@ -299,7 +299,7 @@ const mockWords = [
       memoryTips: ['join 像连接两个东西'],
     },
     visual: {
-      imageUrl: '/images/join.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&auto=format&fit=crop',
       description: 'A puzzle piece fitting into a group.',
     },
     training: {
@@ -342,7 +342,7 @@ const mockWords = [
       memoryTips: ['practice 要反复做(pract)'],
     },
     visual: {
-      imageUrl: '/images/practice.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop',
       description: 'A girl playing violin with musical notes.',
     },
     training: {
@@ -385,7 +385,7 @@ const mockWords = [
       memoryTips: ['improve = im(进入) + prove(证明)，证明变好了'],
     },
     visual: {
-      imageUrl: '/images/improve.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop',
       description: 'A chart arrow going up showing growth.',
     },
     training: {
@@ -428,7 +428,7 @@ const mockWords = [
       memoryTips: ['skill = s + kill，像超级杀手的技能'],
     },
     visual: {
-      imageUrl: '/images/skill.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop',
       description: 'A toolbox with hammer and wrench.',
     },
     training: {
@@ -854,7 +854,7 @@ const mockWords = [
     ],
     logic: {
       mnemonic: 'tr(突然)+u(你)+st(石头)→变成石头也信你。',
-      etymology: 'Norse traust(strong)',
+      etymology: 'trust(from Norse traust)',
       memoryTips: ['trust 听起来很坚定，像信任一样坚定'],
     },
     visual: {
