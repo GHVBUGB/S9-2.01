@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Scripts with sensitive tokens
+push_final.ps1
+push_to_github.ps1
+test_output.ps1
+test_push.ps1
+push_with_token.ps1
+force_push.ps1
+verify_push.ps1
+最终推送方案.ps1
+手动推送指南.md
+push_output.txt
